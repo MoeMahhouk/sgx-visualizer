@@ -1,0 +1,32 @@
+#ifndef LINE_H
+#define LINE_H
+
+#include "Renderable.h"
+
+namespace moe {
+
+    class Line : public Renderable {
+
+    public :
+        Line(Transform2D transform  = Transform2D(), qreal xTarget = 0, qreal yTarget = 0, qreal penWidth = 4, QPen* pen = new QPen(Qt::black));
+        //Line():Line(Transform2D()){}
+
+
+
+        qreal yTarget() const;
+        void setYTarget(const qreal &lineDepth);
+
+        void setXTarget_(qreal xTarget);
+
+    protected:
+        virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
+
+    private:
+        qreal xTarget_;
+        qreal yTarget_;
+        QPen* pen_;
+    };
+
+}
+
+#endif // LINE_H

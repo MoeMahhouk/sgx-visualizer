@@ -1,0 +1,33 @@
+# Directories and files
+set(AM_CMAKE_BINARY_DIR "/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/")
+set(AM_CMAKE_SOURCE_DIR "/home/moe/ClionProjekte/scene/Scene/")
+set(AM_CMAKE_CURRENT_SOURCE_DIR "/home/moe/ClionProjekte/scene/Scene/")
+set(AM_CMAKE_CURRENT_BINARY_DIR "/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/")
+set(AM_CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE "")
+set(AM_BUILD_DIR "/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/Scene_autogen")
+set(AM_SOURCES "/home/moe/ClionProjekte/scene/Scene/src/LabeledRect.cpp;/home/moe/ClionProjekte/scene/Scene/src/Line.cpp;/home/moe/ClionProjekte/scene/Scene/src/MainWindow.cpp;/home/moe/ClionProjekte/scene/Scene/src/MeasureLine.cpp;/home/moe/ClionProjekte/scene/Scene/src/MeasureScaleLine.cpp;/home/moe/ClionProjekte/scene/Scene/src/Rect.cpp;/home/moe/ClionProjekte/scene/Scene/src/SequenceDiagram.cpp;/home/moe/ClionProjekte/scene/Scene/src/TitleText.cpp;/home/moe/ClionProjekte/scene/Scene/src/main.cpp")
+set(AM_HEADERS "/home/moe/ClionProjekte/scene/Scene/include/LabeledRect.h;/home/moe/ClionProjekte/scene/Scene/include/Line.h;/home/moe/ClionProjekte/scene/Scene/include/MainWindow.h;/home/moe/ClionProjekte/scene/Scene/include/MeasureLine.h;/home/moe/ClionProjekte/scene/Scene/include/MeasureScaleLine.h;/home/moe/ClionProjekte/scene/Scene/include/Rect.h;/home/moe/ClionProjekte/scene/Scene/include/RenderBeispielVongPaul.h;/home/moe/ClionProjekte/scene/Scene/include/Renderable.h;/home/moe/ClionProjekte/scene/Scene/include/SequenceDiagram.h;/home/moe/ClionProjekte/scene/Scene/include/TitleText.h;/home/moe/ClionProjekte/scene/Scene/include/Transform2D.h")
+# Qt environment
+set(AM_QT_VERSION_MAJOR "5")
+set(AM_QT_MOC_EXECUTABLE "/usr/lib/x86_64-linux-gnu/qt5/bin/moc")
+set(AM_QT_UIC_EXECUTABLE )
+set(AM_QT_RCC_EXECUTABLE )
+# MOC settings
+set(AM_MOC_SKIP "")
+set(AM_MOC_DEFINITIONS "QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB")
+set(AM_MOC_INCLUDES "/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/Scene_autogen/include;/home/moe/ClionProjekte/scene/Scene/include;/usr/include/x86_64-linux-gnu/qt5;/usr/include/x86_64-linux-gnu/qt5/QtWidgets;/usr/include/x86_64-linux-gnu/qt5/QtGui;/usr/include/x86_64-linux-gnu/qt5/QtCore;/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64;/usr/include")
+set(AM_MOC_OPTIONS "")
+set(AM_MOC_RELAXED_MODE "FALSE")
+set(AM_MOC_DEPEND_FILTERS "")
+set(AM_MOC_PREDEFS_CMD "/usr/bin/c++;-dM;-E;-c;/home/moe/clion-2017.2.3/bin/cmake/share/cmake-3.9/Modules/CMakeCXXCompilerABI.cpp")
+# UIC settings
+set(AM_UIC_SKIP )
+set(AM_UIC_TARGET_OPTIONS )
+set(AM_UIC_OPTIONS_FILES )
+set(AM_UIC_OPTIONS_OPTIONS )
+set(AM_UIC_SEARCH_PATHS )
+# RCC settings
+set(AM_RCC_SOURCES  )
+set(AM_RCC_INPUTS )
+set(AM_RCC_OPTIONS_FILES )
+set(AM_RCC_OPTIONS_OPTIONS )

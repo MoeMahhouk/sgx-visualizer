@@ -1,0 +1,33 @@
+//
+// Created by moe on 17.11.17.
+//
+
+#ifndef SCENE_BLOCKTITLE_H
+#define SCENE_BLOCKTITLE_H
+
+#include <QGraphicsSimpleTextItem>
+#include "Renderable.h"
+
+namespace moe {
+    class TitleText : public Renderable {
+    protected:
+    public:
+        //TitleText(Transform2D transform) : Renderable(transform) {}
+        TitleText(Transform2D transform = Transform2D(),const QString &title_ = "",int fontSize = 12, int xOffset = 6, int yOffset = -16);
+        //TitleText():TitleText(Transform2D(), ""){}
+
+        void setTitle_(const QString &title);
+        const QString &getTitle_() const;
+
+    protected:
+        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+
+    private:
+        QString title_;
+        int fontSize_, xOffset_, yOffset_;
+    };
+
+}
+
+
+#endif //SCENE_BLOCKTITLE_H

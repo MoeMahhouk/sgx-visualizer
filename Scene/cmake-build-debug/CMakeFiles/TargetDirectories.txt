@@ -1,4 +1,0 @@
-/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/CMakeFiles/Scene.dir
-/home/moe/ClionProjekte/scene/Scene/cmake-build-debug/CMakeFiles/Scene_autogen.dir

@@ -17,17 +17,15 @@ namespace moe{
 
         SequenceDiagram(Transform2D transform, QString topBlockLabel);
         Renderable *getSequenceLine_() const;
-
         Renderable *getOffsetForLine_() const;
-
-        //LabeledRect *getTopBlock_() const;
-
-         const LabeledRect &getTopBlock_() const;
-
+        virtual ~SequenceDiagram();
+        const LabeledRect &getTopBlock_() const;
+        qreal getLineScale();
+        void setLineScale(qreal scale);
+        void resetLineScales();
     protected:
-
+        void addBlock(qreal createdTime, qreal endTime);
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
-
     private:
         LabeledRect topBlock_;
         Renderable* offsetForLine_;

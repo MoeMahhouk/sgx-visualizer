@@ -17,13 +17,14 @@ namespace moe{
         Line& getMeasureLine_();
 
         void generateScales(qreal yScale, int yOffset);
+        void resetScales();
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:
         Line measureLine_;
         int height_ = 0;
-        QVector<MeasureScaleLine> measureLines_ = QVector<MeasureScaleLine>(0);
+        QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
     };
 
 }

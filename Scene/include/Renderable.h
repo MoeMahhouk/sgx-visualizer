@@ -4,27 +4,41 @@
 #include <iostream>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <typeindex>
 #include "Transform2D.h"
 
 namespace moe {
     struct SceneData {
         QGraphicsScene* scene;
+        std::string indent = "";
+
+        SceneData(QGraphicsScene* scene) : scene(scene) {}
     };
 
     class Renderable {
 
     public:
+        std::string name = "Renderable";
 
         QVector<Renderable*> children_;
 
         Renderable(Transform2D transform = Transform2D()) {
             relativeTransform_ = transform;
         }
+        //does not allow copy constructor
+        Renderable ( const Renderable & ) = delete;
+
+        virtual ~Renderable() {
+            this->children_.clear();
+        }
 
         Transform2D& getTransform() {
             return relativeTransform_;
         }
 
+       /* const Transform2D& getTransform() const{
+            return relativeTransform_;
+        }*/
         void setTransform(const Transform2D &transform) {
             relativeTransform_ = transform;
         }
@@ -36,8 +50,18 @@ namespace moe {
 
             draw(sceneData, parentTransform);
 
-            for(Renderable* child: children_)
+            std::string myIndent = sceneData.indent;
+            sceneData.indent += "\t";
+
+            std::cout << myIndent << name << " " << this << std::endl;
+
+            for(Renderable* child: children_) {
+                std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
                 child->render(sceneData, absoluteTransform_);
+            }
+            sceneData.indent = myIndent;
+
+            std::cout << myIndent << "done" << std::endl;
         }
     protected:
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) = 0;
@@ -50,7 +74,9 @@ namespace moe {
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) {}
     public:
 
-        EmptyRenderable(Transform2D transform = Transform2D()) : Renderable(transform) {}
+        EmptyRenderable(Transform2D transform = Transform2D()) : Renderable(transform) {
+            name = "Empty";
+        }
 
     };
 

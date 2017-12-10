@@ -31,6 +31,9 @@ private slots:
     void scrollDownPressed();
     void scrollRightPressed();
     void scrollLeftPressed();
+
+protected:
+    void wheelEvent ( QWheelEvent * event );
 private:
 
     //moe::Renderable *sceneRootNodeOffset_;
@@ -42,7 +45,7 @@ private:
     //QVector<moe::Renderable*> renderables;
     //QVector<moe::Renderable*> lineRenderables;
 
-    moe::Transform2D sceneTransformation = moe::Transform2D();
+    moe::Transform2D sceneTransformation = moe::Transform2D(1,0,0,1,0,0);
     //moe::Line *lineMeasureTest2;
     moe::SequenceDiagram *sequenceDiagram;
     //moe::Rect *topElement;

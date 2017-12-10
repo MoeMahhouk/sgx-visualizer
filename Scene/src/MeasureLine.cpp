@@ -11,13 +11,16 @@ void moe::MeasureLine::draw(moe::SceneData &sceneData, moe::Transform2D &parentT
     return;
 }
 
-moe::MeasureLine::MeasureLine(Transform2D transform, qreal lineDepth, int scaleLines) : Renderable(transform), height_(lineDepth)
+moe::MeasureLine::MeasureLine(Transform2D transform, qreal lineDepth, int scaleLines) : Renderable(transform), height_(lineDepth),
+                                                                                        measureLine_ (Transform2D(),0 ,lineDepth,2)
 {
-    measureLines_ = QVector<MeasureScaleLine>(scaleLines);
-    measureLine_ = moe::Line(Transform2D(),0 ,height_,2);
+    name = "MeasureLine";
 
-    for (MeasureScaleLine &scaleLine : measureLines_) {
-        measureLine_.children_.push_back(&scaleLine);
+    measureLines_ = QVector<MeasureScaleLine*>(scaleLines);
+
+    for (int i = 0; i < scaleLines; ++i) {
+        measureLines_[i] = new MeasureScaleLine();
+        measureLine_.children_.push_back(measureLines_[i]);
     }
 
     children_.push_back(&measureLine_);
@@ -38,10 +41,10 @@ void moe::MeasureLine::generateScales(qreal yScale, int yOffset) {
     */
     qreal i = 0;
     qreal step = height_ / (scaleLines-1);
-    for (MeasureScaleLine &scaleLine : measureLines_) {
-        scaleLine.setTransform(Transform2D(1,0,0,1,0,i));
-        scaleLine.setXTarget(2);
-        scaleLine.setText(QString::number((yOffset/yScale) + (i/yScale)));
+    for (MeasureScaleLine *scaleLine : measureLines_) {
+        scaleLine->setTransform(Transform2D(1,0,0,1,0,i));
+        scaleLine->setXTarget(2);
+        scaleLine->setText(QString::number((yOffset/yScale) + (i/yScale)));
         i += step;
     }
 
@@ -66,6 +69,11 @@ void moe::MeasureLine::generateScales(qreal yScale, int yOffset) {
         }
         isMiniScaled = true;
     }*/
+}
+
+void moe::MeasureLine::resetScales() {
+    measureLine_.getTransform().setYScale(1);
+    measureLine_.getTransform().setXScale(1);
 }
 
 

@@ -21,9 +21,7 @@ namespace moe {
         Transform2D(const QTransform& copy) : QTransform(copy) {}
 
         // concatinates the transformations together so that if the parent objects get transformed,
-        // his childrents gets transformed automatically according to their parents changes
-
-
+        // his childrens get transformed automatically according to their parents' changes
         Transform2D operator*(const Transform2D &transform) {
            // return Transform2D(this->qTransform * transform.qTransform);
             return Transform2D(*static_cast<QTransform*>(this) * transform);

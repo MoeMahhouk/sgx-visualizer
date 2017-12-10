@@ -13,6 +13,9 @@ namespace moe {
     public:
         LabeledRect(Transform2D transform = Transform2D(), qreal width=0, qreal height=0, QString title = "",
                     QPen* pen = new QPen(Qt::red), QBrush* brush  = new QBrush(Qt::blue));
+
+        virtual ~LabeledRect();
+
         const TitleText &getLabel_() const;
         void setLabelText (const QString &labelText);
 

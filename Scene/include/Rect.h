@@ -24,8 +24,6 @@ namespace moe {
 
     protected:
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
-        //Renderable* blockTitle_;
-        //QString title_;
         qreal width_, height_;
         QPen* pen_;
         QBrush* brush_;

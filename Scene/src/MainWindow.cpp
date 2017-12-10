@@ -25,103 +25,75 @@ void MainWindow::open()
         loadFile(fileName);
 }
 
-void MainWindow::onZoomInPressed() {
 
-    /*for (moe::SequenceDiagram* r: sequenceList) {
-        r->getSequenceLine_()->getTransform().setYScale(r->getSequenceLine_()->getTransform().yScale() * 1.2 );
-
-    }*/
-
-   // std::cout << size().width() << " | "  << size().height() << "\n" <<endl;
-
-    //measureLine_->getMeasureLine_().getTransform().setYScale(measureLine_->getMeasureLine_().getTransform().yScale() * 1.2);
-//before changing the measureLine
-    for (moe::Renderable* r: sequenceListNode_->children_) {
-        ((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().setYScale(((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().yScale() * 1.2 );
+void MainWindow::wheelEvent(QWheelEvent *event) {
+    for (moe::Renderable* r: sequenceListNode_->children_)
+    {
+        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
+        s->setLineScale(pow((double)2, event->delta() / 240.0));
     }
-    //sequenceListNode_->getTransform().setYScale(sequenceListNode_->getTransform().yScale() * 1.2);
-    measureLine_->generateScales((sequenceDiagram->getSequenceLine_()->getTransform().yScale()),
-                                 -sequenceListNode_->getTransform().getY());
+    measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
     render();
-    std::cout << measureLine_->getMeasureLine_().getTransform().yScale() << "\n" << std::endl;
-    //QPoint sceneCord = mapFrom()
-    /*qDebug() << scene_->sceneRect().topLeft()
-             << scene_->sceneRect().bottomRight();
-    qDebug() << view_->rect().topLeft() << view_->rect().bottomRight();
-    qDebug() << this->rect().topLeft() << this->rect().bottomRight();
-    qDebug() << menuBar()->rect();*/
-    /*for(moe::Renderable* r: renderables){
-        qDebug() << (r->getTransform().getX()) << (r->getTransform().getY());
+    std::cout <<pow((double)2, event->delta() / 240.0)<< std::endl;
+}
 
-    }*/
-    //qDebug() << lineOfTopElement2->getTransform().yScale();
-    //std::cout << lineOfTopElement2->getTransform().yScale() << "\n" << endl;
-    //std::cout << lineOfTopElement2->getTransform().getY() << "\n" << endl;
+void MainWindow::onZoomInPressed()
+{
+    for (moe::Renderable* r: sequenceListNode_->children_)
+    {
+        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
+        s->setLineScale(1.2);
+    }
+    measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
+    render();
 }
 
 void MainWindow::onZoomOutPressed()
 {
-    //measureLine_->getMeasureLine_().getTransform().setYScale(measureLine_->getMeasureLine_().getTransform().yScale() * (1/1.2));//before changing the measureLine
-
-    for (moe::Renderable* r: sequenceListNode_->children_) {
-        ((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().setYScale(((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().yScale() * (1/1.2) );
-    }
-    measureLine_->generateScales((sequenceDiagram->getSequenceLine_()->getTransform().yScale()), -sequenceListNode_->getTransform().getY());
-    /*for (moe::Renderable* r: sequenceListNode_->children_)
+    for (moe::Renderable* r: sequenceListNode_->children_)
     {
-        r->getLine()->getTransform().setYScale(r->getLine()->getTransform().yScale() * (1/1.2));
-    }*/
+        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
+        s->setLineScale(1/1.2);
+    }
+    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
-    //qDebug() << lineOfTopElement2->getTransform().yScale();
 }
 
 void MainWindow::resetPressed()
 {
-    /*for(moe::SequenceDiagram* r : sequenceList)
+    measureLine_->resetScales();
+    for (moe::Renderable* r: sequenceListNode_->children_)
     {
-        r->getSequenceLine_()->getTransform().setXScale(1);
-        r->getSequenceLine_()->getTransform().setYScale(1);
-    }*/
-    measureLine_->getMeasureLine_().getTransform().setXScale(1);
-    measureLine_->getMeasureLine_().getTransform().setYScale(1);
-    for (moe::Renderable* r: sequenceListNode_->children_) {
-
-        ((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().setXScale(1);
-        ((moe::SequenceDiagram *)r)->getSequenceLine_()->getTransform().setYScale(1);
-
+        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
+        s->resetLineScales();
     }
     sequenceListNode_->setTransform(moe::Transform2D());
-   // sceneTransformation = moe::Transform2D(); //before changing the measureLine
-    measureLine_->generateScales((sequenceDiagram->getSequenceLine_()->getTransform().yScale()), sequenceListNode_->getTransform().getY());
-    //MeasureLine->getTransform().setXScale(1);
-    //MeasureLine->getTransform().setYScale(1);
+    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
-void MainWindow::scrollUpPressed() {
-   // sceneTransformation.setY(sceneTransformation.getY() + 20); //before changing the measureLine
-
+void MainWindow::scrollUpPressed()
+{
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,20));
-    measureLine_->generateScales((sequenceDiagram->getSequenceLine_()->getTransform().yScale()), -sequenceListNode_->getTransform().getY());
-    //measureLine_->getTransform().setTransfor(measureLine_->getTransform().getTransfor() * QTransform(1,0,0,1,0,20));
+    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
-void MainWindow::scrollDownPressed() {
-   // sceneTransformation.setY(sceneTransformation.getY() - 20);//before changing the measureLine
-
+void MainWindow::scrollDownPressed()
+{
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,-20));
-    measureLine_->generateScales((sequenceDiagram->getSequenceLine_()->getTransform().yScale()), -sequenceListNode_->getTransform().getY());
-    //measureLine_->getTransform().setTransfor(measureLine_->getTransform().getTransfor() * QTransform(1,0,0,1,0,-20));
+    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
-void MainWindow::scrollRightPressed() {
+void MainWindow::scrollRightPressed()
+{
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,-20,0));
     render();
 }
 
-void MainWindow::scrollLeftPressed() {
+void MainWindow::scrollLeftPressed()
+{
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }
@@ -130,7 +102,6 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
-
     viewMenu_ = menuBar()->addMenu(tr("View"));
     menuBar()->addSeparator();
     helpMenu_ = menuBar()->addMenu(tr("Help"));
@@ -158,7 +129,6 @@ void MainWindow::createToolbar()
 
 void MainWindow::drawScene()
 {
-
     scene_ = new QGraphicsScene(this);
     QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
     QPushButton* scrollDown = new QPushButton(tr("Scroll Down"), this);
@@ -187,39 +157,28 @@ void MainWindow::drawScene()
     scene_->setSceneRect(view_->rect());
     //zoomIn->setFixedSize(20,20);
     //zoomIn->setParent(view_);
-    //std:: cout << scene_->sceneRect().center().x() << " and y is :" << scene_->sceneRect().center().y() << "\n" << endl;
-    //sceneRootNodeOffset_ = new moe::EmptyRenderable();
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
-    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(QTransform(1,0,0,1, 60,scene_->sceneRect().center().y()/4)),tr("test1"));
-
-    //std:: cout << "scenes cord after seqdiag" <<scene_->sceneRect().center().x() << " and y is :" << scene_->sceneRect().center().y() << "\n" << endl;
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(QTransform(1,0,0,1,
+    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, 60,scene_->sceneRect().center().y()/4),tr("test1"));
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,
                                                                     scene_->sceneRect().x()+10,
-                                                                    sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight())),
+                                                                    sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight()),
             500, 26);
-    //sceneRootNodeOffset_->children_.push_back(sceneRootNode_);
-
+std::cout << "MainWindow 1" << std::endl;
     sceneRootNode_->children_.push_back(sequenceListNode_);
+    std::cout << "MainWindow 2" << std::endl;
     sceneRootNode_->children_.push_back(measureLine_);
+    std::cout << "MainWindow 3" << std::endl;
     sequenceListNode_->children_.push_back(sequenceDiagram);
-    //std:: cout << "measureline cord" << measureLine_->getTransform().getX() << "and y is : " << measureLine_->getTransform().getY() << "\n" <<endl;
-    //renderables.push_back(sequenceDiagram);
-    //renderables.push_back(measureLine_);
-    //sequenceList.push_back(sequenceDiagram);
+    std::cout << "MainWindow 4" << std::endl;
     render();
 }
 
 void MainWindow::render() {
     scene_->clear();
-
     scene_->setBackgroundBrush(Qt::lightGray);
-
     moe::SceneData data{scene_};
-    /*for (moe::Renderable* r: renderables)
-        r->render(data, sceneTransformation);*/
     sceneRootNode_->render(data, sceneTransformation);
-    //MeasureLine->render(data,sceneTransformation);
     scene_->update();
     view_->show();
 }
@@ -253,3 +212,4 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
     view_->update();
 }
+

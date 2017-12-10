@@ -4,6 +4,7 @@
 moe::Line::Line(Transform2D transform,qreal xTarget,qreal yTarget, qreal penWidth, QPen* pen) :
         Renderable(transform),xTarget_(xTarget) ,yTarget_(yTarget), pen_(pen)
 {
+    name = "Line";
     //std::cout << "line created" << std::endl;
     pen_->setWidth(penWidth);
 }

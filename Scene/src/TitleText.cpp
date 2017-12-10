@@ -13,7 +13,8 @@ void moe::TitleText::draw(moe::SceneData &sceneData, moe::Transform2D &parentTra
 moe::TitleText::TitleText(moe::Transform2D transform, const QString &title_, int fontSize, int xOffset, int yOffset) :
         Renderable(transform), title_(title_), fontSize_(fontSize), xOffset_(xOffset), yOffset_(yOffset)
 {
-    std::cout << "Title text created with the title : " << title_.toStdString() << std::endl;
+    name = "TitleText";
+
 }
 
 void moe::TitleText::setTitle_(const QString &title) {

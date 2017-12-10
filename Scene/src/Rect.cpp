@@ -6,15 +6,11 @@
 
 moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBrush* brush) : Renderable(transform)
 {
-    //blockTitle_ = new moe::TitleText(Transform2D(),title);
-    //children_.push_back(blockTitle_);
-    //title_ = title;
+    name = "Rect";
     width_ = width;
     height_ = height;
     pen_ = pen;
     brush_ = brush;
-    std::cout << "normal rect created" << std::endl;
-
 }
 
 

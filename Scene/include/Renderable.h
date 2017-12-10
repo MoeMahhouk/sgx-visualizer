@@ -36,9 +36,10 @@ namespace moe {
             return relativeTransform_;
         }
 
-       /* const Transform2D& getTransform() const{
+        const Transform2D& getTransform() const{
             return relativeTransform_;
-        }*/
+        }
+
         void setTransform(const Transform2D &transform) {
             relativeTransform_ = transform;
         }

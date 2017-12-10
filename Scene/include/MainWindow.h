@@ -9,12 +9,13 @@
 #include "Line.h"
 #include "SequenceDiagram.h"
 #include "MeasureLine.h"
+#include "Notifier.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public moe::Notifier
 {
     Q_OBJECT
 

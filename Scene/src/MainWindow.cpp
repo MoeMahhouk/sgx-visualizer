@@ -32,7 +32,9 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->setLineScale(pow((double)2, event->delta() / 240.0));
     }
-    measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
+
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::ZOOM);
+    //measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
     render();
     std::cout <<pow((double)2, event->delta() / 240.0)<< std::endl;
 }
@@ -44,7 +46,8 @@ void MainWindow::onZoomInPressed()
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->setLineScale(1.2);
     }
-    measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::ZOOM);
+    //measureLine_->generateScales((sequenceDiagram->getLineScale()), -sequenceListNode_->getTransform().getY());
     render();
 }
 
@@ -55,34 +58,39 @@ void MainWindow::onZoomOutPressed()
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->setLineScale(1/1.2);
     }
-    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::ZOOM);
+
+    //measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
 void MainWindow::resetPressed()
 {
-    measureLine_->resetScales();
+    //measureLine_->resetScales();
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->resetLineScales();
     }
     sequenceListNode_->setTransform(moe::Transform2D());
-    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::RESET);
+    //measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
 void MainWindow::scrollUpPressed()
 {
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,20));
-    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::SCROLL);
+    //measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
 void MainWindow::scrollDownPressed()
 {
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,-20));
-    measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
+    notify(*sequenceDiagram->getSequenceLine_(),*sequenceListNode_,moe::Observer::SCROLL);
+    //measureLine_->generateScales(sequenceDiagram->getLineScale(), -sequenceListNode_->getTransform().getY());
     render();
 }
 
@@ -164,6 +172,10 @@ void MainWindow::drawScene()
                                                                     scene_->sceneRect().x()+10,
                                                                     sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight()),
             500, 26);
+
+    //Event listner test
+    registerObserver(measureLine_);
+    //
 std::cout << "MainWindow 1" << std::endl;
     sceneRootNode_->children_.push_back(sequenceListNode_);
     std::cout << "MainWindow 2" << std::endl;

@@ -31,9 +31,9 @@ namespace moe
         }
 
     protected:
-        virtual void notify(const Renderable& renderable1, const Renderable& renderable2, Observer::Event event)
+        virtual void notify(Event* event)
         {
-            std::for_each(observers_.begin(),observers_.end(), [&](Observer* observer) {observer->onNotify(renderable1, renderable2, event);});
+            std::for_each(observers_.begin(),observers_.end(), [&](Observer* observer) {observer->onNotify(event);});
         }
     private:
         QSet<Observer*> observers_;

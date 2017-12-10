@@ -52,8 +52,19 @@ void moe::MeasureLine::resetScales() {
     measureLine_.getTransform().setXScale(1);
 }
 
-void moe::MeasureLine::onNotify(const Renderable &renderable1, const Renderable& renderable2, Observer::Event event) {
-    switch (event)
+void moe::MeasureLine::onNotify(Event* event) {
+    if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event)) {
+        generateScales(zoom->r1->getTransform().yScale(), -zoom->r2->getTransform().getY());
+
+    } else if (ScrollEvent *scroll = dynamic_cast<ScrollEvent*>(event)) {
+        generateScales(scroll->r1->getTransform().yScale(), -scroll->r2->getTransform().getY());
+
+    } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event)) {
+        resetScales();
+        generateScales(reset->r1->getTransform().yScale(), -reset->r2->getTransform().getY());
+
+    }
+    /*switch (event)
     {
         case RESET:
             resetScales();
@@ -63,7 +74,7 @@ void moe::MeasureLine::onNotify(const Renderable &renderable1, const Renderable&
         case SCROLL:
             generateScales(renderable1.getTransform().yScale(), -renderable2.getTransform().getY());
             break;
-    }
+    }*/
 }
 
 

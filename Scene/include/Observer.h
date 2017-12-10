@@ -9,17 +9,34 @@
 
 namespace moe
 {
+    struct Event {
+        virtual ~Event(){}
+        virtual void doSmthn() {};
+    };
+
+    struct ZoomEvent : public Event {
+        Renderable* r1, *r2;
+        ZoomEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+    };
+
+    struct ResetEvent : public Event {
+        Renderable* r1, *r2;
+        ResetEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+
+    };
+
+    struct ScrollEvent : public Event {
+        Renderable* r1, *r2;
+        ScrollEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+
+    };
+
     class Observer
     {
     public:
-        enum Event
-        {
-            RESET=0,
-            ZOOM,
-            SCROLL
-        };
+
         virtual ~Observer() {}
-        virtual void onNotify(const Renderable& renderable1, const Renderable& renderable2, Event event) = 0;
+        virtual void onNotify(Event* event) = 0;
     };
 }
 

@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
    // delete ui;
+	delete sceneRootNode_;
 }
 
 

@@ -11,6 +11,10 @@ namespace moe {
         Line(Transform2D transform  = Transform2D(), qreal xTarget = 0, qreal yTarget = 0, qreal penWidth = 4, QPen* pen = new QPen(Qt::black));
         //Line():Line(Transform2D()){}
 
+        virtual ~Line()
+        {
+            delete pen_;
+        }
 
 
         qreal yTarget() const;

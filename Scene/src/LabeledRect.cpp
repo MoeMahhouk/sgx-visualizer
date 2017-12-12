@@ -17,6 +17,7 @@ moe::LabeledRect::LabeledRect(Transform2D transform, qreal width, qreal height, 
 
 moe::LabeledRect::~LabeledRect() {
     std::cout << "LabeledRect is dying " << this << std::endl;
+    children_.removeAll(&label_);
 }
 
 const moe::TitleText &moe::LabeledRect::getLabel_() const {

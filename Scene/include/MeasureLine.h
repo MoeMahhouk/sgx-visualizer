@@ -14,6 +14,10 @@ namespace moe{
     class MeasureLine : public Renderable, public Observer {
     public:
         MeasureLine(Transform2D transform, qreal lineDepth, int scaleLines = 10);
+	    virtual ~MeasureLine()
+	    {
+		    children_.removeAll(&measureLine_);
+	    }
 
         Line& getMeasureLine_();
 

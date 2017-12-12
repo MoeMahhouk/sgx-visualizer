@@ -15,6 +15,12 @@ namespace moe {
     public:
         MeasureScaleLine(Transform2D transform = Transform2D(), qreal yPos = 0, qreal xTarget = 0, const QString &title_ = "");
 
+        virtual ~MeasureScaleLine()
+        {
+            children_.removeAll(&scaleLine_);
+            scaleLine_.children_.removeAll(&scaleText_);
+        }
+
         void setXTarget(qreal xTarget);
         void setText(const QString &title);
 

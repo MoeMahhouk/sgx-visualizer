@@ -29,6 +29,12 @@ namespace moe {
         Renderable ( const Renderable & ) = delete;
 
         virtual ~Renderable() {
+	        auto it = children_.begin();
+	        while (it != children_.end())
+	        {
+		        delete *it;
+		        it++;
+	        }
             this->children_.clear();
         }
 
@@ -78,6 +84,8 @@ namespace moe {
         EmptyRenderable(Transform2D transform = Transform2D()) : Renderable(transform) {
             name = "Empty";
         }
+
+	    virtual ~EmptyRenderable() = default;
 
     };
 

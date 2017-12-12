@@ -59,7 +59,7 @@ void moe::SequenceDiagram::resetLineScales() {
 }
 
 moe::SequenceDiagram::~SequenceDiagram() {
-//this->children_.clear();
+    children_.removeAll(&topBlock_);
 }
 
 void moe::SequenceDiagram::addBlock(qreal createdTime, qreal endTime) {

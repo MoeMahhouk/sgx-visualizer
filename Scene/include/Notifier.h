@@ -21,7 +21,7 @@ namespace moe
 
         virtual void unRegisterObersver(Observer* observer)
         {
-            QSet<Observer*>::const_iterator iter = observers_.find(observer);
+            QSet<Observer*>::iterator iter = observers_.find(observer);
             if(iter != observers_.end())
             {
                 observers_.erase(iter);

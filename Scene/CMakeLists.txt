@@ -19,9 +19,10 @@ file(GLOB SOURCE_FILES src/*.cpp)
 #take all .h files from include folder and add them to the HEADER_FILES variable
 file(GLOB HEADER_FILES include/*.h)
 
-set(LIB_DIR_LOCATION /usr/local/lib)
-find_library(SQLite3 NAMES sqlite3 PATHS ${LIB_DIR_LOCATION})
+#set(LIB_DIR_LOCATION /usr/local/lib)
+#find_library(SQLite3 REQUIRED NAMES sqlite3 PATHS ${LIB_DIR_LOCATION})
 set(INCLUDE_DIRS ${INCLUDE_DIRS} /usr/local/include)
+#message(Include: ${INCLUDE_DIRS})
 
 add_compile_options(
     -O0
@@ -41,5 +42,5 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
 #use the widgets module from Qt 5.
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets SQLite3)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets /usr/local/lib/libsqlite3.so)
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})

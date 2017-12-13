@@ -27,6 +27,7 @@ namespace moe{
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:
+		QString checkUnit(qreal scaleNumber);
         virtual void onNotify(Event* event) override ;
         Line measureLine_;
         int height_ = 0;

@@ -36,8 +36,6 @@ private slots:
 protected:
     void wheelEvent ( QWheelEvent * event );
 private:
-
-    //moe::Renderable *sceneRootNodeOffset_;
     moe::Renderable *sceneRootNode_;
     moe::Renderable *sequenceListNode_;
     moe::MeasureLine *measureLine_;

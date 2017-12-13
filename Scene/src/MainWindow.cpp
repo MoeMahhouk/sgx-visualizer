@@ -180,7 +180,7 @@ void MainWindow::drawScene()
     //zoomIn->setParent(view_);
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
-    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, 60,scene_->sceneRect().center().y()/4),tr("test1"));
+    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, 90,scene_->sceneRect().center().y()/4),tr("test1"));
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,
                                                                     scene_->sceneRect().x()+10,
                                                                     sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight()),
@@ -253,7 +253,7 @@ void MainWindow::loadFile(const QString& fileName)
     }
 
     /* Create SQL statement */
-    sql = "SELECT * from Threads";
+    sql = "SELECT * from Event_map";
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);

@@ -41,7 +41,8 @@ void moe::MeasureLine::generateScales(qreal yScale, int yOffset) {
     for (MeasureScaleLine *scaleLine : measureLines_) {
         scaleLine->setTransform(Transform2D(1,0,0,1,0,i));
         scaleLine->setXTarget(2);
-        scaleLine->setText(QString::number((yOffset/yScale) + (i/yScale)));
+        //scaleLine->setText(QString::number((yOffset/yScale) + (i/yScale),'e',2));
+        scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
         i += step;
     }
 
@@ -75,6 +76,18 @@ void moe::MeasureLine::onNotify(Event* event) {
             generateScales(renderable1.getTransform().yScale(), -renderable2.getTransform().getY());
             break;
     }*/
+}
+
+QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
+    if(scaleNumber >= pow(10,9)) {
+        return QString::number(scaleNumber / pow(10,9),'f',2) + "s";
+    } else if (scaleNumber >= pow(10,6)) {
+        return QString::number(scaleNumber / pow(10, 6), 'f', 2) + "ms";
+    } else if (scaleNumber >= pow(10,3)) {
+        return QString::number(scaleNumber / pow(10,3),'f',2) + "us";
+    } else {
+        return QString::number(scaleNumber,'f',2) + "ns";
+    }
 }
 
 

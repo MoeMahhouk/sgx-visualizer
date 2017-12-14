@@ -6,14 +6,12 @@
 #define SCENE_ECALL_H
 
 #include <string>
-
-namespace moe {
-    struct Ecall {
-        int id_, eid_, symbol_address_;
+#include "Call.h"
+namespace moe  {
+    struct Ecall : public Call{
         bool is_private_;
-        const std::string symbol_name_;
         Ecall(int id, int eid, int symbol_address, bool is_private, std::string symbol_name) :
-                id_(id), eid_(eid), symbol_address_(symbol_address), symbol_name_(symbol_name){}
+                Call(id, eid, symbol_address, symbol_name) , is_private_(is_private){}
     };
 }
 #endif //SCENE_ECALL_H

@@ -23,6 +23,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    int sqlite3_exec_callback(int argc, char **argv, char **azColName);
+
 private slots:
     void open();
     void onZoomInPressed();
@@ -62,6 +64,8 @@ private:
     void loadFile(const QString &fileName);
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
+
+    static int static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName);
 
     Ui::MainWindow *ui;
 

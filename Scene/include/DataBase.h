@@ -5,6 +5,7 @@
 #ifndef SCENE_DATABASE_H
 #define SCENE_DATABASE_H
 
+#include <QtCore/QVector>
 #include "MyThread.h"
 #include "Ecall.h"
 #include "Ocall.h"
@@ -13,6 +14,7 @@
 namespace moe {
 
     class DataBase {
+        QVector<MyThread*> threads;
 
     };
 

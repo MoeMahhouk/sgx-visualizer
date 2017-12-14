@@ -221,9 +221,8 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
-static int callback(void *data, int argc, char **argv, char **azColName){
+int sqlite3_exec_callback(int argc, char **argv, char **azColName){
     int i;
-    fprintf(stderr, "%s: ", (const char*)data);
 
     for(i = 0; i<argc; i++){
         printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
@@ -233,13 +232,16 @@ static int callback(void *data, int argc, char **argv, char **azColName){
     return 0;
 }
 
+int static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName){
+    return static_cast<MainWindow*>(data)->sqlite3_exec_callback(argc, argv, azColName);
+}
+
 void MainWindow::loadFile(const QString& fileName)
 {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
     char *sql;
-    const char* data = "Callback function called";
 
     /* Open database */
 
@@ -256,7 +258,7 @@ void MainWindow::loadFile(const QString& fileName)
     sql = "SELECT * from Event_map";
 
     /* Execute SQL statement */
-    rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
+    rc = sqlite3_exec(db, sql, &static_sqlite3_exec_callback, (void*)this, &zErrMsg);
 
     if( rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);

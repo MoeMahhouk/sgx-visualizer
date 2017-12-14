@@ -79,15 +79,25 @@ void moe::MeasureLine::onNotify(Event* event) {
 }
 
 QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
+    if (scaleNumber == 0) {
+        return QString::number(scaleNumber,'f',2);
+    }
     if(scaleNumber >= pow(10,9)) {
         return QString::number(scaleNumber / pow(10,9),'f',2) + "s";
     } else if (scaleNumber >= pow(10,6)) {
         return QString::number(scaleNumber / pow(10, 6), 'f', 2) + "ms";
     } else if (scaleNumber >= pow(10,3)) {
         return QString::number(scaleNumber / pow(10,3),'f',2) + "us";
-    } else {
+    } else if (scaleNumber >1) {
         return QString::number(scaleNumber,'f',2) + "ns";
+    } else if (scaleNumber * pow(10,3) > 1) {
+        return QString::number(scaleNumber * pow(10,3),'f',2) + "ps";
+    } else if(scaleNumber * pow(10,6) > 1) {
+        return QString::number(scaleNumber * pow(10,6),'f',2) + "fs";
+    } else if(scaleNumber * pow(10,9) > 1) {
+        return QString::number(scaleNumber * pow(10,9),'f',2) + "as";
     }
+
 }
 
 

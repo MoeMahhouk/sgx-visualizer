@@ -221,7 +221,7 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
-int sqlite3_exec_callback(int argc, char **argv, char **azColName){
+int MainWindow::sqlite3_exec_callback(int argc, char **argv, char **azColName){
     int i;
 
     for(i = 0; i<argc; i++){
@@ -232,7 +232,7 @@ int sqlite3_exec_callback(int argc, char **argv, char **azColName){
     return 0;
 }
 
-int static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName){
+int MainWindow::static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName){
     return static_cast<MainWindow*>(data)->sqlite3_exec_callback(argc, argv, azColName);
 }
 

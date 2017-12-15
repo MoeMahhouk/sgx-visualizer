@@ -11,7 +11,7 @@ namespace moe
 {
     struct Event {
         virtual ~Event(){}
-        virtual void doSmthn() {};
+        //virtual void doSmthn() {};
     };
 
     struct ZoomEvent : public Event {
@@ -22,14 +22,13 @@ namespace moe
     struct ResetEvent : public Event {
         Renderable* r1, *r2;
         ResetEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
-
     };
 
     struct ScrollEvent : public Event {
         Renderable* r1, *r2;
         ScrollEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
-
     };
+
 
     class Observer
     {

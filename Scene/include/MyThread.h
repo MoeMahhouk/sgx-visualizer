@@ -7,18 +7,20 @@
 
 
 #include <string>
-#include "Ecall.h"
+#include "ECall.h"
 namespace moe {
     struct MyThread {
         int id_,pthread_id_,start_address_, start_address_normalized_, start_symbol_;
-        const std::string name_, start_symbol_file_name_;
-        QVector<Ecall> threadEcalls;
+        std::string name_, start_symbol_file_name_;
+        QVector<ECall> threadEcalls;
 
-        MyThread(int id, int pthread_id, std::string name , std::string start_symbol_file_name,
-                 int start_address, int start_symbol , int start_address_normalized) :
-                id_(id), pthread_id_(pthread_id), name_(name), start_symbol_file_name_(start_symbol_file_name),
-                start_address_(start_address), start_symbol_(start_symbol),
-                start_address_normalized_(start_address_normalized){}
+        MyThread(int id = 0, int pthread_id = 0, int start_address = 0, int start_address_normalized = 0,
+                 int start_symbol = 0, std::string name = "", std::string start_symbol_file_name = "" ) :
+                id_(id), pthread_id_(pthread_id), start_address_(start_address),
+                start_address_normalized_(start_address_normalized),start_symbol_(start_symbol),name_(name),
+                start_symbol_file_name_(start_symbol_file_name)
+
+                {}
     };
 }
 

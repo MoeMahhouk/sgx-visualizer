@@ -28,7 +28,7 @@ namespace moe{
 
     private:
 		QString checkUnit(qreal scaleNumber);
-        virtual void onNotify(Event* event) override ;
+        virtual void onNotify(Event* event) override;
         Line measureLine_;
         int height_ = 0;
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);

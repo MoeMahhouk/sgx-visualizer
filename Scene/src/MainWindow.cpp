@@ -231,7 +231,14 @@ int MainWindow::sqlite3_exec_callback(int argc, char **argv, char **azColName){
     printf("\n");
     return 0;
 }
-
+/*
+ * typedef int (*sqlite3_callback)(
+ * void*,     Data provided in the 4th argument of sqlite3_exec()
+ * int,       The number of columns in row
+ * char**,    An array of strings representing fields in the row
+ * char**     An array of strings representing column names
+ *       );
+ */
 int MainWindow::static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName){
     return static_cast<MainWindow*>(data)->sqlite3_exec_callback(argc, argv, azColName);
 }
@@ -255,10 +262,10 @@ void MainWindow::loadFile(const QString& fileName)
     }
 
     /* Create SQL statement */
-    sql = "SELECT * from Event_map";
+    sql = "Select COUNT (*) from threads";
 
     /* Execute SQL statement */
-    rc = sqlite3_exec(db, sql, &static_sqlite3_exec_callback, (void*)this, &zErrMsg);
+    rc = sqlite3_exec(db, sql, static_sqlite3_exec_callback, (void*)this, &zErrMsg);
 
     if( rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);

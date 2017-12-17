@@ -10,7 +10,8 @@
 namespace moe  {
     struct ECall : public Call{
         bool is_private_;
-        ECall(int id, int eid, int symbol_address, int start_time, int total_time, bool is_private, std::string symbol_name) :
+        ECall(uint64_t id = 0, uint64_t eid = 0, uint64_t symbol_address = 0, uint64_t start_time = 0,
+              uint64_t total_time = 0, bool is_private = false, std::string symbol_name = "") :
                 Call(id, eid, symbol_address,start_time, total_time, symbol_name), is_private_(is_private){}
     };
 }

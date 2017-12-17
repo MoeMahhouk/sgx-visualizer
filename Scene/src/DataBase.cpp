@@ -9,9 +9,9 @@ moe::DataBase::DataBase(sqlite3* db) {
     int rc;
     rc = sqlite3_exec(db,"Select COUNT (*) from threads",static_thread_numbers_callback,(void*)this,&zErrMsg);
     threads_ = QVector<MyThread>(threadNumbers,MyThread());
-    for (int i = 0; i < threads_.length() ; ++i) {
+    /*for (int i = 0; i < threads_.length() ; ++i) {
         threads_[i] = MyThread(1,1,1,1,1,"blabla","blabla");
-    }
+    }*/
 }
 
 int moe::DataBase::static_thread_numbers_callback(void *data, int argc, char **argv, char **azColName) {

@@ -10,6 +10,7 @@
 #include "SequenceDiagram.h"
 #include "MeasureLine.h"
 #include "Notifier.h"
+#include "DataBaseManager.h"
 
 namespace Ui {
 class MainWindow;

@@ -11,7 +11,14 @@ set(CMAKE_AUTOMOC ON)
 #set(CMAKE_PREFIX_PATH $ENV{HOME}/moe/Qt/5.9.2/gcc_64)
 set(CMAKE_CXX_STANDARD 11)
 #find the QtWidgets library
-find_package(Qt5Widgets)
+#find_package(Qt5Widgets)
+
+find_package(Qt5 REQUIRED COMPONENTS
+        Core
+        Sql
+        Widgets
+        Gui
+        )
 
 #take all .c files from src folder and add them to the SOURCE_FILE variable
 file(GLOB SOURCE_FILES src/*.cpp)
@@ -41,6 +48,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
-#use the widgets module from Qt 5.
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets /usr/local/lib/libsqlite3.so)
+#use the widgets/Sql module from Qt 5
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql /usr/local/lib/libsqlite3.so)
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})

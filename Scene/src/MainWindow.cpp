@@ -245,14 +245,17 @@ int MainWindow::static_sqlite3_exec_callback(void *data, int argc, char **argv, 
 
 void MainWindow::loadFile(const QString& fileName)
 {
-    sqlite3 *db;
+    moe::DataBaseManager db = moe::DataBaseManager(fileName);
+    std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
+   // db.close();
+    /*sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
     char *sql;
-
+*/
     /* Open database */
 
-    rc = sqlite3_open(fileName.toStdString().c_str(), &db);
+  /*  rc = sqlite3_open(fileName.toStdString().c_str(), &db);
 
     if( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -260,12 +263,12 @@ void MainWindow::loadFile(const QString& fileName)
     } else {
         fprintf(stderr, "Opened database successfully\n");
     }
-
+*/
     /* Create SQL statement */
-    sql = "Select COUNT (*) from threads";
+  //  sql = "Select COUNT (*) from threads";
 
     /* Execute SQL statement */
-    rc = sqlite3_exec(db, sql, static_sqlite3_exec_callback, (void*)this, &zErrMsg);
+   /* rc = sqlite3_exec(db, sql, static_sqlite3_exec_callback, (void*)this, &zErrMsg);
 
     if( rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -274,6 +277,7 @@ void MainWindow::loadFile(const QString& fileName)
         fprintf(stdout, "Operation done successfully\n");
     }
     sqlite3_close(db);
+*/
 
 
 }

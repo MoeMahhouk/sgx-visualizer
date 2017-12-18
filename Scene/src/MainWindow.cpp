@@ -246,8 +246,9 @@ int MainWindow::static_sqlite3_exec_callback(void *data, int argc, char **argv, 
 void MainWindow::loadFile(const QString& fileName)
 {
     moe::DataBaseManager db = moe::DataBaseManager(fileName);
-    std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
-   // db.close();
+    //std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
+   //db.testMethod(0);
+    // db.close();
     /*sqlite3 *db;
     char *zErrMsg = 0;
     int rc;

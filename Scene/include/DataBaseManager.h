@@ -19,11 +19,13 @@ namespace moe{
 
     public:
         DataBaseManager(const QString& path);
-        int getEcallsNumberOfThreadAtIndex(int index);
+        void testMethod(int index);
     private:
+        int getEcallsNumberOfThreadAtIndex(int index);
         uint64_t getThreadTime(int index);
         uint64_t getProgramStartTime();
         int getNumberOfRows(const QString& tableName);
+        void initilizeECallsOfThreadAtIndex(int index);
         void initilizeThreadAtIndex(int index);
         uint64_t getTotalTime();
         void close();

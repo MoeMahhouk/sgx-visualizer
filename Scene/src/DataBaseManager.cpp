@@ -16,9 +16,9 @@ moe::DataBaseManager::DataBaseManager(const QString &path) {
         std::cout << "Database: Connection Ok" << std::endl;
     }
     threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
-    /*for (int i = 0; i < threads_.length() ; ++i) {
+    for (int i = 0; i < threads_.length() ; ++i) {
         initilizeThreadAtIndex(i);
-    }*/
+    }
 }
 
 int moe::DataBaseManager::getNumberOfRows(const QString &tableName) {
@@ -52,20 +52,31 @@ void moe::DataBaseManager::close() {
  * @param index
  */
 void moe::DataBaseManager::initilizeThreadAtIndex(int index) {
-    uint64_t id,pthread_id,start_address, start_address_normalized, start_symbol, start_time_, total_time_;
+    uint64_t pthread_id,start_address, start_address_normalized, start_symbol, start_time, total_time;
+
     std::string name, start_symbol_file_name; // TODO add start symbol name and start address normalized and start symbol
+
     int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO get successfull ecall Numbers of the thread and not all
-    start_time_ = getThreadTime(index);
-    total_time_ = getTotalTime() - start_time_; // TODO another query according the thread destruction event
+
+    start_time = getThreadTime(index);
+    total_time = getTotalTime() - start_time; // TODO another query according the thread destruction event
+
     QSqlQuery query;
-    query.prepare("SELECT pthread_id, start_address, name,");
-
-
-
-
+    query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
+    query.bindValue(":id", index);
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        query.next();
+        pthread_id = (uint64_t) query.value(0).toDouble();
+        start_address = (uint64_t) query.value(1).toDouble();
+        name = query.value(2).toString().toStdString();
+        threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, "",ecallNumbers);
+    } //TODO get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children)
 }
 /**
- *
  * @return the absolute runtime of the program
  */
 uint64_t moe::DataBaseManager::getTotalTime() {
@@ -121,7 +132,12 @@ uint64_t moe::DataBaseManager::getProgramStartTime() {
         return query.value(0).toDouble();
     }
 }
-
+/**
+ *
+ * @param index
+ * @return the number of Ecalls which are called from the thread at the given index
+ */
+//TODO this methode should be reworked later for the failed Ecall Creation etc...
 int moe::DataBaseManager::getEcallsNumberOfThreadAtIndex(int index) {
     QSqlQuery query;
     query.prepare("SELECT COUNT (*) FROM events WHERE involved_thread = (:involved_thread) AND type = 13" );
@@ -134,4 +150,27 @@ int moe::DataBaseManager::getEcallsNumberOfThreadAtIndex(int index) {
     query.next();
     return query.value(0).toInt();
     }
+/**
+ * temporary method to test if the querries are valid
+ * @param index
+ */
+//TODO delete this method code at the end
+void moe::DataBaseManager::testMethod(int index) {
+    QSqlQuery query;
+    query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
+    query.bindValue(":id", index);
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        query.next();
+        std::cerr << "Pthread_id: " << (uint64_t)query.value(0).toDouble() << "\nstart_address: " << query.value(1).toDouble() << "\nname: " << query.value(2).toString().toStdString() << std::endl;
+    }
+}
+
+void moe::DataBaseManager::initilizeECallsOfThreadAtIndex(int index) {
+
+    QSqlQuery query;
+}
 

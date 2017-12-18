@@ -24,6 +24,16 @@ namespace moe {
                 {
                     threadEcalls_ = QVector<ECall*>(EcallNumbers);
                 }
+
+        ~MyThread() {
+            auto it = threadEcalls_.begin();
+            while (it != threadEcalls_.end())
+            {
+                delete *it;
+                it++;
+            }
+            this->threadEcalls_.clear();
+        }
     };
 }
 

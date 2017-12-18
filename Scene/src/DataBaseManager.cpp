@@ -75,6 +75,7 @@ void moe::DataBaseManager::initilizeThreadAtIndex(int index) {
         name = query.value(2).toString().toStdString();
         threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, "",ecallNumbers);
     } //TODO get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children)
+
 }
 /**
  * @return the absolute runtime of the program
@@ -170,7 +171,10 @@ void moe::DataBaseManager::testMethod(int index) {
 }
 
 void moe::DataBaseManager::initilizeECallsOfThreadAtIndex(int index) {
+   /* ECall *tmp = new ECall();
 
+    tmp->children_.push_back()
+    threads_[index].threadEcalls_.push_back(new ECall())*/
     QSqlQuery query;
 }
 

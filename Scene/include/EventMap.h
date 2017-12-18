@@ -22,6 +22,7 @@ namespace moe{
         EnclavePagingEvent,
         EnclavePageOutEvent,
         EnclavePageInEvent,
+        EnclaveCallEvent,
         EnclaveECallEvent,
         EnclaveECallReturnEvent,
         EnclaveOCallEvent,

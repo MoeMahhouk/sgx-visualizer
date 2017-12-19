@@ -1,4 +1,4 @@
-#include <sqlite3.h>
+#include "SgxDatabaseStructure.h"
 #include "MainWindow.h"
 
 
@@ -221,65 +221,14 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
-int MainWindow::sqlite3_exec_callback(int argc, char **argv, char **azColName){
-    int i;
-
-    for(i = 0; i<argc; i++){
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-    }
-
-    printf("\n");
-    return 0;
-}
-/*
- * typedef int (*sqlite3_callback)(
- * void*,     Data provided in the 4th argument of sqlite3_exec()
- * int,       The number of columns in row
- * char**,    An array of strings representing fields in the row
- * char**     An array of strings representing column names
- *       );
- */
-int MainWindow::static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName){
-    return static_cast<MainWindow*>(data)->sqlite3_exec_callback(argc, argv, azColName);
-}
 
 void MainWindow::loadFile(const QString& fileName)
 {
-    moe::DataBaseManager db = moe::DataBaseManager(fileName);
+    moe::SgxDatabaseStructure db = moe::SgxDatabaseStructure(fileName);
+    std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
     //std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
    //db.testMethod(0);
     // db.close();
-    /*sqlite3 *db;
-    char *zErrMsg = 0;
-    int rc;
-    char *sql;
-*/
-    /* Open database */
-
-  /*  rc = sqlite3_open(fileName.toStdString().c_str(), &db);
-
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-        return;
-    } else {
-        fprintf(stderr, "Opened database successfully\n");
-    }
-*/
-    /* Create SQL statement */
-  //  sql = "Select COUNT (*) from threads";
-
-    /* Execute SQL statement */
-   /* rc = sqlite3_exec(db, sql, static_sqlite3_exec_callback, (void*)this, &zErrMsg);
-
-    if( rc != SQLITE_OK ) {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-    } else {
-        fprintf(stdout, "Operation done successfully\n");
-    }
-    sqlite3_close(db);
-*/
-
 
 }
 

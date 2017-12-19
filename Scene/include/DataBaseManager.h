@@ -5,33 +5,38 @@
 #ifndef SCENE_DATABASEMANAGER_H
 #define SCENE_DATABASEMANAGER_H
 
-#include <QtCore/QString>
-#include <QVariant>
+
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
-#include <QSqlDriver>
-#include <QSqlError>
-#include "MyThread.h"
-#include "OCall.h"
-#include "EventMap.h"
+#include <iostream>
+
 
 namespace moe{
 
     class DataBaseManager {
 
     public:
-        DataBaseManager(const QString& path);
-    private:
-        int getEcallsNumberOfThreadAtIndex(int index);
-        uint64_t getThreadTime(int index);
-        uint64_t getProgramStartTime();
-        int getNumberOfRows(const QString& tableName);
-        void initilizeECallsOfThreadAtIndex(int index);
-        void initilizeThreadAtIndex(int index);
-        uint64_t getTotalTime();
-        void close();
+
+        DataBaseManager(const QString& path = "newDataBaseCreated") {
+            m_db = QSqlDatabase::addDatabase("QSQLITE");
+            m_db.setDatabaseName(path);
+            if (!m_db.open()) {
+                std::cerr << "Error: connection with database fail" << std::endl;
+            } else {
+                std::cout << "Database: Connection Ok" << std::endl;
+            }
+        }
+
+        virtual ~DataBaseManager() {
+           m_db.close();
+        }
+
+    protected:
+        virtual uint64_t getThreadStartTime(int index);
+        virtual uint64_t getProgramStartTime();
+        virtual int getNumberOfRows(const QString& tableName);
+        virtual uint64_t getProgramTotalTime();
         QSqlDatabase m_db;
-        QVector<MyThread> threads_;
     };
 }
 

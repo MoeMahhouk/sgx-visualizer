@@ -8,9 +8,9 @@
 #include <string>
 #include "Call.h"
 namespace moe  {
-    struct ECall : public Call{
+    struct ECall : public Call {
         bool is_private_;
-        ECall(uint64_t id = 0, uint64_t eid = 0, uint64_t symbol_address = 0, uint64_t start_time = 0,
+        ECall(int id = 0, int eid = 0, uint64_t symbol_address = 0, uint64_t start_time = 0,
               uint64_t total_time = 0, bool is_private = false, std::string symbol_name = "") :
                 Call(id, eid, symbol_address,start_time, total_time, symbol_name), is_private_(is_private){}
     };

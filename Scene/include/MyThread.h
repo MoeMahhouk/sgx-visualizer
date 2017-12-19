@@ -10,11 +10,12 @@
 #include "ECall.h"
 namespace moe {
     struct MyThread {
-        uint64_t id_,pthread_id_,start_address_, start_address_normalized_, start_symbol_, start_time_, total_time_;
+        int id_;
+        uint64_t pthread_id_,start_address_, start_address_normalized_, start_symbol_, start_time_, total_time_;
         std::string name_, start_symbol_file_name_;
         QVector<ECall*> threadEcalls_;
 
-        MyThread(uint64_t id = 0, uint64_t pthread_id = 0, uint64_t start_address = 0,
+        MyThread(int id = 0, uint64_t pthread_id = 0, uint64_t start_address = 0,
                  uint64_t start_address_normalized = 0, uint64_t start_symbol = 0, uint64_t start_time = 0,
                  uint64_t total_time = 0, std::string name = "", std::string start_symbol_file_name = "",
                  int EcallNumbers=0) :

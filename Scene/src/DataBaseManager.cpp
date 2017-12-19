@@ -18,6 +18,7 @@ moe::DataBaseManager::DataBaseManager(const QString &path) {
     threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
     for (int i = 0; i < threads_.length() ; ++i) {
         initilizeThreadAtIndex(i);
+        initilizeECallsOfThreadAtIndex(i);
     }
 }
 
@@ -75,7 +76,6 @@ void moe::DataBaseManager::initilizeThreadAtIndex(int index) {
         name = query.value(2).toString().toStdString();
         threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, "",ecallNumbers);
     } //TODO get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children)
-
 }
 /**
  * @return the absolute runtime of the program
@@ -113,7 +113,7 @@ uint64_t moe::DataBaseManager::getThreadTime(int index) {
     } else {
         query.next();
         int64_t result = query.value(0).toDouble() - getProgramStartTime();
-        return result < 0 ? 0 : result; //TODO ask nico or arthur why the first thread start time before the start time of the general program
+        return result < 0 ? 0 : result; //ToDo problem got fixed but this still not hurt :-)
     }
 }
 
@@ -141,7 +141,8 @@ uint64_t moe::DataBaseManager::getProgramStartTime() {
 //TODO this methode should be reworked later for the failed Ecall Creation etc...
 int moe::DataBaseManager::getEcallsNumberOfThreadAtIndex(int index) {
     QSqlQuery query;
-    query.prepare("SELECT COUNT (*) FROM events WHERE involved_thread = (:involved_thread) AND type = 13" );
+    query.prepare("SELECT COUNT (*) FROM events AS e1 JOIN events AS e2 ON e1.id = e2.call_event "
+                          "WHERE e1.involved_thread = (:involved_thread) AND e1.type = 14 AND e2.return_value = 0");
     query.bindValue(":involved_thread", index);
     if(!query.exec())
     {
@@ -151,30 +152,84 @@ int moe::DataBaseManager::getEcallsNumberOfThreadAtIndex(int index) {
     query.next();
     return query.value(0).toInt();
     }
-/**
- * temporary method to test if the querries are valid
- * @param index
- */
-//TODO delete this method code at the end
-void moe::DataBaseManager::testMethod(int index) {
+
+
+void moe::DataBaseManager::initilizeECallsOfThreadAtIndex(int index) {
+    QMap<int, Call*> calls;
+    int id,call_id,call_event;
+    uint64_t start_time, total_time;
     QSqlQuery query;
-    query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
-    query.bindValue(":id", index);
+    query.prepare("SELECT e1.id,e1.type,e1.time AS start_time,e2.time AS end_time,e1.call_id,IFNULL(e1.call_event, 0) AS call_event"
+                          " FROM events AS e1 JOIN events AS e2 ON e1.id = e2.call_event"
+                          " WHERE e2.return_value = 0 AND e1.involved_thread = (:involved_thread) ORDER BY e1.id");
+    query.bindValue(":involved_thread", index);
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
         return;
-    } else {
-        query.next();
-        std::cerr << "Pthread_id: " << (uint64_t)query.value(0).toDouble() << "\nstart_address: " << query.value(1).toDouble() << "\nname: " << query.value(2).toString().toStdString() << std::endl;
     }
-}
+    while(query.next())
+    {
+        id = query.value(0).toInt();
+        start_time = (uint64_t) query.value(2).toDouble() - getProgramStartTime();
+        total_time = (uint64_t) query.value(3).toDouble() - query.value(2).toDouble();
+        call_id = query.value(4).toInt();
+        call_event = query.value(5).toInt();
 
-void moe::DataBaseManager::initilizeECallsOfThreadAtIndex(int index) {
-   /* ECall *tmp = new ECall();
+        switch(query.value(1).toInt()) { //EventType
+            case (int)EventMap::EnclaveECallEvent: {
+                QSqlQuery tmpQuery;
+                tmpQuery.prepare("SELECT eid,symbol_address,symbol_name,is_private FROM ecalls WHERE id = (:id)");
+                tmpQuery.bindValue(":id",call_id);
+                if(!tmpQuery.exec()) {
+                    std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+                    return;
+                }
+                tmpQuery.next();
+                int eid = tmpQuery.value(0).toInt();
+                uint64_t symbol_address = (uint64_t)tmpQuery.value(1).toDouble();
+                std::string symbol_name = tmpQuery.value(2).toString().toStdString();
+                bool is_private = tmpQuery.value(3).toInt();
+                ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,total_time,is_private,symbol_name);
+                calls[id] = eCall;
 
-    tmp->children_.push_back()
-    threads_[index].threadEcalls_.push_back(new ECall())*/
-    QSqlQuery query;
+                if(call_event != 0) {
+                    calls[call_event]->children_.push_back(eCall);
+                } else {
+                    threads_[index].threadEcalls_.push_back(eCall);
+                }
+                break;
+            }
+            case (int)EventMap::EnclaveOCallEvent : {
+                QSqlQuery tmpQuery;
+                tmpQuery.prepare("SELECT eid,symbol_name,symbol_file_name,symbol_address,symbol_address_normalized "
+                                         " FROM ocalls WHERE id = (:id)");
+                tmpQuery.bindValue(":id",call_id);
+                if(!tmpQuery.exec()) {
+                    std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+                    return;
+                }
+                tmpQuery.next();
+                int eid = tmpQuery.value(0).toInt();
+                std::string symbol_name = tmpQuery.value(1).toString().toStdString();
+                std::string symbol_file_name = tmpQuery.value(2).toString().toStdString();
+                uint64_t symbol_address = (uint64_t)tmpQuery.value(3).toDouble();
+                uint64_t symbol_address_normalized = (uint64_t)tmpQuery.value(4).toDouble();
+
+                OCall *oCall = new OCall(call_id,eid,symbol_address,start_time,total_time,symbol_name,
+                                         symbol_address_normalized,symbol_file_name);
+                calls[id] = oCall;
+
+                if(call_event != 0) {
+                    calls[call_event]->children_.push_back(oCall);
+                } else { //this should never be reachable unless the database is corrupted
+                    std::cerr << "OCall has no ecall id from which its triggered " << std::endl;
+                }
+                break;
+            default://should never happen if the query runs perfectly
+                break;
+            }
+        }
+    }
 }
 

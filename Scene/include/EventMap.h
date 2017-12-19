@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace moe{
-    enum class Event_Map : std::int8_t {
+    enum class EventMap : std::int8_t {
         Event = 0,
         SignalEvent,
         ThreadEvent,

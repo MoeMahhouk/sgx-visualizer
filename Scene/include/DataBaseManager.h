@@ -12,6 +12,8 @@
 #include <QSqlDriver>
 #include <QSqlError>
 #include "MyThread.h"
+#include "OCall.h"
+#include "EventMap.h"
 
 namespace moe{
 
@@ -19,7 +21,6 @@ namespace moe{
 
     public:
         DataBaseManager(const QString& path);
-        void testMethod(int index);
     private:
         int getEcallsNumberOfThreadAtIndex(int index);
         uint64_t getThreadTime(int index);

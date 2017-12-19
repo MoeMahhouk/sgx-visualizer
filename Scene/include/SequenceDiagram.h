@@ -15,7 +15,7 @@ namespace moe{
     class SequenceDiagram : public Renderable {
     public:
 
-        SequenceDiagram(Transform2D transform, QString topBlockLabel);
+        SequenceDiagram(Transform2D transform, QString topBlockLabel, int sequenceLineDepth);
         Renderable *getSequenceLine_() const;
         Renderable *getOffsetForLine_() const;
         virtual ~SequenceDiagram();
@@ -23,8 +23,9 @@ namespace moe{
         qreal getLineScale();
         void setLineScale(qreal scale);
         void resetLineScales();
+        void addBlock(qreal createdTime, qreal endTime); //ToDo this method was protected moved to public for test issues
+        void addLabeledBlock(qreal createdTime, qreal endTime, QString blockLabel); //ToDo this method was protected moved to public for test issues
     protected:
-        void addBlock(qreal createdTime, qreal endTime);
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
     private:
         LabeledRect topBlock_;

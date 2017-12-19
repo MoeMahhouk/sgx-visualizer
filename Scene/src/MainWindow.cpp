@@ -1,4 +1,4 @@
-#include "SgxDatabaseStructure.h"
+
 #include "MainWindow.h"
 
 
@@ -180,7 +180,7 @@ void MainWindow::drawScene()
     //zoomIn->setParent(view_);
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
-    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, 90,scene_->sceneRect().center().y()/4),tr("test1"));
+    sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, scene_->sceneRect().x()+90,scene_->sceneRect().center().y()/4),tr("test1"),500);
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,
                                                                     scene_->sceneRect().x()+10,
                                                                     sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight()),
@@ -224,9 +224,10 @@ void MainWindow::writeSettings()
 
 void MainWindow::loadFile(const QString& fileName)
 {
-    moe::SgxDatabaseStructure db = moe::SgxDatabaseStructure(fileName);
-    std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
-    //std::cerr << db.getEcallsNumberOfThreadAtIndex(0) << std::endl;
+    moe::DataBaseManager* db = new moe::SgxDatabaseStructure(fileName);
+    visualizeThreads(db->getThreads_()); //ToDo still should be tested
+    //std::cerr << db->getThreadStartTime(0) << std::endl;
+   // std::cerr << db.getNumberOfRows("threads") << std::endl;
    //db.testMethod(0);
     // db.close();
 
@@ -242,5 +243,17 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     view_->update();
+}
+
+void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads) {
+    for (int i = 0; i < threads.length() ; ++i) {
+      /*  moe::SequenceDiagram* thread = threads[i].toRenderable(); /*new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+1)),
+                                                                                 scene_->sceneRect().center().y()/4),
+                                                                "Pthread -- " + threads[i].pthread_id_ % 10000,
+                                                                threads[i].total_time_);
+        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+1)),
+                                              scene_->sceneRect().center().y()/4));
+        sequenceListNode_->children_.push_back(thread);*/
+    }
 }
 

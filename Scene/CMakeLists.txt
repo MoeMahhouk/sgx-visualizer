@@ -49,5 +49,5 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
 #use the widgets/Sql module from Qt 5
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql /usr/local/lib/libsqlite3.so)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql)
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})

@@ -4,7 +4,14 @@
 
 #include "SgxDatabaseStructure.h"
 
-moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path) : DataBaseManager(path) {
+moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QString &type) : DataBaseManager(path) {
+    m_db = QSqlDatabase::addDatabase(type);
+    m_db.setDatabaseName(path);
+    if (!m_db.open()) {
+        std::cerr << "Error: connection with database fail" << std::endl;
+    } else {
+        std::cout << "Database: Connection Ok" << std::endl;
+    }
     threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
     for (int i = 0; i < threads_.length() ; ++i) {
         initializeThreadAtIndex(i);
@@ -59,8 +66,7 @@ uint64_t moe::SgxDatabaseStructure::getProgramTotalTime() {
 int moe::SgxDatabaseStructure::getNumberOfRows(const QString &tableName) {
     QSqlQuery query;
     query.prepare("SELECT * FROM " + tableName);
-    //query.prepare("SELECT * FROM Ecalls");
-    //query.bindValue(":tablename",tableName);
+    //query.bindValue(":tableName",tableName);
     int numRows;
     if(!query.exec())
     {
@@ -230,10 +236,7 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
     }
 }
 
-/**
- * closes the datebase file
- */
-/*void moe::SgxDatabaseStructure::close() {
-    std::cout << "SGX Database Structure is now visualised and closed. " << std::endl;
-    m_db.close();
-}*/
+
+void moe::SgxDatabaseStructure::close() {
+m_db.close();
+}

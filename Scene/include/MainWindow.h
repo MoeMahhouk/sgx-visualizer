@@ -10,6 +10,7 @@
 #include "SequenceDiagram.h"
 #include "MeasureLine.h"
 #include "Notifier.h"
+#include "SgxDatabaseStructure.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,8 +23,6 @@ class MainWindow : public QMainWindow, public moe::Notifier
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    int sqlite3_exec_callback(int argc, char **argv, char **azColName);
 
 private slots:
     void open();
@@ -52,7 +51,7 @@ private:
     //moe::Rect *topElement;
     //moe::Renderable *lineOfTopElement;
     //moe::Line *lineOfTopElement2;
-
+    void visualizeThreads(const QVector<moe::MyThread> threads);
     void createMenus();
     void createStatusBar();
     void createActions();
@@ -65,7 +64,6 @@ private:
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-    static int static_sqlite3_exec_callback(void *data, int argc, char **argv, char **azColName);
 
     Ui::MainWindow *ui;
 

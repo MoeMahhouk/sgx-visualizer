@@ -9,28 +9,35 @@
 #include <QSqlError>
 #include <QtCore/QString>
 #include <QVariant>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <iostream>
 #include "DataBaseManager.h"
 #include "MyThread.h"
 #include "OCall.h"
 #include "EventMap.h"
+
 namespace moe {
 
     class SgxDatabaseStructure : public DataBaseManager{
 
     public:
-        SgxDatabaseStructure(const QString& path = "newDataBaseCreated");//ToDo maybe add renderable Scene Root node as parameter??
-        virtual ~SgxDatabaseStructure() = default;
-        int getEcallsNumberOfThreadAtIndex(int index);
+        SgxDatabaseStructure(const QString& path = "newDataBaseCreated", const QString& type = "QSQLITE");//ToDo maybe add renderable Scene Root node as parameter??
+        virtual ~SgxDatabaseStructure() {
+            close();
+        };
+
+        uint64_t getProgramTotalTime() override;
     protected:
-         uint64_t getThreadStartTime(int index) override;
-         uint64_t getProgramStartTime() override;
-         int getNumberOfRows(const QString& tableName) override;
-         uint64_t getProgramTotalTime() override;
-         //void close() override ;
+        int getNumberOfRows(const QString& tableName) override;
+        uint64_t getThreadStartTime(int index) override;
+        uint64_t getProgramStartTime() override;
+        void close() override;
     private:
+        int getEcallsNumberOfThreadAtIndex(int index);
         void initializeECallsOfThreadAtIndex(int index);
         void initializeThreadAtIndex(int index);
-        QVector<MyThread> threads_;
+        QSqlDatabase m_db;
     };
 }
 

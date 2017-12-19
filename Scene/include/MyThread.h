@@ -7,7 +7,9 @@
 
 
 #include <string>
+#include "SequenceDiagram.h"
 #include "ECall.h"
+
 namespace moe {
     struct MyThread {
         int id_;
@@ -35,6 +37,12 @@ namespace moe {
             }
             this->threadEcalls_.clear();
         }
+
+    SequenceDiagram* toRenderable() {
+        SequenceDiagram *threadSequenceDiagram = new SequenceDiagram(Transform2D(), "Pthread --" + pthread_id_ % 1000, total_time_);
+        return threadSequenceDiagram;
+    }
+
     };
 }
 

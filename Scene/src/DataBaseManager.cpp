@@ -226,9 +226,9 @@ void moe::DataBaseManager::initilizeECallsOfThreadAtIndex(int index) {
                     std::cerr << "OCall has no ecall id from which its triggered " << std::endl;
                 }
                 break;
-            default://should never happen if the query runs perfectly
-                break;
             }
+            default:
+                break;
         }
     }
 }

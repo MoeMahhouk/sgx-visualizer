@@ -109,9 +109,9 @@ uint64_t moe::SgxDatabaseStructure::getThreadStartTime(int index) {
 void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
     uint64_t pthread_id,start_address, start_address_normalized, start_symbol, start_time, total_time;
 
-    std::string name, start_symbol_file_name; // TODO add start symbol name and start address normalized and start symbol
+    std::string name, start_symbol_file_name; // ToDo add start symbol name and start address normalized and start symbol
 
-    //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO causes problems when added (should be fixed later)
+    //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //ToDo causes problems when added (should be fixed later)
 
     start_time = getThreadStartTime(index);
 
@@ -119,7 +119,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
      * ToDo later this should be replaced with thread_destruction_time - ProgramStartTime to get the length of the threads timeline
      * ToDo because at the moment all threads sequence diagrams will be drawn at the top despite their creation time which will be later displayed by hovering (maybe)
      */
-    total_time = getProgramTotalTime(); // TODO another query according the thread destruction event
+    total_time = getProgramTotalTime(); // ToDo another query according the thread destruction event
 
     QSqlQuery query;
     query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
@@ -134,7 +134,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
         start_address = (uint64_t) query.value(1).toDouble();
         name = query.value(2).toString().toStdString();
         threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, ""/*,ecallNumbers*/);
-    } //TODO get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children)
+    } //ToDo get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children) (done)
 }
 
 /**
@@ -142,7 +142,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
  * @param index
  * @return the number of Ecalls which are called from the thread at the given index
  */
-//TODO this methode should be reworked later for the failed Ecall Creation etc...
+//ToDo this methode should be reworked later for the failed Ecall Creation etc...
 int moe::SgxDatabaseStructure::getEcallsNumberOfThreadAtIndex(int index) {
     QSqlQuery query;
     //this returns only the successfull Ecalls that operate directly on the thread and not children from Ocalls
@@ -165,7 +165,7 @@ int moe::SgxDatabaseStructure::getEcallsNumberOfThreadAtIndex(int index) {
 void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
     QMap<int, Call*> calls;
     int id,call_id,call_event;
-    uint64_t start_time, total_time;
+    uint64_t start_time, relative_start_time, total_time;
     QSqlQuery query;
     query.prepare("SELECT e1.id,e1.type,e1.time AS start_time,e2.time AS end_time,e1.call_id,IFNULL(e1.call_event, 0) AS call_event"
                           " FROM events AS e1 JOIN events AS e2 ON e1.id = e2.call_event"
@@ -179,7 +179,7 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
     while(query.next())
     {
         id = query.value(0).toInt();
-        start_time = (uint64_t) query.value(2).toDouble() - getProgramStartTime();
+        relative_start_time = start_time = (uint64_t) query.value(2).toDouble() - getProgramStartTime();
         total_time = (uint64_t) query.value(3).toDouble() - query.value(2).toDouble();
         call_id = query.value(4).toInt();
         call_event = query.value(5).toInt();
@@ -199,12 +199,12 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
                 uint64_t symbol_address = (uint64_t)tmpQuery.value(1).toDouble();
                 std::string symbol_name = tmpQuery.value(2).toString().toStdString();
                 bool is_private = tmpQuery.value(3).toInt();
-                ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,total_time,is_private,symbol_name);
+                ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,is_private,symbol_name);
                 calls[id] = eCall;
 
                 if(call_event != 0) {
                     //here i calculate the relative start time of the child according to his parent start time
-                    eCall->start_time_ -= getRelaTimeOfParent(call_event);
+                    eCall->relative_start_time_ -= getRelaTimeOfParent(call_event);
                     calls[call_event]->children_.push_back(eCall);
                 } else {
                     threads_[index].threadEcalls_.push_back(eCall);
@@ -228,13 +228,13 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
                 uint64_t symbol_address = (uint64_t)tmpQuery.value(3).toDouble();
                 uint64_t symbol_address_normalized = (uint64_t)tmpQuery.value(4).toDouble();
 
-                OCall *oCall = new OCall(call_id,eid,symbol_address,start_time,total_time,symbol_name,
+                OCall *oCall = new OCall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,symbol_name,
                                          symbol_address_normalized,symbol_file_name);
                 calls[id] = oCall;
 
                 if(call_event != 0) {
                     //here i calculate the relative start time of the child according to his parent start time
-                    oCall->start_time_ -= getRelaTimeOfParent(call_event);
+                    oCall->relative_start_time_ -= getRelaTimeOfParent(call_event);
                     calls[call_event]->children_.push_back(oCall);
                 } else { //this should never be reachable unless the database is corrupted
                     std::cerr << "OCall has no ecall id from which its triggered " << std::endl;

@@ -227,10 +227,11 @@ void MainWindow::loadFile(const QString& fileName)
     moe::DataBaseManager* db = new moe::SgxDatabaseStructure(fileName);
     visualizeThreads(db->getThreads_(), 500.0/db->getProgramTotalTime()); //ToDo still should be tested
     //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+10,50),db->getProgramTotalTime(),20);
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+10,50),db->getProgramTotalTime(),800,40);
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
     render();
+    delete db;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

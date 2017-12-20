@@ -13,7 +13,7 @@ namespace moe{
 
     class MeasureLine : public Renderable, public Observer {
     public:
-        MeasureLine(Transform2D transform, qreal lineDepth, int scaleLines = 10);
+        MeasureLine(Transform2D transform, uint64_t total_timeline,int pixel_line_depth, int scaleLines = 20);
 	    virtual ~MeasureLine()
 	    {
 		    children_.removeAll(&measureLine_);
@@ -30,7 +30,8 @@ namespace moe{
 		QString checkUnit(qreal scaleNumber);
         virtual void onNotify(Event* event) override;
         Line measureLine_;
-        qreal height_ = 0; //ToDo i changed this from int to qreal
+		int pixel_line_depth_ = 0;
+        uint64_t total_timeline_ = 0; //ToDo i changed this from int to uint64_t
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
     };
 

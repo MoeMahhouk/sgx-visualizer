@@ -7,13 +7,14 @@
 #include "MeasureLine.h"
 
 void moe::MeasureLine::draw(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
-    //generateScales();
     return;
 }
 
-moe::MeasureLine::MeasureLine(Transform2D transform, qreal lineDepth, int scaleLines) : Renderable(transform), height_(lineDepth),
-                                                                                        measureLine_ (Transform2D(),0 ,500/*lineDepth*/,2)
-//TODO i added 500 only for test purpose, fix later by adding factor parameter or another solution
+moe::MeasureLine::MeasureLine(Transform2D transform, uint64_t total_timeline, int pixel_line_depth, int scaleLines) :
+        Renderable(transform), total_timeline_(total_timeline), pixel_line_depth_(pixel_line_depth),
+        measureLine_ (Transform2D(),0 ,pixel_line_depth,2)
+//TODO i added 500 only for test purpose, fix later by adding factor parameter or another solution (changed)
+//ToDo i changed the hardcoded 500 from above and added new class variable for the line depth in pixel and not nano second
 {
     name = "MeasureLine";
 
@@ -38,17 +39,16 @@ void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset) {
     int scaleLines = measureLines_.size();
 
     qreal i = 0;
-    qreal step = height_ / (scaleLines-1);
+    qreal step = total_timeline_ / (scaleLines-1);
     for (MeasureScaleLine *scaleLine : measureLines_) {
-        scaleLine->setTransform(Transform2D(1,0,0,1,0,i * (500/height_))); //TODO this is also for test purpose
+        scaleLine->setTransform(Transform2D(1,0,0,1,0,i * ((qreal)pixel_line_depth_/total_timeline_)));
         scaleLine->setXTarget(2);
-        //scaleLine->setText(QString::number((yOffset/yScale) + (i/yScale),'e',2));
         scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
         i += step;
     }
 
 }
-
+//ToDo delete this method later if it appears to be useless
 void moe::MeasureLine::resetScales() {
     measureLine_.getTransform().setYScale(1);
     measureLine_.getTransform().setXScale(1);
@@ -56,14 +56,11 @@ void moe::MeasureLine::resetScales() {
 
 void moe::MeasureLine::onNotify(Event* event) {
     if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event)) {
-            //generateScales(zoom->r1->getTransform().yScale(), -zoom->r2->getTransform().getY());
             generateScales(zoom->yScale_, -zoom->yOffset_);
     } else if (ScrollEvent *scroll = dynamic_cast<ScrollEvent*>(event)) {
-            //generateScales(scroll->r1->getTransform().yScale(), -scroll->r2->getTransform().getY());
             generateScales(scroll->yScale_, -scroll->yOffset_);
     } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event)) {
-        resetScales();
-        //generateScales(reset->r1->getTransform().yScale(), -reset->r2->getTransform().getY()); //toDo old solution with 2 renderable event variables
+        //resetScales();
         generateScales(1,0);
 
     }
@@ -91,6 +88,3 @@ QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
         return QString::number(0,'f',2);
     }
 }
-
-
-

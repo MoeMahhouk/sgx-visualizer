@@ -6,8 +6,8 @@
 
 
 
-moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLabel,qreal sequenceLineDepth) :
-        Renderable(transform), topBlock_(Transform2D(), 30, 20, topBlockLabel)
+moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLabel,int sequenceLineDepth) :
+        Renderable(transform), topBlock_(Transform2D(), 50, 20, topBlockLabel)
 {
     name = "SequenceDiagram";
     this->children_.push_back(&topBlock_);
@@ -16,13 +16,6 @@ moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLab
     topBlock_.children_.push_back(offsetForLine_);
     sequenceLine_ = new moe::Line(Transform2D(),0,sequenceLineDepth,2);
     offsetForLine_->children_.push_back(sequenceLine_);
-    /*Rect *rect = new Rect(Transform2D(1,0,0,1,-2,25),15,20);
-    rect->addBlock(new Rect(Transform2D(1,0,0,1,-2,10),15,10));
-    addBlock(rect);*/
-    //sequenceLine_->children_.push_back(new moe::LabeledRect(Transform2D(1,0,0,1,-2,25),15,20,"test2"));
-    //addLabeledBlock(25,20,"test2");
-    //addBlock(50,15);
-
     std::cout << "sequence diagram created" << std::endl;
 }
 

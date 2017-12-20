@@ -39,12 +39,15 @@ namespace moe {
 
         SequenceDiagram* toRenderable(qreal factor) const { //ToDo added factor parameter for test purposes
 
-            SequenceDiagram *threadSequenceDiagram = new SequenceDiagram(Transform2D(), "Pthread --" /*+ pthread_id_ % 1000*/, total_time_ * factor );
+            SequenceDiagram *threadSeqDiag = new SequenceDiagram(Transform2D()
+                                                                ,"Pthread --" + QString::number(pthread_id_ % 1000)
+                                                                ,total_time_ * factor
+                                                                );
             for (ECall *eCall : threadEcalls_) {
                 Renderable *eCallRenderable = eCall->toRenderable(factor);
-                threadSequenceDiagram->addBlock(eCallRenderable);
+                threadSeqDiag->addBlock(eCallRenderable);
             }
-            return threadSequenceDiagram;
+            return threadSeqDiag;
          }
 
     };

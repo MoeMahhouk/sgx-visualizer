@@ -12,9 +12,12 @@ namespace moe {
     class TitleText : public Renderable {
     protected:
     public:
-        //TitleText(Transform2D transform) : Renderable(transform) {}
-        TitleText(Transform2D transform = Transform2D(),const QString &title_ = "",int fontSize = 10, int xOffset = 6, int yOffset = -16);
-        //TitleText():TitleText(Transform2D(), ""){}
+        TitleText(Transform2D transform = Transform2D(),
+                  const QString &title_ = "",
+                  int fontSize = 10,
+                  int xOffset = 2,
+                  int yOffset = -16
+                 );
 
         void setTitle_(const QString &title);
         const QString &getTitle_() const;

@@ -25,6 +25,8 @@ namespace moe{
         void resetLineScales();
         void addBlock(qreal createdTime, qreal endTime); //ToDo this method was protected moved to public for test issues
         void addLabeledBlock(qreal createdTime, qreal endTime, QString blockLabel); //ToDo this method was protected moved to public for test issues
+        void addBlock(Renderable *childBlock);
+        void addLabeledBlock(Renderable *childBlock);
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
     private:

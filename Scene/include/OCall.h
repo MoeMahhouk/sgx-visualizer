@@ -16,6 +16,15 @@ namespace moe {
                 Call(id, eid, symbol_address,start_time, total_time, symbol_name),
                                               symbol_address_normalized_(symbol_address_normalized),
                                               symbol_file_name_(symbol_file_name) {}
+
+        virtual Rect* toRenderable() const override {
+            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_),15,total_time_,new QPen(Qt::yellow),new QBrush(Qt::yellow));
+            for (Call *call : children_) {
+                Renderable *childRenderable = call->toRenderable();
+                callBlock->addBlock(childRenderable);
+            }
+            return callBlock;
+        }
     };
 }
 

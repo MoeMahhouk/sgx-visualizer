@@ -111,7 +111,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
 
     std::string name, start_symbol_file_name; // TODO add start symbol name and start address normalized and start symbol
 
-    int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO get successfull ecall Numbers of the thread and not all
+    int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO causes problems when added
 
     start_time = getThreadStartTime(index);
     total_time = getProgramTotalTime() - start_time; // TODO another query according the thread destruction event
@@ -128,7 +128,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
         pthread_id = (uint64_t) query.value(0).toDouble();
         start_address = (uint64_t) query.value(1).toDouble();
         name = query.value(2).toString().toStdString();
-        threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, "",ecallNumbers);
+        threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, ""/*,ecallNumbers*/);
     } //TODO get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children)
 }
 

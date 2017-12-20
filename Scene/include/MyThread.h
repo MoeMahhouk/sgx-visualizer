@@ -20,12 +20,12 @@ namespace moe {
         MyThread(int id = 0, uint64_t pthread_id = 0, uint64_t start_address = 0,
                  uint64_t start_address_normalized = 0, uint64_t start_symbol = 0, uint64_t start_time = 0,
                  uint64_t total_time = 0, std::string name = "", std::string start_symbol_file_name = "",
-                 int EcallNumbers=0) :
+                 /*int EcallNumbers=0*/) :
                 id_(id), pthread_id_(pthread_id), start_address_(start_address),
                 start_address_normalized_(start_address_normalized), start_symbol_(start_symbol), start_time_(start_time),
                 total_time_(total_time), name_(name), start_symbol_file_name_(start_symbol_file_name)
                 {
-                    threadEcalls_ = QVector<ECall*>(EcallNumbers);
+                    //threadEcalls_ = QVector<ECall*>(EcallNumbers);
                 }
 
         ~MyThread() {
@@ -38,10 +38,15 @@ namespace moe {
             this->threadEcalls_.clear();
         }
 
-    SequenceDiagram* toRenderable() {
-        SequenceDiagram *threadSequenceDiagram = new SequenceDiagram(Transform2D(), "Pthread --" + pthread_id_ % 1000, total_time_);
-        return threadSequenceDiagram;
-    }
+        SequenceDiagram* toRenderable() const {
+
+            SequenceDiagram *threadSequenceDiagram = new SequenceDiagram(Transform2D(), "Pthread --" /*+ pthread_id_ % 1000*/, total_time_);
+            for (ECall *eCall : threadEcalls_) {
+                Renderable *eCallRenderable = eCall->toRenderable();
+                threadSequenceDiagram->addBlock(eCallRenderable);
+            }
+            return threadSequenceDiagram;
+         }
 
     };
 }

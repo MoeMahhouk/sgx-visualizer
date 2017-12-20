@@ -13,6 +13,15 @@ namespace moe  {
         ECall(int id = 0, int eid = 0, uint64_t symbol_address = 0, uint64_t start_time = 0,
               uint64_t total_time = 0, bool is_private = false, std::string symbol_name = "") :
                 Call(id, eid, symbol_address,start_time, total_time, symbol_name), is_private_(is_private){}
+
+        virtual Rect* toRenderable() const override {
+            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_),15,total_time_,new QPen(Qt::blue));
+            for (Call *call : children_) {
+                Renderable *childRenderable = call->toRenderable();
+                callBlock->addBlock(childRenderable);
+            }
+            return callBlock;
+        }
     };
 }
 #endif //SCENE_ECALL_H

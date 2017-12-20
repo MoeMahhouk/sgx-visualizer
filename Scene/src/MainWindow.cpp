@@ -247,13 +247,18 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads) {
     for (int i = 0; i < threads.length() ; ++i) {
-      /*  moe::SequenceDiagram* thread = threads[i].toRenderable(); /*new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+1)),
-                                                                                 scene_->sceneRect().center().y()/4),
-                                                                "Pthread -- " + threads[i].pthread_id_ % 10000,
-                                                                threads[i].total_time_);
-        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+1)),
+       /* std::cerr << threads[i].pthread_id_<<std::endl;
+        for (moe::ECall *ecall:threads[i].threadEcalls_) {
+            std::cerr << ecall->symbol_name_ << std::endl;
+        }*/
+        moe::SequenceDiagram* thread = threads[i].toRenderable();
+        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)),
                                               scene_->sceneRect().center().y()/4));
-        sequenceListNode_->children_.push_back(thread);*/
+        sequenceListNode_->children_.push_back(thread);
+        render();//ToDo fix the zoom events so that they dont depend on sequence diagram object
+                //ToDo Write a query to get the relative start time of each call to their parent caller
+                //ToDo Scale the blocks and the line to a specific measure scale
+
     }
 }
 

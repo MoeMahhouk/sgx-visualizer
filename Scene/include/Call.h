@@ -27,6 +27,7 @@ namespace moe {
             }
             this->children_.clear();
         }
+        virtual Rect* toRenderable() const = 0;
     };
 }
 

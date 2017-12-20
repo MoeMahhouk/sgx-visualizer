@@ -16,6 +16,9 @@ moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLab
     topBlock_.children_.push_back(offsetForLine_);
     sequenceLine_ = new moe::Line(Transform2D(),0,sequenceLineDepth,2);
     offsetForLine_->children_.push_back(sequenceLine_);
+    Rect *rect = new Rect(Transform2D(1,0,0,1,-2,25),15,20);
+    rect->addBlock(new Rect(Transform2D(1,0,0,1,-2,10),15,10));
+    addBlock(rect);
     //sequenceLine_->children_.push_back(new moe::LabeledRect(Transform2D(1,0,0,1,-2,25),15,20,"test2"));
     //addLabeledBlock(25,20,"test2");
     //addBlock(50,15);
@@ -63,6 +66,14 @@ void moe::SequenceDiagram::addBlock(qreal createdTime, qreal endTime) {
 
 void moe::SequenceDiagram::addLabeledBlock(qreal createdTime, qreal endTime, QString blockLabel) {
     sequenceLine_->children_.push_back(new moe::LabeledRect(Transform2D(1,0,0,1,-2,createdTime),15,endTime, blockLabel));
+}
+
+void moe::SequenceDiagram::addBlock(moe::Renderable *childBlock) {
+    sequenceLine_->children_.push_back(childBlock);
+}
+
+void moe::SequenceDiagram::addLabeledBlock(moe::Renderable *childBlock) {
+    sequenceLine_->children_.push_back(childBlock);
 }
 
 

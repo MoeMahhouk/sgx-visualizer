@@ -21,7 +21,7 @@ namespace moe{
 
         Line& getMeasureLine_();
 
-        void generateScales(qreal yScale, int yOffset);
+        void generateScales(qreal yScale, qreal yOffset);
         void resetScales();
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
@@ -30,7 +30,7 @@ namespace moe{
 		QString checkUnit(qreal scaleNumber);
         virtual void onNotify(Event* event) override;
         Line measureLine_;
-        int height_ = 0;
+        qreal height_ = 0; //ToDo i changed this from int to qreal
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
     };
 

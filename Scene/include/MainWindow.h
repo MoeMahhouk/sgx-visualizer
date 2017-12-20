@@ -51,7 +51,7 @@ private:
     //moe::Rect *topElement;
     //moe::Renderable *lineOfTopElement;
     //moe::Line *lineOfTopElement2;
-    void visualizeThreads(const QVector<moe::MyThread> threads);
+    void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo added factor for test purposes
     void createMenus();
     void createStatusBar();
     void createActions();
@@ -66,7 +66,8 @@ private:
 
 
     Ui::MainWindow *ui;
-
+    qreal yScale = 1; //toDo better solution for zooming
+    qreal yOffset = 0;
     QGraphicsView *view_;
     QGraphicsScene *scene_;
     QMenu *fileMenu_;

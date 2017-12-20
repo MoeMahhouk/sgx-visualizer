@@ -15,18 +15,28 @@ namespace moe
     };
 
     struct ZoomEvent : public Event {
-        Renderable* r1, *r2;
-        ZoomEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+       // Renderable* r1, *r2;
+        qreal yScale_;
+        qreal yOffset_;
+        //Renderable* sequenceListNode_; //ToDo change it later qreal yOffset
+       // ZoomEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+        ZoomEvent(qreal yScale, qreal yOffset) : yScale_(yScale), yOffset_(yOffset) {}
     };
 
-    struct ResetEvent : public Event {
+    /*struct ResetEvent : public Event {
         Renderable* r1, *r2;
         ResetEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+    };*/
+
+    struct ResetEvent : public Event {
     };
 
     struct ScrollEvent : public Event {
-        Renderable* r1, *r2;
-        ScrollEvent(Renderable* renderable1, Renderable* renderable2) : r1(renderable1), r2(renderable2) {}
+        //Renderable* r1, *r2;
+        qreal yScale_;
+        qreal yOffset_;
+       // Renderable* sequenceListNode_; //ToDo change it later qreal yOffset
+        ScrollEvent(qreal yScale, qreal yOffset) : yScale_(yScale), yOffset_(yOffset) {}
     };
 
 

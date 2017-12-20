@@ -15,7 +15,7 @@ namespace moe{
     class SequenceDiagram : public Renderable {
     public:
 
-        SequenceDiagram(Transform2D transform, QString topBlockLabel, int sequenceLineDepth);
+        SequenceDiagram(Transform2D transform, QString topBlockLabel, qreal sequenceLineDepth); //ToDo changed lineDepth from int to qreal
         Renderable *getSequenceLine_() const;
         Renderable *getOffsetForLine_() const;
         virtual ~SequenceDiagram();

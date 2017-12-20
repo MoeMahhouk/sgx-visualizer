@@ -14,10 +14,11 @@ namespace moe  {
               uint64_t total_time = 0, bool is_private = false, std::string symbol_name = "") :
                 Call(id, eid, symbol_address,start_time, total_time, symbol_name), is_private_(is_private){}
 
-        virtual Rect* toRenderable() const override {
-            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_),15,total_time_,new QPen(Qt::blue));
+        virtual Rect* toRenderable(qreal factor) const override { //ToDo added factor for test purposes
+            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_*factor),50,total_time_*factor,new QPen(Qt::blue));
+            std::cerr << " ECALL position mulitplicated with factor : " << start_time_ * factor << std::endl;
             for (Call *call : children_) {
-                Renderable *childRenderable = call->toRenderable();
+                Renderable *childRenderable = call->toRenderable(factor);
                 callBlock->addBlock(childRenderable);
             }
             return callBlock;

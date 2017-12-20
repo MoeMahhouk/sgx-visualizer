@@ -25,7 +25,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
  */
 uint64_t moe::SgxDatabaseStructure::getProgramStartTime() {
     QSqlQuery query;
-    query.prepare("SELECT value FROM general where key LIKE 'start_time'");
+    query.prepare("SELECT value FROM general WHERE key LIKE 'start_time'");
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
@@ -43,7 +43,7 @@ uint64_t moe::SgxDatabaseStructure::getProgramStartTime() {
  */
 uint64_t moe::SgxDatabaseStructure::getProgramTotalTime() {
     QSqlQuery query;
-    query.prepare("SELECT value FROM general where key LIKE 'start_time' OR key LIKE 'end_time'");
+    query.prepare("SELECT value FROM general WHERE key LIKE 'start_time' OR key LIKE 'end_time'");
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
@@ -84,7 +84,7 @@ int moe::SgxDatabaseStructure::getNumberOfRows(const QString &tableName) {
 }
 /**
  * @param index
- * @return returns the absolute start time of the thread at given index
+ * @return returns the start time of the thread at given index relatively to the program start time
  */
 
 uint64_t moe::SgxDatabaseStructure::getThreadStartTime(int index) {
@@ -111,10 +111,15 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
 
     std::string name, start_symbol_file_name; // TODO add start symbol name and start address normalized and start symbol
 
-    int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO causes problems when added
+    //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //TODO causes problems when added (should be fixed later)
 
     start_time = getThreadStartTime(index);
-    total_time = getProgramTotalTime() - start_time; // TODO another query according the thread destruction event
+
+    /* total time relative to the program start time and not the thread start time
+     * ToDo later this should be replaced with thread_destruction_time - ProgramStartTime to get the length of the threads timeline
+     * ToDo because at the moment all threads sequence diagrams will be drawn at the top despite their creation time which will be later displayed by hovering (maybe)
+     */
+    total_time = getProgramTotalTime(); // TODO another query according the thread destruction event
 
     QSqlQuery query;
     query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
@@ -180,6 +185,7 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
         call_event = query.value(5).toInt();
 
         switch(query.value(1).toInt()) { //EventType
+
             case (int)EventMap::EnclaveECallEvent: {
                 QSqlQuery tmpQuery;
                 tmpQuery.prepare("SELECT eid,symbol_address,symbol_name,is_private FROM ecalls WHERE id = (:id)");
@@ -197,12 +203,15 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
                 calls[id] = eCall;
 
                 if(call_event != 0) {
+                    //here i calculate the relative start time of the child according to his parent start time
+                    eCall->start_time_ -= getRelaTimeOfParent(call_event);
                     calls[call_event]->children_.push_back(eCall);
                 } else {
                     threads_[index].threadEcalls_.push_back(eCall);
                 }
                 break;
             }
+
             case (int)EventMap::EnclaveOCallEvent : {
                 QSqlQuery tmpQuery;
                 tmpQuery.prepare("SELECT eid,symbol_name,symbol_file_name,symbol_address,symbol_address_normalized "
@@ -224,6 +233,8 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
                 calls[id] = oCall;
 
                 if(call_event != 0) {
+                    //here i calculate the relative start time of the child according to his parent start time
+                    oCall->start_time_ -= getRelaTimeOfParent(call_event);
                     calls[call_event]->children_.push_back(oCall);
                 } else { //this should never be reachable unless the database is corrupted
                     std::cerr << "OCall has no ecall id from which its triggered " << std::endl;
@@ -236,7 +247,23 @@ void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
     }
 }
 
-
 void moe::SgxDatabaseStructure::close() {
 m_db.close();
+}
+
+/**
+ *
+ * @param parentRowNumber
+ * @return the time of the event at the given row number relatively to the program start time
+ */
+uint64_t moe::SgxDatabaseStructure::getRelaTimeOfParent(int parentRowNumber) {
+    QSqlQuery query;
+    query.prepare("SELECT  time FROM events WHERE id = (:id) ");
+    query.bindValue(":id", parentRowNumber);
+    if(!query.exec()) {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return -1;
+    }
+    query.next();
+    return (uint64_t)(query.value(0).toDouble() - getProgramStartTime());
 }

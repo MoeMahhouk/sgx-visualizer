@@ -34,6 +34,7 @@ namespace moe {
         uint64_t getProgramStartTime() override;
         void close() override;
     private:
+        uint64_t  getRelaTimeOfParent(int parentRowNumber);
         int getEcallsNumberOfThreadAtIndex(int index);
         void initializeECallsOfThreadAtIndex(int index);
         void initializeThreadAtIndex(int index);

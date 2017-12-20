@@ -17,10 +17,11 @@ namespace moe {
                                               symbol_address_normalized_(symbol_address_normalized),
                                               symbol_file_name_(symbol_file_name) {}
 
-        virtual Rect* toRenderable() const override {
-            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_),15,total_time_,new QPen(Qt::yellow),new QBrush(Qt::yellow));
+        virtual Rect* toRenderable(qreal factor) const override { //ToDo added factor for test purposes
+            Rect *callBlock = new Rect(Transform2D(1,0,0,1,-2,start_time_*factor),35,total_time_*factor,new QPen(Qt::yellow),new QBrush(Qt::yellow));
+            std::cerr << "OCALL position mulitplicated with factor : " << start_time_ * factor << std::endl;
             for (Call *call : children_) {
-                Renderable *childRenderable = call->toRenderable();
+                Renderable *childRenderable = call->toRenderable(factor);
                 callBlock->addBlock(childRenderable);
             }
             return callBlock;

@@ -32,9 +32,11 @@ namespace moe {
         int getNumberOfRows(const QString& tableName) override;
         uint64_t getThreadStartTime(int index) override;
         uint64_t getProgramStartTime() override;
+        uint64_t getProgramEndTime() override;
         void close() override;
     private:
         uint64_t  getRelaTimeOfParent(int parentRowNumber);
+        uint64_t  getThreadTotalTime(int index);
         int getEcallsNumberOfThreadAtIndex(int index);
         void initializeECallsOfThreadAtIndex(int index);
         void initializeThreadAtIndex(int index);

@@ -60,15 +60,15 @@ namespace moe {
             std::string myIndent = sceneData.indent;
             sceneData.indent += "\t";
 
-            std::cout << myIndent << name << " " << this << std::endl;
+            //std::cout << myIndent << name << " " << this << std::endl;
 
             for(Renderable* child: children_) {
-                std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
+               // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
                 child->render(sceneData, absoluteTransform_);
             }
             sceneData.indent = myIndent;
 
-            std::cout << myIndent << "done" << std::endl;
+            //std::cout << myIndent << "done" << std::endl;
         }
     protected:
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) = 0;

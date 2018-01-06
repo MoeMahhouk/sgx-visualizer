@@ -37,6 +37,7 @@ private slots:
 protected:
     void wheelEvent ( QWheelEvent * event );
 private:
+
     moe::Renderable *sceneRootNode_;
     moe::Renderable *sequenceListNode_;
     moe::MeasureLine *measureLine_;
@@ -51,13 +52,16 @@ private:
     //moe::Rect *topElement;
     //moe::Renderable *lineOfTopElement;
     //moe::Line *lineOfTopElement2;
-    void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo added factor for test purposes
+    void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1);
     void createMenus();
     void createStatusBar();
     void createActions();
     void createToolbar();
     void drawScene();
     void render();
+    void verticalScroll(qreal yOffset, qreal factor = 1);
+    void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
+    void scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo implement it later as a button with Slots and Signals
     void applySettings();
     void writeSettings();
     void loadFile(const QString &fileName);
@@ -66,8 +70,9 @@ private:
 
 
     Ui::MainWindow *ui;
-    qreal yScale = 1; //toDo better solution for zooming
-    qreal yOffset = 0;
+    qreal factor_ = 1;
+    qreal yScale_ = 1; //toDo better solution for zooming
+    qreal yOffset_ = 0;
     QGraphicsView *view_;
     QGraphicsScene *scene_;
     QMenu *fileMenu_;

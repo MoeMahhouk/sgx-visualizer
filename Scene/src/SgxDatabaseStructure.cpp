@@ -2,6 +2,7 @@
 // Created by moe on 19.12.17.
 //
 
+//#include <assert.h>
 #include "SgxDatabaseStructure.h"
 
 moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QString &type) : DataBaseManager(path) {
@@ -26,6 +27,22 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
 uint64_t moe::SgxDatabaseStructure::getProgramStartTime() {
     QSqlQuery query;
     query.prepare("SELECT value FROM general WHERE key LIKE 'start_time'");
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return -1;
+    } else {
+        query.next();
+        //std::cout << query.value(0).toInt() << std::endl;
+        return query.value(0).toDouble();
+    }
+}
+/**
+ * @return the program's end time relatively to the PC logged with
+ */
+uint64_t moe::SgxDatabaseStructure::getProgramEndTime() {
+    QSqlQuery query;
+    query.prepare("SELECT value FROM general WHERE key LIKE 'end_time'");
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
@@ -97,8 +114,8 @@ uint64_t moe::SgxDatabaseStructure::getThreadStartTime(int index) {
         return -1;
     } else {
         query.next();
-        int64_t result = query.value(0).toDouble() - getProgramStartTime();
-        return result < 0 ? 0 : result; //ToDo problem got fixed but this still not hurt :-)
+        int64_t result = query.value(0).toDouble() /*- getProgramStartTime()*/;
+        return result;
     }
 }
 
@@ -113,7 +130,7 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
 
     //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //ToDo causes problems when added (should be fixed later)
 
-    start_time = getThreadStartTime(index);
+    start_time = getThreadStartTime(index) - getProgramStartTime(); // Absolute start_time
 
     /* total time relative to the program start time and not the thread start time
      * ToDo later this should be replaced with thread_destruction_time - ProgramStartTime to get the length of the threads timeline
@@ -260,6 +277,7 @@ uint64_t moe::SgxDatabaseStructure::getRelaTimeOfParent(int parentRowNumber) {
     QSqlQuery query;
     query.prepare("SELECT  time FROM events WHERE id = (:id) ");
     query.bindValue(":id", parentRowNumber);
+    //assert(query.exec());
     if(!query.exec()) {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
         return -1;
@@ -267,3 +285,30 @@ uint64_t moe::SgxDatabaseStructure::getRelaTimeOfParent(int parentRowNumber) {
     query.next();
     return (uint64_t)(query.value(0).toDouble() - getProgramStartTime());
 }
+/*
+ * this method is still buggy and needs lot of work and the whole program should be then reworked because the ecalls and ocalls
+ * will be printed way further than the relative thread they are called from
+ * and this problem is originated because the threads are beside each other and not to their own real start time
+ */
+uint64_t moe::SgxDatabaseStructure::getThreadTotalTime(int index) {
+    QSqlQuery query;
+    query.prepare("SELECT time FROM events WHERE involved_thread = (:involvedThread) AND type = 5");
+    query.bindValue(":involvedThread", index);
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return -1;
+    } else {
+        uint64_t threadStartTime = getThreadStartTime(index);
+        uint64_t result = 0;
+        if (query.size() != 0) {
+            query.next();
+            result = query.value(0).toDouble() - threadStartTime;
+            return (uint64_t)result;
+        } else {
+            result = getProgramEndTime() - threadStartTime;
+            return (uint64_t) result;
+        }
+    }
+}
+

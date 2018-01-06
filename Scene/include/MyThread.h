@@ -40,7 +40,7 @@ namespace moe {
         SequenceDiagram* toRenderable(qreal factor) const { //ToDo added factor parameter for test purposes
 
             SequenceDiagram *threadSeqDiag = new SequenceDiagram(Transform2D()
-                                                                ,"Pthread --" + QString::number(pthread_id_ % 1000)
+                                                                ,"ThreadNr --" + QString::number(id_)
                                                                 ,total_time_ * factor
                                                                 );
             for (ECall *eCall : threadEcalls_) {

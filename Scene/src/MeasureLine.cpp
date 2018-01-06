@@ -13,7 +13,6 @@ void moe::MeasureLine::draw(moe::SceneData &sceneData, moe::Transform2D &parentT
 moe::MeasureLine::MeasureLine(Transform2D transform, uint64_t total_timeline, int pixel_line_depth, int scaleLines) :
         Renderable(transform), total_timeline_(total_timeline), pixel_line_depth_(pixel_line_depth),
         measureLine_ (Transform2D(),0 ,pixel_line_depth,2)
-//TODO i added 500 only for test purpose, fix later by adding factor parameter or another solution (changed)
 //ToDo i changed the hardcoded 500 from above and added new class variable for the line depth in pixel and not nano second
 {
     name = "MeasureLine";

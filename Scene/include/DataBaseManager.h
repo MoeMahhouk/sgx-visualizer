@@ -25,6 +25,7 @@ namespace moe {
         virtual void close() = 0;
         virtual uint64_t getThreadStartTime(int index) = 0;
         virtual uint64_t getProgramStartTime() = 0;
+        virtual uint64_t getProgramEndTime() = 0;
         virtual int getNumberOfRows(const QString& tableName) = 0;
         QVector<MyThread> threads_;
     };

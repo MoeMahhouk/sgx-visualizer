@@ -90,6 +90,7 @@ void MainWindow::scrollLeftPressed()
 void MainWindow::scrollToNextEvent() {
     if(db)
     {
+        std::cerr << "data base is not null" << std::endl;
         scrollToNextEvent(db->getThreads_(),factor_);
     }
 }
@@ -133,7 +134,7 @@ void MainWindow::drawScene()
     QPushButton* reset = new QPushButton(tr("Reset"), this);
     QPushButton* scrollRight = new QPushButton(tr("Scroll Right"), this);
     QPushButton* scrollLeft = new QPushButton(tr("Scroll Left"), this);
-    QPushButton* scrollToNextEvent = new QPushButton(tr("Next Event"), this);
+    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), this);
     reset->move(0,155);
     zoomOut->move(0,105);
     zoomIn->move(0,55);
@@ -141,7 +142,7 @@ void MainWindow::drawScene()
     scrollDown->move(0,255);
     scrollRight->move(0,305);
     scrollLeft->move(0,355);
-    scrollToNextEvent->move(0,405);
+    scrollToNextEventButton->move(0,405);
     zoomIn->connect(zoomIn, SIGNAL(clicked()) , this, SLOT(onZoomInPressed()));
     zoomOut->connect(zoomOut, SIGNAL(clicked()), this, SLOT(onZoomOutPressed()));
     reset->connect(reset,SIGNAL(clicked()),this, SLOT(resetPressed()));
@@ -149,7 +150,7 @@ void MainWindow::drawScene()
     scrollDown->connect(scrollDown,SIGNAL(clicked()), this,SLOT(scrollDownPressed()));
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
-    scrollToNextEvent->connect(scrollToNextEvent, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
+    scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
     view_ = new QGraphicsView(scene_, this);
     view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
@@ -265,7 +266,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
                 {
                     new_yOffset = threads[i].threadEcalls_[j]->start_time_;
                     std::cout << "next event is found, the current time is : " << currentTime << std::endl;
-                    std::cout << "the new yOffset should be now : " << threads[i].threadEcalls_[j]->start_time_ << std::endl;
+                    std::cout << "the new yOffset should be now : " << threads[i].threadEcalls_[j]->start_time_/10000 << std::endl;
                     std::cout << (threads[i].threadEcalls_[j]->start_time_ > currentTime) << std::endl;
 
                     succFound = true; //ToDo this should later be adjusted for more threads

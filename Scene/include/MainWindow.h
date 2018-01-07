@@ -70,7 +70,7 @@ private:
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-    moe::DataBaseManager* db;
+    moe::DataBaseManager* db = 0;
     Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming

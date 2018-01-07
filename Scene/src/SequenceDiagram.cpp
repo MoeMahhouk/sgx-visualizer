@@ -2,6 +2,7 @@
 // Created by moe on 17.11.17.
 //
 
+
 #include "SequenceDiagram.h"
 
 
@@ -40,7 +41,7 @@ moe::Renderable *moe::SequenceDiagram::getOffsetForLine_() const {
     return offsetForLine_;
 }
 
-const moe::LabeledRect &moe::SequenceDiagram::getTopBlock_() const {
+const moe::LabeledBlock &moe::SequenceDiagram::getTopBlock_() const {
     return topBlock_;
 }
 
@@ -54,11 +55,11 @@ moe::SequenceDiagram::~SequenceDiagram() {
 }
 
 void moe::SequenceDiagram::addBlock(qreal createdTime, qreal endTime) {
-    sequenceLine_->children_.push_back(new moe::Rect(Transform2D(1,0,0,1,-2,createdTime),15,endTime));
+    sequenceLine_->children_.push_back(new moe::SeqDiagBlock(Transform2D(1,0,0,1,-2,createdTime),15,endTime));
 }
 
 void moe::SequenceDiagram::addLabeledBlock(qreal createdTime, qreal endTime, QString blockLabel) {
-    sequenceLine_->children_.push_back(new moe::LabeledRect(Transform2D(1,0,0,1,-2,createdTime),15,endTime, blockLabel));
+    sequenceLine_->children_.push_back(new moe::LabeledBlock(Transform2D(1,0,0,1,-2,createdTime),15,endTime, blockLabel));
 }
 
 void moe::SequenceDiagram::addBlock(moe::Renderable *childBlock) {

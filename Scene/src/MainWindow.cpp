@@ -32,10 +32,10 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
         verticalZoom(pow((double) 2, event->delta() / 240.0));
     } else {
-        verticalScroll(moe::signum(event->delta())*10000000,factor_); //ToDo scrolling schould be negative in the other direction
+        verticalScroll(moe::signum(event->delta())*100000000,factor_); //ToDo scrolling schould be negative in the other direction
     }
 
-    std::cout << event->delta() /360.0<< std::endl;
+    //std::cout << event->delta() /360.0<< std::endl;
 }
 
 void MainWindow::onZoomInPressed()
@@ -67,23 +67,11 @@ void MainWindow::resetPressed()
 void MainWindow::scrollUpPressed()
 {
     verticalScroll(100000000, factor_);
-   /* sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,1000000 * factor_));
-    yOffset_ += 1000000;
-    //moe::ScrollEvent e = {sequenceDiagram->getSequenceLine_(),sequenceListNode_};
-    moe::ScrollEvent e = {yScale_,yOffset_};
-    notify(&e);
-    render();*/
 }
 
 void MainWindow::scrollDownPressed()
 {
     verticalScroll(-100000000, factor_);
-    /*sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,-1000000 * factor_));
-    yOffset_ -= 1000000;
-    //moe::ZoomEvent e = {sequenceDiagram->getSequenceLine_(),sequenceListNode_};
-    moe::ScrollEvent e = {yScale_,yOffset_};
-    notify(&e);
-    render();*/
 }
 
 void MainWindow::scrollRightPressed()
@@ -235,32 +223,44 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
         thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)), 30));
         sequenceListNode_->children_.push_back(thread);
         //ToDo fix the zoom events so that they dont depend on sequence diagram object (partially fixed, still need to be refactored)
-        //ToDo Write a query to get the relative start time of each call to their parent caller (done)
         //ToDo Scale the blocks and the line to a specific measure scale (bugy as hell)
     }
 }
+
+
 //ToDo needs implementation for all ecalls of all threads according to their start time
+/**
+ * jumps to the next event of t
+ * @param threads
+ * @param factor
+ */
 void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor) {
     if (threads.isEmpty()){
         return;
     }
     std::cerr << " yOffset ist : " << threads[0].threadEcalls_[0]->start_time_ << std::endl;
+
     yOffset_ = 0;
     qreal new_yOffset = threads[0].threadEcalls_[0]->start_time_ ;
-    for (int i = 0; i < threads.length() ; ++i) { // ToDo this is not finished and only takes the first ecall of each thread and compare them
-        if(threads[i].threadEcalls_[0]->start_time_ * factor < yOffset_) {
+
+    //real new_yOffset;
+    for (int i = 0; i < threads.length() ; ++i) {// ToDo this is not finished and only takes the first ecall of each thread and compare them
+        /*for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j) {
+
+        }*/
+        if(threads[i].threadEcalls_[0]->start_time_ < yOffset_) {
             new_yOffset = threads[i].threadEcalls_[0]->start_time_;
         }
     }
     verticalScroll(-new_yOffset,factor);
-
-    /*sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,-yOffset_));
-    moe::ScrollEvent e = {yScale_,-yOffset_/factor};
-    notify(&e);
-    */
-
 }
 
+
+/**
+ * abstract function for vertical scall events
+ * @param yOffset
+ * @param factor
+ */
 void MainWindow::verticalScroll(qreal yOffset, qreal factor) {
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,yOffset * factor));
     yOffset_ += yOffset;
@@ -269,15 +269,20 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor) {
     render();
 }
 
+
+/**
+ * abstract function for vertical zoom events
+ * @param yScale
+ * @param factor
+ */
 void MainWindow::verticalZoom(qreal yScale, qreal factor) {
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->setLineScale(yScale);
-        yScale_ *= (yScale);
     }
+    yScale_ *= (yScale);
     moe::ZoomEvent e = {yScale_,yOffset_};
     notify(&e);
     render();
 }
-

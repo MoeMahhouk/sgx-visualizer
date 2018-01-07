@@ -3,8 +3,8 @@
 moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBrush* brush) : Renderable(transform)
 {
     name = "Rect";
-    offsetForLine_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, ((width) - 1), 0));
-    children_.push_back(offsetForLine_);
+    //offsetForLine_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, ((width) - 1), 0));
+    //children_.push_back(offsetForLine_);
     width_ = width;
     height_ = height;
     pen_ = pen;
@@ -43,7 +43,7 @@ void moe::Rect::setWidth(const qreal& width)
     width_ = width;
 }
 
-void moe::Rect::addBlock(moe::Renderable *innerBlock) {
+/*void moe::Rect::addBlock(moe::Renderable *innerBlock) {
     offsetForLine_->children_.push_back(innerBlock);
-}
+}*/
 

@@ -6,9 +6,9 @@
 #define SCENE_SEQUENCEDIAGRAM_H
 
 #include "Renderable.h"
-#include "Rect.h"
+#include "SeqDiagBlock.h"
 #include "Line.h"
-#include "LabeledRect.h"
+#include "LabeledBlock.h"
 
 namespace moe{
 
@@ -19,7 +19,7 @@ namespace moe{
         Renderable *getSequenceLine_() const;
         Renderable *getOffsetForLine_() const;
         virtual ~SequenceDiagram();
-        const LabeledRect &getTopBlock_() const;
+        const LabeledBlock &getTopBlock_() const;
         qreal getLineScale();
         void setLineScale(qreal scale);
         void resetLineScales();
@@ -30,7 +30,7 @@ namespace moe{
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
     private:
-        LabeledRect topBlock_;
+        LabeledBlock topBlock_;
         Renderable* offsetForLine_;
         Renderable* sequenceLine_;
     };

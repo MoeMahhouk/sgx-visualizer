@@ -5,16 +5,16 @@
 #ifndef SCENE_LABELEDRECT_H
 #define SCENE_LABELEDRECT_H
 
-#include "Rect.h"
+#include "SeqDiagBlock.h"
 
 namespace moe {
 
-    class LabeledRect : public Rect {
+    class LabeledBlock : public SeqDiagBlock {
     public:
-        LabeledRect(Transform2D transform = Transform2D(), qreal width=0, qreal height=0, QString title = "",
+        LabeledBlock(Transform2D transform = Transform2D(), qreal width=0, qreal height=0, QString title = "",
                     QPen* pen = new QPen(Qt::red), QBrush* brush  = new QBrush(Qt::blue));
 
-        virtual ~LabeledRect();
+        virtual ~LabeledBlock();
 
         const TitleText &getLabel_() const;
         void setLabelText (const QString &labelText);

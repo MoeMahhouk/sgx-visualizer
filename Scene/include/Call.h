@@ -27,7 +27,7 @@ namespace moe {
             }
             this->children_.clear();
         }
-        virtual Rect* toRenderable(qreal factor) const = 0; //ToDo added factor for test purposes
+        virtual SeqDiagBlock* toRenderable(qreal factor) const = 0; //ToDo added factor for test purposes
     };
 }
 

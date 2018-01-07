@@ -27,12 +27,12 @@ namespace moe {
         qreal getWidth() const;
         void setWidth(const qreal& width);
 
-        void addBlock(Renderable *innerBlock);
+        //void addBlock(Renderable *innerBlock);
 
     protected:
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
         qreal width_, height_;
-        Renderable* offsetForLine_;
+       // Renderable* offsetForLine_;
         QPen* pen_;
         QBrush* brush_;
 

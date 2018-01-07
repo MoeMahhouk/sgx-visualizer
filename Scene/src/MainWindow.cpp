@@ -248,37 +248,41 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     if (threads.isEmpty()){
         return;
     }
-    std::cerr << " yOffset ist : " << yOffset_ << std::endl;
-    /*yOffset_ = 0;
-    qreal new_yOffset = threads[0].threadEcalls_[0]->start_time_ ;
-    */
-    qreal new_yOffset = yOffset_ * moe::signum(yOffset_);
-    if (yOffset_ != 0)
+    qreal currentTime = (qreal)((yOffset_ * moe::signum(yOffset_)) / yScale_)/10000;
+
+    std::cerr << " yOffset ist : " << (yOffset_ * moe::signum(yOffset_))/yScale_ << std::endl;
+    qreal new_yOffset = 0;
+
+    if (currentTime != 0)
     {
         bool succFound = false;
-        //int marker = 0;
+
         for (int i = 0; i < threads.length() ; ++i)
         {
             for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
             {
-                if(threads[i].threadEcalls_[j]->start_time_ > (yOffset_ * moe::signum(yOffset_)) / yScale_)
+                if(threads[i].threadEcalls_[j]->start_time_/10000 > currentTime)
                 {
-                    new_yOffset = threads[i].threadEcalls_[j]->start_time_ * yScale_;
+                    new_yOffset = threads[i].threadEcalls_[j]->start_time_;
+                    std::cout << "next event is found, the current time is : " << currentTime << std::endl;
+                    std::cout << "the new yOffset should be now : " << threads[i].threadEcalls_[j]->start_time_ << std::endl;
+                    std::cout << (threads[i].threadEcalls_[j]->start_time_ > currentTime) << std::endl;
+
                     succFound = true; //ToDo this should later be adjusted for more threads
                     break;
                 }
-                if(succFound)
-                {
-                    break;
-                } else {
-                    new_yOffset = 0;
-                }
             }
+            /*if(succFound)
+            {
+                break;
+            } else {
+                new_yOffset = 0;
+            }*/
         }
     } else {
-        new_yOffset = threads[0].threadEcalls_[0]->start_time_ ;
+        new_yOffset = threads[0].threadEcalls_[0]->start_time_;
     }
-    scrollTo(-new_yOffset,factor);
+    scrollTo(-new_yOffset * yScale_,factor);
 }
 //ToDo needs implementation for all ecalls of all threads according to their start time
 

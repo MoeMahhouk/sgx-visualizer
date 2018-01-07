@@ -33,6 +33,7 @@ private slots:
     void scrollDownPressed();
     void scrollRightPressed();
     void scrollLeftPressed();
+    void scrollToNextEvent();
 
 protected:
     void wheelEvent ( QWheelEvent * event );
@@ -62,13 +63,14 @@ private:
     void verticalScroll(qreal yOffset, qreal factor = 1);
     void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
     void scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo implement it later as a button with Slots and Signals
+    void scrollTo(qreal yOffset, qreal factor = 1);
     void applySettings();
     void writeSettings();
     void loadFile(const QString &fileName);
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-
+    moe::DataBaseManager* db;
     Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming

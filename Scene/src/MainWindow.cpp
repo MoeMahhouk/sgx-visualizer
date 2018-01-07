@@ -17,6 +17,7 @@ MainWindow::~MainWindow()
 {
    // delete ui;
 	delete sceneRootNode_;
+    delete db;
 }
 
 
@@ -86,6 +87,13 @@ void MainWindow::scrollLeftPressed()
     render();
 }
 
+void MainWindow::scrollToNextEvent() {
+    if(db)
+    {
+        scrollToNextEvent(db->getThreads_(),factor_);
+    }
+}
+
 void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
@@ -125,6 +133,7 @@ void MainWindow::drawScene()
     QPushButton* reset = new QPushButton(tr("Reset"), this);
     QPushButton* scrollRight = new QPushButton(tr("Scroll Right"), this);
     QPushButton* scrollLeft = new QPushButton(tr("Scroll Left"), this);
+    QPushButton* scrollToNextEvent = new QPushButton(tr("Next Event"), this);
     reset->move(0,155);
     zoomOut->move(0,105);
     zoomIn->move(0,55);
@@ -132,6 +141,7 @@ void MainWindow::drawScene()
     scrollDown->move(0,255);
     scrollRight->move(0,305);
     scrollLeft->move(0,355);
+    scrollToNextEvent->move(0,405);
     zoomIn->connect(zoomIn, SIGNAL(clicked()) , this, SLOT(onZoomInPressed()));
     zoomOut->connect(zoomOut, SIGNAL(clicked()), this, SLOT(onZoomOutPressed()));
     reset->connect(reset,SIGNAL(clicked()),this, SLOT(resetPressed()));
@@ -139,6 +149,7 @@ void MainWindow::drawScene()
     scrollDown->connect(scrollDown,SIGNAL(clicked()), this,SLOT(scrollDownPressed()));
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
+    scrollToNextEvent->connect(scrollToNextEvent, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
     view_ = new QGraphicsView(scene_, this);
     view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
@@ -147,7 +158,7 @@ void MainWindow::drawScene()
     //zoomIn->setFixedSize(20,20);
     //zoomIn->setParent(view_);
     sceneRootNode_ = new moe::EmptyRenderable();
-    sequenceListNode_ = new moe::EmptyRenderable();
+    sequenceListNode_ = new moe::EmptyRenderable(moe::Transform2D(1,0,0,1,0,0));
    // sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, scene_->sceneRect().x()+90,scene_->sceneRect().center().y()/4),tr("test1"),500);
     //measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,
       //                                                              scene_->sceneRect().x()+10,50
@@ -192,16 +203,15 @@ void MainWindow::writeSettings()
 
 void MainWindow::loadFile(const QString& fileName)
 {
-    moe::DataBaseManager* db = new moe::SgxDatabaseStructure(fileName);
+    db = new moe::SgxDatabaseStructure(fileName);
     factor_ = 500.0/db->getProgramTotalTime();
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+10,50),db->getProgramTotalTime(),500,40);
     registerObserver(measureLine_);
     visualizeThreads(db->getThreads_(), factor_); //ToDo still should be tested
-    scrollToNextEvent(db->getThreads_(), factor_);
+   // scrollToNextEvent(db->getThreads_(), factor_);
     //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
     sceneRootNode_->children_.push_back(measureLine_);
     render();
-    delete db;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -228,40 +238,57 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
 }
 
 
-//ToDo needs implementation for all ecalls of all threads according to their start time
 /**
- * jumps to the next event of t
+ * jumps to the next event in consideration of their start time
  * @param threads
  * @param factor
  */
-void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor) {
+void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor)
+{
     if (threads.isEmpty()){
         return;
     }
-    std::cerr << " yOffset ist : " << threads[0].threadEcalls_[0]->start_time_ << std::endl;
-
-    yOffset_ = 0;
+    std::cerr << " yOffset ist : " << yOffset_ << std::endl;
+    /*yOffset_ = 0;
     qreal new_yOffset = threads[0].threadEcalls_[0]->start_time_ ;
-
-    //real new_yOffset;
-    for (int i = 0; i < threads.length() ; ++i) {// ToDo this is not finished and only takes the first ecall of each thread and compare them
-        /*for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j) {
-
-        }*/
-        if(threads[i].threadEcalls_[0]->start_time_ < yOffset_) {
-            new_yOffset = threads[i].threadEcalls_[0]->start_time_;
+    */
+    qreal new_yOffset = yOffset_ * moe::signum(yOffset_);
+    if (yOffset_ != 0)
+    {
+        bool succFound = false;
+        //int marker = 0;
+        for (int i = 0; i < threads.length() ; ++i)
+        {
+            for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
+            {
+                if(threads[i].threadEcalls_[j]->start_time_ > (yOffset_ * moe::signum(yOffset_)) / yScale_)
+                {
+                    new_yOffset = threads[i].threadEcalls_[j]->start_time_ * yScale_;
+                    succFound = true; //ToDo this should later be adjusted for more threads
+                    break;
+                }
+                if(succFound)
+                {
+                    break;
+                } else {
+                    new_yOffset = 0;
+                }
+            }
         }
+    } else {
+        new_yOffset = threads[0].threadEcalls_[0]->start_time_ ;
     }
-    verticalScroll(-new_yOffset,factor);
+    scrollTo(-new_yOffset,factor);
 }
-
+//ToDo needs implementation for all ecalls of all threads according to their start time
 
 /**
  * abstract function for vertical scall events
  * @param yOffset
  * @param factor
  */
-void MainWindow::verticalScroll(qreal yOffset, qreal factor) {
+void MainWindow::verticalScroll(qreal yOffset, qreal factor)
+{
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,yOffset * factor));
     yOffset_ += yOffset;
     moe::ScrollEvent e = {yScale_,yOffset_};
@@ -275,7 +302,8 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor) {
  * @param yScale
  * @param factor
  */
-void MainWindow::verticalZoom(qreal yScale, qreal factor) {
+void MainWindow::verticalZoom(qreal yScale, qreal factor)
+{
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
@@ -286,3 +314,12 @@ void MainWindow::verticalZoom(qreal yScale, qreal factor) {
     notify(&e);
     render();
 }
+
+void MainWindow::scrollTo(qreal yOffset, qreal factor) {
+    sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,0,yOffset * factor));
+    yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
+    moe::ScrollEvent e = {yScale_,yOffset_};
+    notify(&e);
+    render();
+}
+

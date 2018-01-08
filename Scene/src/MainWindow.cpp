@@ -33,7 +33,7 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
         verticalZoom(pow((double) 2, event->delta() / 240.0));
     } else {
-        verticalScroll(moe::signum(event->delta())*100000000,factor_); //ToDo scrolling schould be negative in the other direction
+        verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
     }
 
     //std::cout << event->delta() /360.0<< std::endl;
@@ -90,7 +90,7 @@ void MainWindow::scrollLeftPressed()
 void MainWindow::scrollToNextEvent() {
     if(db)
     {
-        std::cerr << "data base is not null" << std::endl;
+       // std::cerr << "data base is not null" << std::endl;
         scrollToNextEvent(db->getThreads_(),factor_);
     }
 }
@@ -249,43 +249,41 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     if (threads.isEmpty()){
         return;
     }
-    qreal currentTime = (qreal)((yOffset_ * moe::signum(yOffset_)) / yScale_)/10000;
-
-    std::cerr << " yOffset ist : " << (yOffset_ * moe::signum(yOffset_))/yScale_ << std::endl;
+    qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/10000;
     qreal new_yOffset = 0;
+    QVector<qreal> nextEventStartTime;
 
     if (currentTime != 0)
     {
-        bool succFound = false;
-
         for (int i = 0; i < threads.length() ; ++i)
         {
             for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
             {
                 if(threads[i].threadEcalls_[j]->start_time_/10000 > currentTime)
                 {
-                    new_yOffset = threads[i].threadEcalls_[j]->start_time_;
-                    std::cout << "next event is found, the current time is : " << currentTime << std::endl;
+                    nextEventStartTime.push_back(threads[i].threadEcalls_[j]->start_time_);
+                    /*std::cout << "next event is found, the current time is : " << currentTime << std::endl;
                     std::cout << "the new yOffset should be now : " << threads[i].threadEcalls_[j]->start_time_/10000 << std::endl;
-                    std::cout << (threads[i].threadEcalls_[j]->start_time_ > currentTime) << std::endl;
-
-                    succFound = true; //ToDo this should later be adjusted for more threads
+                    std::cout << (threads[i].threadEcalls_[j]->start_time_ > currentTime) << std::endl;*/
                     break;
                 }
             }
-            /*if(succFound)
-            {
-                break;
-            } else {
-                new_yOffset = 0;
-            }*/
+        }
+        if(!nextEventStartTime.isEmpty())
+        {
+            new_yOffset = nextEventStartTime[0];
+            for (int i = 0; i < nextEventStartTime.length()  ; ++i) {
+                if (new_yOffset > nextEventStartTime[i])
+                {
+                    new_yOffset = nextEventStartTime[i];
+                }
+            }
         }
     } else {
         new_yOffset = threads[0].threadEcalls_[0]->start_time_;
     }
     scrollTo(-new_yOffset * yScale_,factor);
 }
-//ToDo needs implementation for all ecalls of all threads according to their start time
 
 /**
  * abstract function for vertical scall events
@@ -321,7 +319,8 @@ void MainWindow::verticalZoom(qreal yScale, qreal factor)
 }
 
 void MainWindow::scrollTo(qreal yOffset, qreal factor) {
-    sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,0,yOffset * factor));
+    qreal oldXCoordinate = sequenceListNode_->getTransform().getX(); // so that it wont reset the xCoordinate each time next Event is clicked
+    sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCoordinate,yOffset * factor));
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
     moe::ScrollEvent e = {yScale_,yOffset_};
     notify(&e);

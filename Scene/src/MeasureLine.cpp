@@ -27,7 +27,7 @@ moe::MeasureLine::MeasureLine(Transform2D transform, uint64_t total_timeline, in
     children_.push_back(&measureLine_);
 
     generateScales(1,0);
-    std::cout << "MeasureLine created with scales" << std::endl;
+    //std::cout << "MeasureLine created with scales" << std::endl;
 }
 
 moe::Line & moe::MeasureLine::getMeasureLine_() {

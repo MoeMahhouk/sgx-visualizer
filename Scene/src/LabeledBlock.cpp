@@ -11,11 +11,11 @@ moe::LabeledBlock::LabeledBlock(Transform2D transform, qreal width, qreal height
 
     name = "LabeledBlock";
     this->children_.push_back(&label_);
-    std::cout << "labeledRect born "<< this << std::endl;
+    //std::cout << "labeledRect born "<< this << std::endl;
 }
 
 moe::LabeledBlock::~LabeledBlock() {
-    std::cout << "LabeledBlock is dying " << this << std::endl;
+    //std::cout << "LabeledBlock is dying " << this << std::endl;
     children_.removeAll(&label_);
 }
 

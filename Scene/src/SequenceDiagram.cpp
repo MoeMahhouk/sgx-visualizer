@@ -17,7 +17,7 @@ moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLab
     topBlock_.children_.push_back(offsetForLine_);
     sequenceLine_ = new moe::Line(Transform2D(),0,sequenceLineDepth,2);
     offsetForLine_->children_.push_back(sequenceLine_);
-    std::cout << "sequence diagram created" << std::endl;
+    //std::cout << "sequence diagram created" << std::endl;
 }
 
 moe::Renderable *moe::SequenceDiagram::getSequenceLine_() const {

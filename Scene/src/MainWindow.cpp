@@ -31,10 +31,10 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
-        qreal oldYOffset = yOffset_;
+       // qreal oldYOffset = yOffset_;
         qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
         verticalZoom(yScaleFactor);
-        scrollTo(oldYOffset * yScaleFactor, factor_);
+        //scrollTo(oldYOffset * yScaleFactor, factor_);
         //std::cerr << "the oldYOffset is : " << oldYOffset * factor_ << std::endl;
     } else {
         verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
@@ -128,7 +128,6 @@ void MainWindow::createToolbar()
 
 void MainWindow::drawScene()
 {
-    scene_ = new QGraphicsScene(this);
     QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
     QPushButton* scrollDown = new QPushButton(tr("Scroll Down"), this);
     QPushButton* zoomIn = new QPushButton(tr("Zoom In"), this);
@@ -153,11 +152,21 @@ void MainWindow::drawScene()
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
     scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
-    view_ = new QGraphicsView(scene_, this);
-    view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scene_ = new QGraphicsScene(this);
+    view_ = new QGraphicsView(scene_,this);
+    //view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
     view_->setGeometry(200, 55, this->rect().width()*0.8, this->rect().height()*0.9);
+    view_->setFrameStyle(0);
+
+    //view_->centerOn(200,55);
+    //view_->setFixedSize(this->rect().width()*0.8,this->rect().height()*0.9);
+    //view_->fitInView(0,0,this->rect().width()*0.8,this->rect().height()*0.9,Qt::KeepAspectRatio);
+    //QRect viewRect = view_->rect();
+    //viewRect.setRect(0,0,this->rect().width()*0.8-200, this->rect().height()*0.9-55);
     scene_->setSceneRect(view_->rect());
+    //scene_->setSceneRect(view_->rect().x()*0.8,view_->rect().y()*0.8,view_->rect().width()*0.8,view_->rect().height()*0.8);
+
     //zoomIn->setFixedSize(20,20);
     //zoomIn->setParent(view_);
     sceneRootNode_ = new moe::EmptyRenderable();
@@ -214,7 +223,7 @@ void MainWindow::loadFile(const QString& fileName)
    // scrollToNextEvent(db->getThreads_(), factor_);
     //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
     sceneRootNode_->children_.push_back(measureLine_);
-    //zoomAndScrollTofirstEvent();
+    zoomAndScrollTofirstEvent();
     render();
 }
 
@@ -285,7 +294,8 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     } else {
         new_yOffset = threads[0].threadEcalls_[0]->start_time_;
     }
-    scrollTo(-new_yOffset * yScale_,factor);
+    scrollTo(-new_yOffset * yScale_, factor);
+    render();
 }
 
 /**
@@ -295,9 +305,9 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
  */
 void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 {
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,0,yOffset * factor));
+    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, yOffset * factor));
     yOffset_ += yOffset;
-    moe::ScrollEvent e = {yScale_,yOffset_};
+    moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
     render();
 }
@@ -310,14 +320,16 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
  */
 void MainWindow::verticalZoom(qreal yScale, qreal factor)
 {
+    qreal oldYOffset = yOffset_;
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
         s->setLineScale(yScale);
     }
-    yScale_ *= (yScale);
-    moe::ZoomEvent e = {yScale_,yOffset_};
+    yScale_ *= yScale;
+    moe::ZoomEvent e = {yScale_, yOffset_};
     notify(&e);
+    scrollTo(oldYOffset * yScale, factor_);
     render();
 }
 
@@ -325,9 +337,9 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor) {
     qreal oldXCoordinate = sequenceListNode_->getTransform().getX(); // so that it wont reset the xCoordinate each time next Event is clicked
     sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCoordinate,yOffset * factor));
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
-    moe::ScrollEvent e = {yScale_,yOffset_};
+    moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
-    render();
+    //render();
 }
 /**
  * calculate the total program usage and scrolls to the first event and scales the whole process so that it will be

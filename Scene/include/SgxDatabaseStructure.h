@@ -28,12 +28,12 @@ namespace moe {
         };
 
         uint64_t getProgramTotalTime() override;
+        void close() override;
     protected:
         int getNumberOfRows(const QString& tableName) override;
         uint64_t getThreadStartTime(int index) override;
         uint64_t getProgramStartTime() override;
         uint64_t getProgramEndTime() override;
-        void close() override;
     private:
         uint64_t  getRelaTimeOfParent(int parentRowNumber);
         uint64_t  getThreadTotalTime(int index);

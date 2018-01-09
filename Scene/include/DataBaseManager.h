@@ -21,8 +21,8 @@ namespace moe {
             return threads_;
         }
         virtual uint64_t getProgramTotalTime() = 0;
-    protected:
         virtual void close() = 0;
+    protected:
         virtual uint64_t getThreadStartTime(int index) = 0;
         virtual uint64_t getProgramStartTime() = 0;
         virtual uint64_t getProgramEndTime() = 0;

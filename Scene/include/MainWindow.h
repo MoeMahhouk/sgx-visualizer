@@ -4,13 +4,13 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
-#include "Renderable.h"
-#include "Rect.h"
-#include "Line.h"
-#include "SequenceDiagram.h"
-#include "MeasureLine.h"
-#include "Notifier.h"
-#include "SgxDatabaseStructure.h"
+#include "Rendering/Renderable.h"
+#include "Rendering/Rect.h"
+#include "Rendering/Line.h"
+#include "Rendering/SequenceDiagram.h"
+#include "Rendering/MeasureLine.h"
+#include "Utility/Notifier.h"
+#include "DataBase/SGX/SgxDatabaseStructure.h"
 
 namespace Ui {
 class MainWindow;
@@ -71,7 +71,7 @@ private:
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-    moe::DataBaseManager* db = 0;
+    moe::SgxDatabaseStructure* db = 0;
     Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming
@@ -86,7 +86,7 @@ private:
     QStatusBar *statusBar_;
 
     QAction *openAction_;
-
+    QVector <moe::MyThread*> threadsFilterList;
 
 
 };

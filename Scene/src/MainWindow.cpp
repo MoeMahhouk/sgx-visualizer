@@ -1,6 +1,6 @@
 
 #include "MainWindow.h"
-#include "MathUtility.h"
+#include "Utility/MathUtility.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {

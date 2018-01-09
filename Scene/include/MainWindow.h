@@ -64,6 +64,7 @@ private:
     void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
     void scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo implement it later as a button with Slots and Signals
     void scrollTo(qreal yOffset, qreal factor = 1);
+    void zoomAndScrollTofirstEvent();
     void applySettings();
     void writeSettings();
     void loadFile(const QString &fileName);

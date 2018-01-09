@@ -31,7 +31,12 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
+        //qreal oldYOffset = yOffset_;
+        //qreal oldYscale = yScale_;
         verticalZoom(pow((double) 2, event->delta() / 240.0));
+        //qreal yScaleDiff = yScale_ - oldYscale;
+        //scrollTo(oldYOffset * (1/yScaleDiff) ,factor_);
+        //std::cerr << "the oldYOffset is : " << oldYOffset * factor_ << std::endl;
     } else {
         verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
     }
@@ -212,6 +217,7 @@ void MainWindow::loadFile(const QString& fileName)
    // scrollToNextEvent(db->getThreads_(), factor_);
     //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
     sceneRootNode_->children_.push_back(measureLine_);
+    //zoomAndScrollTofirstEvent();
     render();
 }
 
@@ -233,7 +239,6 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
         thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)), 30));
         sequenceListNode_->children_.push_back(thread);
-        //ToDo fix the zoom events so that they dont depend on sequence diagram object (partially fixed, still need to be refactored)
         //ToDo Scale the blocks and the line to a specific measure scale (bugy as hell)
     }
 }
@@ -249,7 +254,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     if (threads.isEmpty()){
         return;
     }
-    qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/10000;
+    qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
     qreal new_yOffset = 0;
     QVector<qreal> nextEventStartTime;
 
@@ -259,7 +264,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
         {
             for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
             {
-                if(threads[i].threadEcalls_[j]->start_time_/10000 > currentTime)
+                if(threads[i].threadEcalls_[j]->start_time_/1000 > currentTime)
                 {
                     nextEventStartTime.push_back(threads[i].threadEcalls_[j]->start_time_);
                     /*std::cout << "next event is found, the current time is : " << currentTime << std::endl;
@@ -325,5 +330,21 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor) {
     moe::ScrollEvent e = {yScale_,yOffset_};
     notify(&e);
     render();
+}
+
+void MainWindow::zoomAndScrollTofirstEvent() {
+    if(db)
+    {
+        qreal yScaleNew = yScale_;
+        qreal startTimeOfFirstEvent = db->getThreads_()[0].threadEcalls_[0]->start_time_;
+        int lastThreadIndex = db->getThreads_().length() - 1;
+        int lastEcallIndex = db->getThreads_()[lastThreadIndex].threadEcalls_.length() - 1;
+        qreal startTimeOfLastEvent = db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->start_time_;
+        qreal endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->total_time_;
+
+        yScaleNew = (qreal)db->getProgramTotalTime() / (endTimeOfLastEvent - startTimeOfFirstEvent);
+        verticalZoom(yScaleNew,factor_);
+        scrollTo(-startTimeOfFirstEvent * yScale_, factor_);
+    }
 }
 

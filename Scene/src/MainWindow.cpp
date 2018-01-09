@@ -31,11 +31,10 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
-        //qreal oldYOffset = yOffset_;
-        //qreal oldYscale = yScale_;
-        verticalZoom(pow((double) 2, event->delta() / 240.0));
-        //qreal yScaleDiff = yScale_ - oldYscale;
-        //scrollTo(oldYOffset * (1/yScaleDiff) ,factor_);
+        qreal oldYOffset = yOffset_;
+        qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
+        verticalZoom(yScaleFactor);
+        scrollTo(oldYOffset * yScaleFactor, factor_);
         //std::cerr << "the oldYOffset is : " << oldYOffset * factor_ << std::endl;
     } else {
         verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
@@ -331,7 +330,10 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor) {
     notify(&e);
     render();
 }
-
+/**
+ * calculate the total program usage and scrolls to the first event and scales the whole process so that it will be
+ * visualised according to the scale line
+ */
 void MainWindow::zoomAndScrollTofirstEvent() {
     if(db)
     {

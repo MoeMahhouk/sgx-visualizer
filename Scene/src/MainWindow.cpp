@@ -39,8 +39,6 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
     } else {
         verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
     }
-
-    //std::cout << event->delta() /360.0<< std::endl;
 }
 
 void MainWindow::onZoomInPressed()
@@ -253,9 +251,10 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     if (threads.isEmpty()){
         return;
     }
-    qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
+    //qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
+    uint64_t currentTime =(uint64_t) ((yOffset_ * moe::signum(yOffset_)) / yScale_);
     qreal new_yOffset = 0;
-    QVector<qreal> nextEventStartTime;
+    QVector<uint64_t> nextEventStartTime;
 
     if (currentTime != 0)
     {
@@ -263,7 +262,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
         {
             for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
             {
-                if(threads[i].threadEcalls_[j]->start_time_/1000 > currentTime)
+                if(threads[i].threadEcalls_[j]->start_time_ > currentTime)
                 {
                     nextEventStartTime.push_back(threads[i].threadEcalls_[j]->start_time_);
                     /*std::cout << "next event is found, the current time is : " << currentTime << std::endl;
@@ -337,13 +336,12 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor) {
 void MainWindow::zoomAndScrollTofirstEvent() {
     if(db)
     {
-        qreal yScaleNew = yScale_;
+        qreal yScaleNew;
         qreal startTimeOfFirstEvent = db->getThreads_()[0].threadEcalls_[0]->start_time_;
         int lastThreadIndex = db->getThreads_().length() - 1;
         int lastEcallIndex = db->getThreads_()[lastThreadIndex].threadEcalls_.length() - 1;
         qreal startTimeOfLastEvent = db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->start_time_;
         qreal endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->total_time_;
-
         yScaleNew = (qreal)db->getProgramTotalTime() / (endTimeOfLastEvent - startTimeOfFirstEvent);
         verticalZoom(yScaleNew,factor_);
         scrollTo(-startTimeOfFirstEvent * yScale_, factor_);

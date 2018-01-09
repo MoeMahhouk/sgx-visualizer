@@ -156,7 +156,7 @@ void MainWindow::drawScene()
     view_ = new QGraphicsView(scene_, this);
     view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
-    view_->setGeometry(200, 53, this->rect().width()*0.8, this->rect().height());
+    view_->setGeometry(200, 55, this->rect().width()*0.8, this->rect().height()*0.9);
     scene_->setSceneRect(view_->rect());
     //zoomIn->setFixedSize(20,20);
     //zoomIn->setParent(view_);
@@ -251,8 +251,8 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     if (threads.isEmpty()){
         return;
     }
-    //qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
-    uint64_t currentTime =(uint64_t) ((yOffset_ * moe::signum(yOffset_)) / yScale_);
+    qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
+    //uint64_t currentTime =(uint64_t) ((yOffset_ * moe::signum(yOffset_)) / yScale_);
     qreal new_yOffset = 0;
     QVector<uint64_t> nextEventStartTime;
 
@@ -262,7 +262,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
         {
             for (int j = 0; j < threads[i].threadEcalls_.length() ; ++j)
             {
-                if(threads[i].threadEcalls_[j]->start_time_ > currentTime)
+                if(threads[i].threadEcalls_[j]->start_time_/1000 > currentTime)
                 {
                     nextEventStartTime.push_back(threads[i].threadEcalls_[j]->start_time_);
                     /*std::cout << "next event is found, the current time is : " << currentTime << std::endl;

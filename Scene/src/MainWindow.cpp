@@ -238,14 +238,17 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     QMainWindow::resizeEvent(event);
     view_->update();
 }
-
-void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor) {//ToDo added factor for test purposes
+/**
+ * visualize the threads and their transitions as sequence diagrams in the scene
+ * @param threads
+ * @param factor
+ */
+void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor) {
     resetPressed();
     for (int i = 0; i < threads.length() ; ++i) {
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
         thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)), 30));
         sequenceListNode_->children_.push_back(thread);
-        //ToDo Scale the blocks and the line to a specific measure scale (bugy as hell)
     }
 }
 

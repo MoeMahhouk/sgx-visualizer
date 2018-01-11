@@ -139,7 +139,6 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
      * ToDo because at the moment all threads sequence diagrams will be drawn at the top despite their creation time which will be later displayed by hovering (maybe)
      */
     total_time = getProgramTotalTime(); // ToDo another query according the thread destruction event
-
     QSqlQuery query;
     query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
     query.bindValue(":id", index);

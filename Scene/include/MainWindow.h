@@ -12,9 +12,10 @@
 #include "Utility/Notifier.h"
 #include "DataBase/SGX/SgxDatabaseStructure.h"
 
-namespace Ui {
+//ToDo found out that this is added automatically while programming by Qt platform to point at the automatically generated class from the drag and drop view
+/*namespace Ui {
 class MainWindow;
-}
+}*/
 
 class MainWindow : public QMainWindow, public moe::Notifier
 {
@@ -71,8 +72,9 @@ private:
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
+    QListView *filterListView;
     moe::SgxDatabaseStructure* db = 0;
-    Ui::MainWindow *ui;
+   // Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming
     qreal yOffset_ = 0;

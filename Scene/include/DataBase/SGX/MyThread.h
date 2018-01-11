@@ -27,7 +27,8 @@ namespace moe {
                     //threadEcalls_ = QVector<ECall*>(EcallNumbers);
                 }
 
-        ~MyThread() {
+        ~MyThread()
+        {
             auto it = threadEcalls_.begin();
             while (it != threadEcalls_.end())
             {
@@ -37,13 +38,14 @@ namespace moe {
             this->threadEcalls_.clear();
         }
 
-        SequenceDiagram* toRenderable(qreal factor) const { //ToDo added factor parameter for test purposes
-
+        SequenceDiagram* toRenderable(qreal factor) const   //ToDo added factor parameter for test purposes
+        {
             SequenceDiagram *threadSeqDiag = new SequenceDiagram(Transform2D()
                                                                 ,"ThreadNr --" + QString::number(id_)
                                                                 ,total_time_ * factor
                                                                 );
-            for (ECall *eCall : threadEcalls_) {
+            for (ECall *eCall : threadEcalls_)
+            {
                 Renderable *eCallRenderable = eCall->toRenderable(factor);
                 threadSeqDiag->addBlock(eCallRenderable);
             }

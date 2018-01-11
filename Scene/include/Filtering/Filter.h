@@ -20,6 +20,8 @@ namespace moe {
 
         virtual QVector<MyThread> execute (const QVector<MyThread> &toFilterList,const QVector<int> &chosenElements) = 0;
 
+        virtual QString toSQLStatement() = 0;
+
     };
 }
 #endif //SCENE_FILTER_H

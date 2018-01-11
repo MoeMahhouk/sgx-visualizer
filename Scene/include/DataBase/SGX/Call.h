@@ -18,7 +18,7 @@ namespace moe {
                 id_(id), eid_(eid), symbol_address_(symbol_address), start_time_(start_time),
                 relative_start_time_(relative_start_time), total_time_(total_time), symbol_name_(symbol_name) {}
 
-        ~Call() {
+        virtual ~Call() {
             auto it = children_.begin();
             while (it != children_.end())
             {

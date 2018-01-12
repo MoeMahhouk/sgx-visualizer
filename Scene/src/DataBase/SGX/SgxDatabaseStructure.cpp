@@ -13,9 +13,10 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     } else {
         std::cout << "Database: Connection Ok" << std::endl;
     }
-    threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
-    for (int i = 0; i < threads_.length() ; ++i) {
-        initializeThreadAtIndex(i);
+    //threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
+    initializeThreads();
+    for (int i = 0; i < getNumberOfRows("threads"); ++i) {
+
         initializeECallsOfThreadAtIndex(i);
     }
     loadECallTypeList();
@@ -125,14 +126,14 @@ uint64_t moe::SgxDatabaseStructure::getThreadStartTime(int index) {
  * initializes the threads in the vector MyThreads
  * @param index
  */
-void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
+void moe::SgxDatabaseStructure::initializeThreads() {
     uint64_t pthread_id,start_address, start_address_normalized, start_symbol, start_time, total_time;
 
     std::string name, start_symbol_file_name; // ToDo add start symbol name and start address normalized and start symbol
-
+    int id;
     //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //ToDo causes problems when added (should be fixed later)
 
-    start_time = getThreadStartTime(index) - getProgramStartTime(); // Absolute start_time
+    //start_time = getThreadStartTime(index) - getProgramStartTime(); // Absolute start_time
 
     /* total time relative to the program start time and not the thread start time
      * ToDo later this should be replaced with thread_destruction_time - ProgramStartTime to get the length of the threads timeline
@@ -140,18 +141,28 @@ void moe::SgxDatabaseStructure::initializeThreadAtIndex(int index) {
      */
     total_time = getProgramTotalTime(); // ToDo another query according the thread destruction event
     QSqlQuery query;
-    query.prepare("SELECT pthread_id, start_address, name FROM threads WHERE id = (:id)");
-    query.bindValue(":id", index);
+    query.prepare("SELECT t.id, t.pthread_id, t.start_address, t.name, IFNULL(t.start_symbol,0),"
+                          " IFNULL(t.start_symbol_file_name, \"\"),"
+                          " IFNULL(t.start_address_normalized,0), e1.time AS start_time"
+                          " FROM threads AS t JOIN events AS e1  ON t.id = e1.involved_thread "
+                          "WHERE e1.type = 3 ORDER BY t.id");
+    //query.bindValue(":id", index);
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
         return;
-    } else {
-        query.next();
-        pthread_id = (uint64_t) query.value(0).toDouble();
-        start_address = (uint64_t) query.value(1).toDouble();
-        name = query.value(2).toString().toStdString();
-        threads_[index] = MyThread(index, pthread_id, start_address, 0, 0, start_time, total_time, name, ""/*,ecallNumbers*/);
+    } else { //ToDo ask nico to implement thread Destruction for the first thread
+        while (query.next()) {
+            id = query.value(0).toInt();
+            pthread_id = (uint64_t) query.value(1).toDouble();
+            start_address = (uint64_t) query.value(2).toDouble();
+            name = query.value(3).toString().toStdString();
+            start_symbol = (uint64_t) query.value(4).toDouble();
+            start_symbol_file_name = query.value(5).toString().toStdString();
+            start_address_normalized = (uint64_t) query.value(6).toDouble();
+            threads_.push_back(MyThread(id, pthread_id, start_address, start_address_normalized, start_symbol,
+                                        start_time, total_time, name, start_symbol_file_name));
+        }
     } //ToDo get the ECalls and add them to the children of their parent thread (considering that Ecalls might as well have children) (done)
 }
 
@@ -180,7 +191,7 @@ int moe::SgxDatabaseStructure::getEcallsNumberOfThreadAtIndex(int index) {
  * initializes the Ecalls and their children according to the given Thread
  * @param index
  */
-void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) {
+void moe::SgxDatabaseStructure::initializeECallsOfThreadAtIndex(int index) { //ToDo initialize all ECalls and OCalls according to the existing threads
     QMap<int, Call*> calls;
     int id,call_id,call_event;
     uint64_t start_time, relative_start_time, total_time;
@@ -380,4 +391,3 @@ const QVector<moe::OCallTypes> &moe::SgxDatabaseStructure::getOCallTypeList() co
 const QVector<moe::ECallTypes> &moe::SgxDatabaseStructure::getECallTypeList() const {
     return eCallTypeList;
 }
-

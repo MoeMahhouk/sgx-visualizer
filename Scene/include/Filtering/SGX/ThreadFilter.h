@@ -10,15 +10,17 @@
 
 namespace moe {
 
-    class ThreadFilter : public Filter {
+    class ThreadFilterEvent : public Filter {
 
     public:
 
-        ThreadFilter();
+        ThreadFilterEvent();
 
-        virtual ~ThreadFilter();
+        virtual ~ThreadFilterEvent();
 
-        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, const QVector<int> &chosenThreads);
+        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, QVector<int> &chosenThreads);
+
+        virtual QString toSQLStatement(QVector<int> &chosenElementIndex) override;
 
     };
 
@@ -26,3 +28,4 @@ namespace moe {
 
 
 #endif //SCENE_THREADFILTERSGX_H
+

@@ -12,6 +12,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <iostream>
+#include <Utility/Observer.h>
 #include "DataBase/DataBaseManager.h"
 #include "MyThread.h"
 #include "OCall.h"
@@ -51,7 +52,7 @@ namespace moe {
         uint64_t  getThreadTotalTime(int index);
         int getEcallsNumberOfThreadAtIndex(int index);
         void initializeECallsOfThreadAtIndex(int index);
-        void initializeThreadAtIndex(int index);
+        void initializeThreads();
         void loadECallTypeList();
         void loadOCallTypeList();
 

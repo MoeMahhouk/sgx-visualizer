@@ -18,9 +18,9 @@ namespace moe {
 
         virtual ~Filter() = default;
 
-        virtual QVector<MyThread> execute (const QVector<MyThread> &toFilterList,const QVector<int> &chosenElements) = 0;
+        virtual QVector<MyThread> execute (const QVector<MyThread> &toFilterList,QVector<int> &chosenElements) = 0;
 
-        virtual QString toSQLStatement() = 0;
+        virtual QString toSQLStatement(QVector<int> &chosenElementIndex) = 0;
 
     };
 }

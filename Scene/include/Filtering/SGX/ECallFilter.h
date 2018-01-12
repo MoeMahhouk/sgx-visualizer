@@ -18,7 +18,7 @@ namespace moe {
 
         virtual ~ECallFilter();
 
-        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, const QVector<int> &chosenECalls);
+        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, QVector<int> &chosenECalls);
 
     private:
 

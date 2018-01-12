@@ -15,7 +15,7 @@ moe::ECallFilter::~ECallFilter()
 }
 
 QVector<moe::MyThread>
-moe::ECallFilter::execute(const QVector<moe::MyThread> &toFilterList, const QVector<int> &chosenECalls)
+moe::ECallFilter::execute(const QVector<moe::MyThread> &toFilterList, QVector<int> &chosenECalls)
 {
     if(chosenECalls.isEmpty())
         return toFilterList;

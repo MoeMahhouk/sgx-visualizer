@@ -29,7 +29,6 @@ namespace moe
         ScrollEvent(qreal yScale, qreal yOffset) : yScale_(yScale), yOffset_(yOffset) {}
     };
 
-
     class Observer {
     public:
 

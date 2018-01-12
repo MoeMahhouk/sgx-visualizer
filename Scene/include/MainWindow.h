@@ -72,6 +72,7 @@ private:
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
 
+
     QListView *filterListView;
     moe::SgxDatabaseStructure* db = 0;
    // Ui::MainWindow *ui;
@@ -87,6 +88,21 @@ private:
     QToolBar *toolBar_;
     QStatusBar *statusBar_;
 
+
+    /*
+     * test stuff
+     */
+    QTabWidget* generateTabList();
+    QListWidget* generateECallList();
+    QListWidget* generateThreadList();
+    QTabWidget *tabwidget_;
+    QListWidget *eCallList_;
+    QListWidget *threadList_;
+    QDockWidget *threadDock_;
+    QDockWidget *eCallDock_;
+    /*
+     * end of test
+     */
     QAction *openAction_;
     QVector <moe::MyThread*> threadsFilterList;
 

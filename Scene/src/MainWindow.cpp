@@ -10,6 +10,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     createStatusBar();
     applySettings();
     drawScene();
+    /*setCentralWidget(view_);
+    threadDock_ = new QDockWidget(tr("Threads"), this);
+    threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    threadList_ = generateThreadList();
+    threadDock_->setWidget(threadList_);
+    addDockWidget(Qt::LeftDockWidgetArea, threadDock_);
+
+    eCallDock_ = new QDockWidget(tr("ECalls"), this);
+    eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    eCallList_ = generateECallList();
+    eCallDock_->setWidget(eCallList_);
+    addDockWidget(Qt::LeftDockWidgetArea, eCallDock_);*/
 
 }
 
@@ -37,7 +49,7 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
         //scrollTo(oldYOffset * yScaleFactor, factor_);
         //std::cerr << "the oldYOffset is : " << oldYOffset * factor_ << std::endl;
     } else {
-        verticalScroll(moe::signum(event->delta())*10000*yScale_,factor_); //ToDo scrolling schould be negative in the other direction
+        verticalScroll(moe::signum(event->delta())*10,factor_); //ToDo scrolling schould be negative in the other direction
     }
 }
 
@@ -69,12 +81,12 @@ void MainWindow::resetPressed()
 
 void MainWindow::scrollUpPressed()
 {
-    verticalScroll(100000000, factor_);
+    verticalScroll(20, factor_);
 }
 
 void MainWindow::scrollDownPressed()
 {
-    verticalScroll(-100000000, factor_);
+    verticalScroll(-20, factor_);
 }
 
 void MainWindow::scrollRightPressed()
@@ -128,6 +140,7 @@ void MainWindow::createToolbar()
 
 void MainWindow::drawScene()
 {
+    //QDockWidget * mywid = new QDockWidget(tr("Buttons"),this);
     QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
     QPushButton* scrollDown = new QPushButton(tr("Scroll Down"), this);
     QPushButton* zoomIn = new QPushButton(tr("Zoom In"), this);
@@ -136,6 +149,17 @@ void MainWindow::drawScene()
     QPushButton* scrollRight = new QPushButton(tr("Scroll Right"), this);
     QPushButton* scrollLeft = new QPushButton(tr("Scroll Left"), this);
     QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), this);
+    /*QVBoxLayout * layout = new QVBoxLayout;
+    layout->addWidget(scrollUp);
+    layout->addWidget(scrollDown);
+    layout->addWidget(zoomIn);
+    layout->addWidget(zoomOut);
+    layout->addWidget(reset);
+    layout->addWidget(scrollRight);
+    layout->addWidget(scrollLeft);
+    layout->addWidget(scrollToNextEventButton);
+    mywid->setLayout(layout);
+    addDockWidget(Qt::LeftDockWidgetArea,mywid);*/
     reset->move(0,155);
     zoomOut->move(0,105);
     zoomIn->move(0,55);
@@ -308,8 +332,8 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
  */
 void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 {
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, yOffset * factor));
-    yOffset_ += yOffset;
+    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, yOffset));
+    yOffset_ += (yOffset/factor);
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
     render();
@@ -361,5 +385,31 @@ void MainWindow::zoomAndScrollTofirstEvent() {
         verticalZoom(yScaleNew,factor_);
         scrollTo(-startTimeOfFirstEvent * yScale_, factor_);
     }
+}
+
+QListWidget *MainWindow::generateECallList() {
+    eCallList_ = new QListWidget();
+    QListWidgetItem* item1 = new QListWidgetItem("test1", eCallList_);
+    item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
+    QListWidgetItem* item2 = new QListWidgetItem("test2", eCallList_);
+    item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
+    QListWidgetItem* item3 = new QListWidgetItem("test3", eCallList_);
+    item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
+    eCallList_->show();
+    return eCallList_;
+}
+
+QListWidget *MainWindow::generateThreadList() {
+    threadList_ = new QListWidget();
+    QListWidgetItem* item1 = new QListWidgetItem("test1", threadList_);
+    item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
+    item1->setCheckState(Qt::Checked);
+    QListWidgetItem* item2 = new QListWidgetItem("test2", threadList_);
+    item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
+    item2->setCheckState(Qt::Checked);
+    QListWidgetItem* item3 = new QListWidgetItem("test3", threadList_);
+    item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
+    item3->setCheckState(Qt::Checked);
+    return threadList_;
 }
 

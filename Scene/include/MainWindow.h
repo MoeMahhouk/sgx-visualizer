@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+#include <Filtering/IFilter.h>
+#include <Filtering/SGX/ECallFilter.h>
 
 #include "Rendering/Renderable.h"
 #include "Rendering/Rect.h"
@@ -92,6 +94,7 @@ private:
     /*
      * test stuff
      */
+    moe::IFilter *filter;
     QTabWidget* generateTabList();
     QListWidget* generateECallList();
     QListWidget* generateThreadList();

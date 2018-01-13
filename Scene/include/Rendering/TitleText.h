@@ -10,7 +10,7 @@
 
 namespace moe {
     class TitleText : public Renderable {
-    protected:
+
     public:
         TitleText(Transform2D transform = Transform2D(),
                   const QString &title_ = "",

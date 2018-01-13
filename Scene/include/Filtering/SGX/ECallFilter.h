@@ -6,23 +6,18 @@
 #define SCENE_ECALLFILTER_H
 
 
-#include <Filtering/Filter.h>
+#include <Filtering/IFilter.h>
 
 namespace moe {
 
-    class ECallFilter : public Filter {
+    class ECallFilter : public IFilter {
 
     public:
+        ECallFilter(IReciever *reciever, QVector<int> chosenElements);
 
-        ECallFilter();
+        QString toSQLStatement() override;
 
-        virtual ~ECallFilter();
-
-        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, QVector<int> &chosenECalls);
-
-    private:
-
-        bool checkChildren(ECall parentEcall, const QVector<int> &chosenECalls);
+        void execute() override;
     };
 }
 

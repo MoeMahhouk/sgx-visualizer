@@ -6,21 +6,19 @@
 #define SCENE_THREADFILTERSGX_H
 
 
-#include <Filtering/Filter.h>
+#include <Filtering/IFilter.h>
 
 namespace moe {
 
-    class ThreadFilterEvent : public Filter {
+    class ThreadFilter : public IFilter {
 
     public:
 
-        ThreadFilterEvent();
+        ThreadFilter(IReciever *reciever, QVector<int> chosenElements);
 
-        virtual ~ThreadFilterEvent();
+        void execute() override;
 
-        virtual QVector<MyThread> execute(const QVector<MyThread> &toFilterList, QVector<int> &chosenThreads);
-
-        virtual QString toSQLStatement(QVector<int> &chosenElementIndex) override;
+        virtual QString toSQLStatement() override;
 
     };
 

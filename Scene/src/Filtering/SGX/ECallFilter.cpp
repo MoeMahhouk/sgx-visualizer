@@ -4,62 +4,32 @@
 
 #include "Filtering/SGX/ECallFilter.h"
 
-moe::ECallFilter::ECallFilter()
+moe::ECallFilter::ECallFilter(IReciever *reciever, QVector<int> chosenElements) : IFilter(reciever, chosenElements)
 {
 
 }
 
-moe::ECallFilter::~ECallFilter()
-{
-
-}
-
-QVector<moe::MyThread>
-moe::ECallFilter::execute(const QVector<moe::MyThread> &toFilterList, QVector<int> &chosenECalls)
-{
-    if(chosenECalls.isEmpty())
-        return toFilterList;
-
-    QVector<MyThread> filteredThreadList = toFilterList;
-
-    for (int i = 0; i < toFilterList.size() ; ++i)
+QString moe::ECallFilter::toSQLStatement() {
+    QString conditionQuery = "";
+    if (!chosenElements_.isEmpty())
     {
-        for (int j = 0; j < toFilterList[i].threadEcalls_.size() ; ++j)
-        {
-            int currentEcallId = toFilterList[i].threadEcalls_[j]->id_;
-            if (!(std::binary_search(chosenECalls.begin(),chosenECalls.end(),currentEcallId) || checkChildren(*toFilterList[i].threadEcalls_[j], chosenECalls)))
-            {
-                filteredThreadList[i].threadEcalls_.erase(filteredThreadList[i].threadEcalls_.begin()+j);
-            }
+
+        conditionQuery.append(" AND e1.call_id IN ( ");
+        for (int i = 0; i < chosenElements_.size() ; ++i) {
+            conditionQuery.append(QString::number(chosenElements_[i]));
+            conditionQuery.append(" ,");
+
         }
-        if(filteredThreadList[i].threadEcalls_.isEmpty()) {
-            filteredThreadList.erase(filteredThreadList.begin()+i);
-        }
+        conditionQuery.remove(conditionQuery.size()-1, 1);
+        conditionQuery.append(")");
+        return conditionQuery;
+    } else {
+        return conditionQuery;
     }
 }
 
-
-bool moe::ECallFilter::checkChildren(moe::ECall parentEcall, const QVector<int> &chosenECalls)
-{
-    if (parentEcall.children_.isEmpty())
-    {
-        return false;
-    }
-
-    for (int i = 0; i < parentEcall.children_.size() ; ++i)
-    {
-        if (!parentEcall.children_[i]->children_.isEmpty())
-        {
-            for (int j = 0; j < parentEcall.children_[i]->children_.size() ; ++j)
-            {
-                if (std::binary_search(chosenECalls.begin(), chosenECalls.end(), parentEcall.children_[i]->children_[j]->id_))
-                {
-                    return true;
-                } else if (checkChildren(parentEcall.children_[i]->children_[j]->id_, chosenECalls)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+void moe::ECallFilter::execute() {
+    dReciever_->SetAction(TYPES::ACTION_LIST::ECALLFILTER);
+    dReciever_->getResult(toSQLStatement());
 }
+

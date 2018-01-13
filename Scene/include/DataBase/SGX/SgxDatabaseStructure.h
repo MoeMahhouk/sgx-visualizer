@@ -13,6 +13,7 @@
 #include <QtSql/QSqlQuery>
 #include <iostream>
 #include <Utility/Observer.h>
+#include <Filtering/IReciever.h>
 #include "DataBase/DataBaseManager.h"
 #include "MyThread.h"
 #include "OCall.h"
@@ -22,7 +23,7 @@
 
 namespace moe {
 
-    class SgxDatabaseStructure : public DataBaseManager{
+    class SgxDatabaseStructure : public DataBaseManager, public IReciever{
 
     public:
 
@@ -42,20 +43,26 @@ namespace moe {
 
         const QVector<ECallTypes> &getECallTypeList() const;
 
+        void SetAction(TYPES::ACTION_LIST action) override;
+
+        void getResult(QString conditionQuery) override;
+
     private:
 
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
         uint64_t getProgramStartTime();
         uint64_t getProgramEndTime();
-        uint64_t  getRelaTimeOfParent(int parentRowNumber);
         uint64_t  getThreadTotalTime(int index);
         int getEcallsNumberOfThreadAtIndex(int index);
-        void initializeECallsOfThreadAtIndex(int index);
-        void initializeThreads();
+        void initializeECallsAndOCalls(QString conditionQuery = nullptr);
+        void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
         void loadOCallTypeList();
+        QString getInvolvedThreads();
+        int searchThreadIndex(int threadId);
 
+        TYPES::ACTION_LIST currentAction;
         QVector<OCallTypes> oCallTypeList; // this list is not for rendering, it is for the filtering stuff
         QVector<ECallTypes> eCallTypeList; //this list is not for rendering, it is for the filtering stuff
         QVector<MyThread> threads_;

@@ -1,4 +1,5 @@
 
+
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
 
@@ -87,6 +88,20 @@ void MainWindow::scrollUpPressed()
 void MainWindow::scrollDownPressed()
 {
     verticalScroll(-20, factor_);
+    /**
+     * filter test ToDo should be later implemented with listitems and chosing method
+     */
+    QVector<int> chosenElements;
+    chosenElements.push_back(19);
+    chosenElements.push_back(8);
+    chosenElements.push_back(9);
+    chosenElements.push_back(31);
+    filter = new moe::ECallFilter(db,chosenElements);
+    filter->execute();
+    sequenceListNode_->children_.clear();
+    visualizeThreads(db->getThreads_(), factor_);
+    render();
+
 }
 
 void MainWindow::scrollRightPressed()

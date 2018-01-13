@@ -4,42 +4,33 @@
 
 #include "Filtering/SGX/ThreadFilter.h"
 
-moe::ThreadFilterEvent::ThreadFilterEvent()
+moe::ThreadFilter::ThreadFilter(IReciever *reciever,QVector<int> chosenElements) : IFilter(reciever, chosenElements)
 {
 
 }
 
-moe::ThreadFilterEvent::~ThreadFilterEvent()
-{
-}
 
-QVector<moe::MyThread> moe::ThreadFilterEvent::execute(const QVector<moe::MyThread> &toFilterList, QVector<int> &chosenThreads)
+QString moe::ThreadFilter::toSQLStatement()
 {
-    if(chosenThreads.isEmpty())
-        return toFilterList;
-
-    QVector<MyThread> filteredThreadList;
-    for (int i = 0; i < chosenThreads.size(); ++i)
+    QString conditionQuery = "";
+    if (!chosenElements_.isEmpty())
     {
-        int chosenThreadIndex = chosenThreads[i];
-        if(chosenThreadIndex >= toFilterList.size() || chosenThreadIndex < 0){
-            std::cerr << "neeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeein" << std::endl;
+
+        conditionQuery.append(" AND t.id IN ( ");
+        for (int i = 0; i < chosenElements_.size() ; ++i) {
+            conditionQuery.append(QString::number(chosenElements_[i]));
+            conditionQuery.append(" ,");
+
         }
-        MyThread copy = toFilterList[chosenThreadIndex];
-        filteredThreadList.push_back(copy);
+        conditionQuery.remove(conditionQuery.size()-1, 1);
+        conditionQuery.append(")");
+        return conditionQuery;
+    } else {
+        return conditionQuery;
     }
-    return filteredThreadList;
 }
 
-QString moe::ThreadFilterEvent::toSQLStatement(QVector<int> &chosenElementIndex) {
-    if (chosenElementIndex.isEmpty())
-    {
-        return "SELECT t.id, t.pthread_id, t.start_address, t.name, IFNULL(t.start_symbol,0),"
-                " IFNULL(t.start_symbol_file_name, \"\"),"
-                " IFNULL(t.start_address_normalized,0), e1.time AS start_time"
-                " FROM threads AS t JOIN events AS e1  ON t.id = e1.involved_thread "
-                "WHERE e1.type = 3 ORDER BY t.id";
-    } else {
-        return "";
-    }
+void moe::ThreadFilter::execute() {
+    dReciever_->SetAction(TYPES::ACTION_LIST::THREADFILTER);
+    dReciever_->getResult(toSQLStatement());
 }

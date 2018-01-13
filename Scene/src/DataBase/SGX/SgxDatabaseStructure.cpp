@@ -291,7 +291,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     }
 }
 
-void moe::SgxDatabaseStructure::close() {
+void moe::SgxDatabaseStructure::close()
+{
     m_db.close();
 }
 

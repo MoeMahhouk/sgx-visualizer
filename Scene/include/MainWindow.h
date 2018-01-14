@@ -67,6 +67,7 @@ private:
     void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
     void scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo implement it later as a button with Slots and Signals
     void scrollTo(qreal yOffset, qreal factor = 1);
+    void addZoomAndScrollOptions(QToolBar* toolbar);
     void zoomAndScrollTofirstEvent();
     void applySettings();
     void writeSettings();
@@ -81,6 +82,8 @@ private:
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming
     qreal yOffset_ = 0;
+
+    QWidget* viewArea;
     QGraphicsView *view_;
     QGraphicsScene *scene_;
     QMenu *fileMenu_;

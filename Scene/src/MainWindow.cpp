@@ -402,7 +402,8 @@ void MainWindow::zoomAndScrollTofirstEvent() {
     }
 }
 
-QListWidget *MainWindow::generateECallList() {
+QListWidget *MainWindow::generateECallList()
+{
     eCallList_ = new QListWidget();
     QListWidgetItem* item1 = new QListWidgetItem("test1", eCallList_);
     item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
@@ -414,17 +415,20 @@ QListWidget *MainWindow::generateECallList() {
     return eCallList_;
 }
 
-QListWidget *MainWindow::generateThreadList() {
+QListWidget *MainWindow::generateThreadList()
+{
     threadList_ = new QListWidget();
-    QListWidgetItem* item1 = new QListWidgetItem("test1", threadList_);
-    item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
-    item1->setCheckState(Qt::Checked);
-    QListWidgetItem* item2 = new QListWidgetItem("test2", threadList_);
-    item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
-    item2->setCheckState(Qt::Checked);
-    QListWidgetItem* item3 = new QListWidgetItem("test3", threadList_);
-    item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
-    item3->setCheckState(Qt::Checked);
-    return threadList_;
+    if(db){
+        QListWidgetItem* item1 = new QListWidgetItem("test1", threadList_);
+        item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
+        item1->setCheckState(Qt::Checked);
+        QListWidgetItem* item2 = new QListWidgetItem("test2", threadList_);
+        item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
+        item2->setCheckState(Qt::Checked);
+        QListWidgetItem* item3 = new QListWidgetItem("test3", threadList_);
+        item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
+        item3->setCheckState(Qt::Checked);
+        return threadList_;
+    }
 }
 

@@ -230,10 +230,10 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     }
     while(query.next())
     {
-        id = query.value(0).toInt();
+        id = query.value(0).toInt(); //line unique id in the table events
         relative_start_time = start_time = (uint64_t) query.value(2).toDouble() - getProgramStartTime();
         total_time = (uint64_t) query.value(3).toDouble() - query.value(2).toDouble();
-        call_id = query.value(4).toInt();
+        call_id = query.value(4).toInt(); //ecall's or ocall's unique id from the table ecalls / ocalls
         call_event = query.value(5).toInt();
         isFail = query.value(6).toInt();
         involvedThreadId = query.value(7).toInt();
@@ -254,6 +254,9 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                         //here i calculate the relative start time of the child according to his parent start time
                         eCall->relative_start_time_ -= calls[call_event]->start_time_;
                         calls[call_event]->children_.push_back(eCall);
+                    } else {
+                        calls.remove(id);
+                        delete eCall;
                     }
                 } else {
                     threads_[searchThreadIndex(involvedThreadId)].threadEcalls_.push_back(eCall);
@@ -279,6 +282,9 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                         //here i calculate the relative start time of the child according to his parent start time
                         oCall->relative_start_time_ -= calls[call_event]->start_time_;
                         calls[call_event]->children_.push_back(oCall);
+                    } else {
+                        calls.remove(id);
+                        delete oCall;
                     }
                 } else { //this should never be reachable unless the database is corrupted
                     std::cerr << "OCall has no ecall id from which its triggered " << std::endl;
@@ -297,7 +303,7 @@ void moe::SgxDatabaseStructure::close()
 }
 
 
-/*
+/* ToDo
  * this method is still buggy and needs lot of work and the whole program should be then reworked because the ecalls and ocalls
  * will be printed way further than the relative thread they are called from
  * and this problem is originated because the threads are beside each other and not to their own real start time

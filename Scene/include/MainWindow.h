@@ -31,8 +31,6 @@ private slots:
     void open();
     void applyFilter();
     void resetFilter();
-    void onZoomInPressed();
-    void onZoomOutPressed();
     void resetPressed();
     void scrollUpPressed();
     void scrollDownPressed();
@@ -94,13 +92,16 @@ private:
     /*
      * test stuff
      */
-    QVector<int> chosenThreads;
-    QVector<int> chosenEcallsAndOcalls;
+    QSet<int> chosenThreads;
+    QSet<int> chosenEcallsAndOcalls;
     moe::IFilter *filter;
     QTabWidget* generateTabList();
     void generateECallList();
     void generateThreadList();
     void generateFilterControls();
+    bool updateThreads();
+    bool updateECalls();
+    void resetThreadsEcallsAndOcalls();
 
     QTabWidget *tabwidget_;
     QListWidget *eCallList_;

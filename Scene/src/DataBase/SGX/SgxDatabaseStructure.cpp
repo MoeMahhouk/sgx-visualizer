@@ -410,9 +410,17 @@ void moe::SgxDatabaseStructure::getResult(QString conditionQuery)
         threads_.clear();
         initializeThreads(conditionQuery);
         initializeECallsAndOCalls();
+
     } else if (currentAction == TYPES::ACTION_LIST::ECALLFILTER)
     {
-        for (int i = 0; i < threads_.length() ; ++i) {
+        for (int i = 0; i < threads_.length() ; ++i)
+        {
+            auto it = threads_[i].threadEcalls_.begin();
+            while (it != threads_[i].threadEcalls_.end())
+            {
+                delete *it;
+                it++;
+            }
             threads_[i].threadEcalls_.clear();
         }
         initializeECallsAndOCalls(conditionQuery);

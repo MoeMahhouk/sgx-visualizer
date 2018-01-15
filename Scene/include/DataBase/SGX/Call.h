@@ -17,6 +17,7 @@ namespace moe {
         std::string symbol_name_;
         QVector<Call*> children_;
         int isFail_;
+        //QBrush *blockColor;
 
         Call(int id, int eid, uint64_t symbol_address, uint64_t start_time, uint64_t relative_start_time,
              uint64_t total_time, std::string symbol_name, int isFail) :

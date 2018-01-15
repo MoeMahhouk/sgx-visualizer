@@ -17,8 +17,9 @@ namespace moe {
 
         IFilter(IReciever *dreciever, QVector<int> chosenElements) : dReciever_(dreciever), chosenElements_(chosenElements){};
 
-        virtual ~IFilter() {
-            delete dReciever_;
+        virtual ~IFilter()
+        {
+            // delete dReciever_;//ToDO this is causing problems because it deletes the db and produce free error (ask nico for help politly :) )
         };
 
         virtual QString toSQLStatement() = 0;

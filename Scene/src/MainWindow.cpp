@@ -1,5 +1,6 @@
 
 
+#include <Filtering/SGX/ThreadFilter.h>
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
 
@@ -12,18 +13,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     createStatusBar();
     applySettings();
     generateGraphicsView();
-    /*setCentralWidget(view_);
-    threadDock_ = new QDockWidget(tr("Threads"), this);
-    threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    threadList_ = generateThreadList();
-    threadDock_->setWidget(threadList_);
-    addDockWidget(Qt::LeftDockWidgetArea, threadDock_);
-
-    eCallDock_ = new QDockWidget(tr("ECalls"), this);
-    eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    eCallList_ = generateECallList();
-    eCallDock_->setWidget(eCallList_);
-    addDockWidget(Qt::LeftDockWidgetArea, eCallDock_);*/
 
 }
 
@@ -32,6 +21,7 @@ MainWindow::~MainWindow()
    // delete ui;
 	delete sceneRootNode_;
     delete db;
+   // delete filter;
 }
 
 
@@ -52,15 +42,6 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
     }
 }
 
-void MainWindow::onZoomInPressed()
-{
-    verticalZoom(1.2);
-}
-
-void MainWindow::onZoomOutPressed()
-{
-    verticalZoom(1/1.2);
-}
 
 void MainWindow::resetPressed()
 {
@@ -89,16 +70,7 @@ void MainWindow::scrollDownPressed()
     /**
      * filter test ToDo should be later implemented with listitems and chosing method
      */
-    QVector<int> chosenElements;
-    chosenElements.push_back(19);
-    chosenElements.push_back(8);
-    chosenElements.push_back(9);
-    chosenElements.push_back(31);
-    filter = new moe::ECallFilter(db,chosenElements);
-    filter->execute();
-    sequenceListNode_->children_.clear();
-    visualizeThreads(db->getThreads_(), factor_);
-    render();
+
 
 }
 
@@ -131,7 +103,7 @@ void MainWindow::createMenus()
     viewMenu_->addAction(threadFilterAction_);
     viewMenu_->addAction(eCallFilterAction_);
    // viewMenu_->addAction(oCallFilterAction_);
-    //viewMenu_->addAction(applyDockAction_);
+    viewMenu_->addAction(applyDockAction_);
 
 
     menuBar()->addSeparator();
@@ -228,9 +200,10 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     toolbar->addWidget(scrollRight);
 
-    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), toolbar);
+    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next ECall"), toolbar);
     scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
     toolbar->addWidget(scrollToNextEventButton);
+    toolbar->setStyleSheet("QToolBar{spacing:5px;}");
 }
 
 void MainWindow::render()
@@ -246,7 +219,7 @@ void MainWindow::render()
 
 void MainWindow::applySettings()
 {
-    QSettings settings("BachelorArbeit", "SceneTest");
+    QSettings settings("BachelorArbeit IBR", "SGX AnalysisTool");
     QSize size = settings.value("size", QSize(800, 600)).toSize();
     resize(size);
 }
@@ -254,15 +227,16 @@ void MainWindow::applySettings()
 
 void MainWindow::writeSettings()
 {
-    QSettings settings("BachelorArbeit", "SceneTest");
+    QSettings settings("BachelorArbeit IBR", "SGX AnalysisTool");
     settings.setValue("size", size());
 }
 
 void MainWindow::loadFile(const QString& fileName)
 {
+    resetPressed();
     db = new moe::SgxDatabaseStructure(fileName);
     factor_ = 500.0/db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+10,50),db->getProgramTotalTime(),500,40);
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),500,40);
     registerObserver(measureLine_);
     visualizeThreads(db->getThreads_(), factor_); //ToDo still should be tested
    // scrollToNextEvent(db->getThreads_(), factor_);
@@ -293,11 +267,10 @@ void MainWindow::resizeEvent(QResizeEvent* event)
  */
 void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor)
 {
-    resetPressed();
     for (int i = 0; i < threads.length() ; ++i)
     {
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
-        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)), 30));
+        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (110 * (i+2)), 30));
         sequenceListNode_->children_.push_back(thread);
     }
 }
@@ -398,7 +371,7 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor)
  */
 void MainWindow::zoomAndScrollTofirstEvent()
 {
-    if(db)
+    if(db && !db->getThreads_().isEmpty())
     {
         qreal yScaleNew;
         qreal startTimeOfFirstEvent = db->getThreads_()[0].threadEcalls_[0]->start_time_;
@@ -422,13 +395,33 @@ void MainWindow::generateECallList()
             QListWidgetItem *eCallItem = new QListWidgetItem(eCallItemName, eCallList_);
             eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
             eCallItem->setCheckState(Qt::Checked);
-            chosenEcallsAndOcalls.push_back(i);
+            chosenEcallsAndOcalls.insert(i);
         }
     }
 }
-/**
- * ToDo
- */
+bool MainWindow::updateECalls() {
+    bool isChanged = false;
+    for (int i = 0; i < eCallList_->count() ; ++i)
+    {
+        /*if the thread got unchecked and still not removed from the chosen thread set,
+         * then it get removed from the set and method returns at the end so that the filter can be applied on the
+         * chosen threads and if the thread was rechecked then it should be readded and then filter will be applied :)
+         */
+        if(eCallList_->item(i)->checkState() == Qt::Unchecked && chosenEcallsAndOcalls.contains(i))
+        {
+            chosenEcallsAndOcalls.remove(i);
+            isChanged = true;
+
+        } else if(eCallList_->item(i)->checkState() == Qt::Checked && !chosenEcallsAndOcalls.contains(i))
+        {
+            chosenEcallsAndOcalls.insert(i);
+            isChanged = true;
+        }
+    }
+    return isChanged;
+}
+
+
 void MainWindow::generateThreadList()
 {
     if(db)
@@ -440,9 +433,31 @@ void MainWindow::generateThreadList()
             QListWidgetItem *threadItem = new QListWidgetItem(threadItemName, threadList_);
             threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
             threadItem->setCheckState(Qt::Checked);
-            chosenThreads.push_back(i);
+            chosenThreads.insert(i);
         }
     }
+}
+
+bool MainWindow::updateThreads() {
+    bool isChanged = false;
+    for (int i = 0; i < threadList_->count() ; ++i)
+    {
+        /*if the thread got unchecked and still not removed from the chosen thread set,
+         * then it get removed from the set and method returns at the end so that the filter can be applied on the
+         * chosen threads and if the thread was rechecked then it should be readded and then filter will be applied :)
+         */
+        if(threadList_->item(i)->checkState() == Qt::Unchecked && chosenThreads.contains(i))
+        {
+            chosenThreads.remove(i);
+            isChanged = true;
+
+        } else if(threadList_->item(i)->checkState() == Qt::Checked && !chosenThreads.contains(i))
+        {
+            chosenThreads.insert(i);
+            isChanged = true;
+        }
+    }
+    return isChanged;
 }
 
 void MainWindow::createFilterDocks()
@@ -474,6 +489,7 @@ void MainWindow::createFilterDocks()
     addDockWidget(Qt::LeftDockWidgetArea, applyDock);
     applyDockAction_ = applyDock->toggleViewAction();
     connect(applyDockAction_, SIGNAL(toggled(bool)), applyDock, SLOT(setVisible(bool)));
+
 }
 
 void MainWindow::generateFilterControls()
@@ -492,11 +508,54 @@ void MainWindow::generateFilterControls()
 
 void MainWindow::applyFilter()
 {
+    bool updateScene = false;
+    if(updateThreads())
+    {
+        updateScene = true;
+        filter = new moe::ThreadFilter(db,chosenThreads.toList().toVector());
+        filter->execute();
+        delete filter;
+    }
 
+    if(updateECalls())
+    {
+        updateScene = true;
+        filter = new moe::ECallFilter(db, chosenEcallsAndOcalls.toList().toVector());
+        filter->execute();
+        delete filter;
+    }
+
+    if(updateScene)
+    {
+        auto it = sequenceListNode_->children_.begin();
+        while (it != sequenceListNode_->children_.end())
+        {
+            delete *it;
+            it++;
+        }
+        sequenceListNode_->children_.clear();
+        resetPressed();
+        visualizeThreads(db->getThreads_(),factor_);
+        zoomAndScrollTofirstEvent();
+        render();
+    }
 }
 
 void MainWindow::resetFilter()
 {
+    resetThreadsEcallsAndOcalls();
+    applyFilter();
+}
 
+void MainWindow::resetThreadsEcallsAndOcalls()
+{
+    for (int i = 0; i < threadList_->count() ; ++i)
+    {
+        threadList_->item(i)->setCheckState(Qt::Checked);
+    }
+    for (int j = 0; j < eCallList_->count() ; ++j)
+    {
+        eCallList_->item(j)->setCheckState(Qt::Checked);
+    }
 }
 

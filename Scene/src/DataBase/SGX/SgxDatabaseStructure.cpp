@@ -357,7 +357,7 @@ void moe::SgxDatabaseStructure::loadECallTypeList() {
             isprivate = query.value(4).toBool();
            // std::cerr << id << "   "  << symbol_name.toStdString() << std::endl;
             ECallTypes eCalltypeMember = ECallTypes(id, eid, symbol_address, symbol_name, isprivate);
-            eCallTypeList.push_back(eCalltypeMember);
+            eCallTypeList[id] = eCalltypeMember;
         }
     }
 }

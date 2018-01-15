@@ -29,6 +29,8 @@ public:
 
 private slots:
     void open();
+    void applyFilter();
+    void resetFilter();
     void onZoomInPressed();
     void onZoomOutPressed();
     void resetPressed();
@@ -46,22 +48,16 @@ private:
     moe::Renderable *sequenceListNode_;
     moe::MeasureLine *measureLine_;
 
-    //QVector<moe::SequenceDiagram*> sequenceList;
-    //QVector<moe::Renderable*> renderables;
-    //QVector<moe::Renderable*> lineRenderables;
 
     moe::Transform2D sceneTransformation = moe::Transform2D(1,0,0,1,0,0);
-    //moe::Line *lineMeasureTest2;
-    moe::SequenceDiagram *sequenceDiagram;
-    //moe::Rect *topElement;
-    //moe::Renderable *lineOfTopElement;
-    //moe::Line *lineOfTopElement2;
+
     void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1);
     void createMenus();
     void createStatusBar();
     void createActions();
     void createToolbar();
-    void drawScene();
+    void createFilterDocks();
+    void generateGraphicsView();
     void render();
     void verticalScroll(qreal yOffset, qreal factor = 1);
     void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
@@ -83,7 +79,8 @@ private:
     qreal yScale_ = 1; //toDo better solution for zooming
     qreal yOffset_ = 0;
 
-    QWidget* viewArea;
+    QWidget *viewArea_;
+    QToolBar *viewToolbar_;
     QGraphicsView *view_;
     QGraphicsScene *scene_;
     QMenu *fileMenu_;
@@ -97,21 +94,29 @@ private:
     /*
      * test stuff
      */
+    QVector<int> chosenThreads;
+    QVector<int> chosenEcallsAndOcalls;
     moe::IFilter *filter;
     QTabWidget* generateTabList();
-    QListWidget* generateECallList();
-    QListWidget* generateThreadList();
+    void generateECallList();
+    void generateThreadList();
+    void generateFilterControls();
+
     QTabWidget *tabwidget_;
     QListWidget *eCallList_;
     QListWidget *threadList_;
     QDockWidget *threadDock_;
     QDockWidget *eCallDock_;
+    QAction *threadFilterAction_;
+    QAction *eCallFilterAction_;
+    QAction *oCallFilterAction_;
+    QAction *applyDockAction_;
+    QWidget *filterControls_;
+
     /*
      * end of test
      */
     QAction *openAction_;
-    QVector <moe::MyThread*> threadsFilterList;
-
 
 };
 

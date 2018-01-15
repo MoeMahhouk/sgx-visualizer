@@ -6,11 +6,12 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
     createActions();
+    createFilterDocks();
     createMenus();
     createToolbar();
     createStatusBar();
     applySettings();
-    drawScene();
+    generateGraphicsView();
     /*setCentralWidget(view_);
     threadDock_ = new QDockWidget(tr("Threads"), this);
     threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -44,13 +45,10 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
-       // qreal oldYOffset = yOffset_;
         qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
         verticalZoom(yScaleFactor);
-        //scrollTo(oldYOffset * yScaleFactor, factor_);
-        //std::cerr << "the oldYOffset is : " << oldYOffset * factor_ << std::endl;
     } else {
-        verticalScroll(moe::signum(event->delta())*10,factor_); //ToDo scrolling schould be negative in the other direction
+        verticalScroll(moe::signum(event->delta())*20,factor_); //ToDo scrolling schould be negative in the other direction
     }
 }
 
@@ -106,13 +104,13 @@ void MainWindow::scrollDownPressed()
 
 void MainWindow::scrollRightPressed()
 {
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,-20,0));
+    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }
 
 void MainWindow::scrollLeftPressed()
 {
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
+    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,-20,0));
     render();
 }
 
@@ -128,7 +126,14 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
+
     viewMenu_ = menuBar()->addMenu(tr("View"));
+    viewMenu_->addAction(threadFilterAction_);
+    viewMenu_->addAction(eCallFilterAction_);
+   // viewMenu_->addAction(oCallFilterAction_);
+    //viewMenu_->addAction(applyDockAction_);
+
+
     menuBar()->addSeparator();
     helpMenu_ = menuBar()->addMenu(tr("Help"));
 
@@ -153,29 +158,23 @@ void MainWindow::createToolbar()
     toolBar_->addAction(openAction_);
 }
 
-void MainWindow::drawScene()
+void MainWindow::generateGraphicsView()
 {
-    //QDockWidget * mywid = new QDockWidget(tr("Buttons"),this);
-    QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
+    viewArea_ = new QWidget();
+    auto layout = new QVBoxLayout(viewArea_);
+    viewToolbar_ = new QToolBar(viewArea_);
+    addZoomAndScrollOptions(viewToolbar_);
+    layout->addWidget(viewToolbar_);
+    /*QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
     QPushButton* scrollDown = new QPushButton(tr("Scroll Down"), this);
     QPushButton* zoomIn = new QPushButton(tr("Zoom In"), this);
     QPushButton* zoomOut = new QPushButton(tr("Zoom Out") , this);
     QPushButton* reset = new QPushButton(tr("Reset"), this);
     QPushButton* scrollRight = new QPushButton(tr("Scroll Right"), this);
     QPushButton* scrollLeft = new QPushButton(tr("Scroll Left"), this);
-    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), this);
-    /*QVBoxLayout * layout = new QVBoxLayout;
-    layout->addWidget(scrollUp);
-    layout->addWidget(scrollDown);
-    layout->addWidget(zoomIn);
-    layout->addWidget(zoomOut);
-    layout->addWidget(reset);
-    layout->addWidget(scrollRight);
-    layout->addWidget(scrollLeft);
-    layout->addWidget(scrollToNextEventButton);
-    mywid->setLayout(layout);
-    addDockWidget(Qt::LeftDockWidgetArea,mywid);*/
-    reset->move(0,155);
+    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), this);*/
+
+    /*reset->move(0,155);
     zoomOut->move(0,105);
     zoomIn->move(0,55);
     scrollUp->move(0,205);
@@ -190,52 +189,59 @@ void MainWindow::drawScene()
     scrollDown->connect(scrollDown,SIGNAL(clicked()), this,SLOT(scrollDownPressed()));
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
-    scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
+    scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));*/
     scene_ = new QGraphicsScene(this);
     view_ = new QGraphicsView(scene_,this);
-    //view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
-    view_->setGeometry(200, 55, this->rect().width()*0.8, this->rect().height()*0.9);
+    view_->setGeometry(0, 0, this->rect().width()*0.8, this->rect().height()*0.8);
     view_->setFrameStyle(0);
-
-    //view_->centerOn(200,55);
-    //view_->setFixedSize(this->rect().width()*0.8,this->rect().height()*0.9);
-    //view_->fitInView(0,0,this->rect().width()*0.8,this->rect().height()*0.9,Qt::KeepAspectRatio);
-    //QRect viewRect = view_->rect();
-    //viewRect.setRect(0,0,this->rect().width()*0.8-200, this->rect().height()*0.9-55);
     scene_->setSceneRect(view_->rect());
-    //scene_->setSceneRect(view_->rect().x()*0.8,view_->rect().y()*0.8,view_->rect().width()*0.8,view_->rect().height()*0.8);
-
-    //zoomIn->setFixedSize(20,20);
-    //zoomIn->setParent(view_);
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable(moe::Transform2D(1,0,0,1,0,0));
-   // sequenceDiagram = new moe::SequenceDiagram(moe::Transform2D(1,0,0,1, scene_->sceneRect().x()+90,scene_->sceneRect().center().y()/4),tr("test1"),500);
-    //measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,
-      //                                                              scene_->sceneRect().x()+10,50
-                                                                    /*sequenceDiagram->getTransform().getY()+sequenceDiagram->getTopBlock_().getHeight()*/
-        //   ), 500, 26);
-
-    //Event listner test
-   // registerObserver(measureLine_);
-
-std::cout << "MainWindow 1" << std::endl;
+    std::cout << "MainWindow 1" << std::endl;
     sceneRootNode_->children_.push_back(sequenceListNode_);
-    //std::cout << "MainWindow 2" << std::endl;
-   // sceneRootNode_->children_.push_back(measureLine_);
-    //std::cout << "MainWindow 3" << std::endl;
-    //sequenceListNode_->children_.push_back(sequenceDiagram);
-    //std::cout << "MainWindow 4" << std::endl;
+
+    layout->addWidget(view_);
+    viewArea_->setLayout(layout);
+    setCentralWidget(viewArea_);
+
     render();
 }
 
-void MainWindow::render() {
+void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
+{
+    auto zoomLabel = new QLabel("Zoom Options: ");
+    toolbar->addWidget(zoomLabel);
+    QPushButton* reset = new QPushButton(tr("Reset"), toolbar);
+    reset->connect(reset,SIGNAL(clicked()),this, SLOT(resetPressed()));
+    toolbar->addWidget(reset);
+    toolbar->addSeparator();
+
+    auto scrollLabel = new QLabel("Scroll Options: ");
+    toolbar->addWidget(scrollLabel);
+
+    QPushButton* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
+    scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
+    toolbar->addWidget(scrollLeft);
+
+    QPushButton* scrollRight = new QPushButton(tr("Scroll Right ->"), toolbar);
+    scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
+    toolbar->addWidget(scrollRight);
+
+    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), toolbar);
+    scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
+    toolbar->addWidget(scrollToNextEventButton);
+}
+
+void MainWindow::render()
+{
     scene_->clear();
     scene_->setBackgroundBrush(Qt::lightGray);
     moe::SceneData data{scene_};
     sceneRootNode_->render(data, sceneTransformation);
     scene_->update();
-    view_->show();
+    viewArea_->show();
+    //view_->show(); ToDo replaced it with viewArea.show (needs testing a little bit)
 }
 
 void MainWindow::applySettings()
@@ -245,12 +251,12 @@ void MainWindow::applySettings()
     resize(size);
 }
 
+
 void MainWindow::writeSettings()
 {
     QSettings settings("BachelorArbeit", "SceneTest");
     settings.setValue("size", size());
 }
-
 
 void MainWindow::loadFile(const QString& fileName)
 {
@@ -263,6 +269,8 @@ void MainWindow::loadFile(const QString& fileName)
     //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
     sceneRootNode_->children_.push_back(measureLine_);
     zoomAndScrollTofirstEvent();
+    generateThreadList();
+    generateECallList();
     render();
 }
 
@@ -271,26 +279,28 @@ void MainWindow::closeEvent(QCloseEvent* event)
     writeSettings();
     event->accept();
 }
-
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     view_->update();
 }
+
+
 /**
  * visualize the threads and their transitions as sequence diagrams in the scene
  * @param threads
  * @param factor
  */
-void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor) {
+void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor)
+{
     resetPressed();
-    for (int i = 0; i < threads.length() ; ++i) {
+    for (int i = 0; i < threads.length() ; ++i)
+    {
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
         thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (90 * (i+2)), 30));
         sequenceListNode_->children_.push_back(thread);
     }
 }
-
 
 /**
  * jumps to the next event in consideration of their start time
@@ -299,9 +309,9 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
  */
 void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor)
 {
-    if (threads.isEmpty()){
+    if (threads.isEmpty())
         return;
-    }
+
     qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
     //uint64_t currentTime =(uint64_t) ((yOffset_ * moe::signum(yOffset_)) / yScale_);
     qreal new_yOffset = 0;
@@ -316,9 +326,6 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
                 if(threads[i].threadEcalls_[j]->start_time_/1000 > currentTime)
                 {
                     nextEventStartTime.push_back(threads[i].threadEcalls_[j]->start_time_);
-                    /*std::cout << "next event is found, the current time is : " << currentTime << std::endl;
-                    std::cout << "the new yOffset should be now : " << threads[i].threadEcalls_[j]->start_time_/10000 << std::endl;
-                    std::cout << (threads[i].threadEcalls_[j]->start_time_ > currentTime) << std::endl;*/
                     break;
                 }
             }
@@ -340,6 +347,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
     render();
 }
 
+
 /**
  * abstract function for vertical scall events
  * @param yOffset
@@ -353,7 +361,6 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
     notify(&e);
     render();
 }
-
 
 /**
  * abstract function for vertical zoom events
@@ -375,7 +382,8 @@ void MainWindow::verticalZoom(qreal yScale, qreal factor)
     render();
 }
 
-void MainWindow::scrollTo(qreal yOffset, qreal factor) {
+void MainWindow::scrollTo(qreal yOffset, qreal factor)
+{
     qreal oldXCoordinate = sequenceListNode_->getTransform().getX(); // so that it wont reset the xCoordinate each time next Event is clicked
     sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCoordinate,yOffset * factor));
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
@@ -383,11 +391,13 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor) {
     notify(&e);
     //render();
 }
+
 /**
  * calculate the total program usage and scrolls to the first event and scales the whole process so that it will be
  * visualised according to the scale line
  */
-void MainWindow::zoomAndScrollTofirstEvent() {
+void MainWindow::zoomAndScrollTofirstEvent()
+{
     if(db)
     {
         qreal yScaleNew;
@@ -402,33 +412,91 @@ void MainWindow::zoomAndScrollTofirstEvent() {
     }
 }
 
-QListWidget *MainWindow::generateECallList()
+void MainWindow::generateECallList()
 {
-    eCallList_ = new QListWidget();
-    QListWidgetItem* item1 = new QListWidgetItem("test1", eCallList_);
-    item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
-    QListWidgetItem* item2 = new QListWidgetItem("test2", eCallList_);
-    item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
-    QListWidgetItem* item3 = new QListWidgetItem("test3", eCallList_);
-    item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
-    eCallList_->show();
-    return eCallList_;
+    if(db)
+    {
+        for (int i = 0; i < db->getECallTypeList().size() ; ++i)
+        {
+            QString eCallItemName = db->getECallTypeList()[i].symbol_name_;
+            QListWidgetItem *eCallItem = new QListWidgetItem(eCallItemName, eCallList_);
+            eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
+            eCallItem->setCheckState(Qt::Checked);
+            chosenEcallsAndOcalls.push_back(i);
+        }
+    }
+}
+/**
+ * ToDo
+ */
+void MainWindow::generateThreadList()
+{
+    if(db)
+    {
+        for (int i = 0; i <db->getThreads_().size() ; ++i)
+        {
+            QString threadItemName = "Thread ";
+            threadItemName.append(QString::number(i));
+            QListWidgetItem *threadItem = new QListWidgetItem(threadItemName, threadList_);
+            threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
+            threadItem->setCheckState(Qt::Checked);
+            chosenThreads.push_back(i);
+        }
+    }
 }
 
-QListWidget *MainWindow::generateThreadList()
+void MainWindow::createFilterDocks()
 {
+    threadDock_ = new QDockWidget(tr("Thread Filter"), this);
+    threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     threadList_ = new QListWidget();
-    if(db){
-        QListWidgetItem* item1 = new QListWidgetItem("test1", threadList_);
-        item1->setFlags(item1->flags() | Qt::ItemIsUserCheckable);
-        item1->setCheckState(Qt::Checked);
-        QListWidgetItem* item2 = new QListWidgetItem("test2", threadList_);
-        item2->setFlags(item2->flags() | Qt::ItemIsUserCheckable);
-        item2->setCheckState(Qt::Checked);
-        QListWidgetItem* item3 = new QListWidgetItem("test3", threadList_);
-        item3->setFlags(item3->flags() | Qt::ItemIsUserCheckable);
-        item3->setCheckState(Qt::Checked);
-        return threadList_;
-    }
+    threadDock_->setWidget(threadList_);
+    addDockWidget(Qt::LeftDockWidgetArea, threadDock_);
+    threadFilterAction_ = threadDock_->toggleViewAction();
+    connect(threadFilterAction_, SIGNAL(toggled(bool)), threadDock_, SLOT(setVisible(bool)));
+
+    eCallDock_ = new QDockWidget(tr("Ecall Filter"), this);
+    eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    eCallList_ = new QListWidget();
+    eCallDock_->setWidget(eCallList_);
+    addDockWidget(Qt::LeftDockWidgetArea, eCallDock_);
+    eCallFilterAction_ = eCallDock_->toggleViewAction();
+    connect(eCallFilterAction_, SIGNAL(toggled(bool)), eCallDock_, SLOT(setVisible(bool)));
+
+    /* ToDO oCall_Dock implementation
+     * follows here
+     */
+
+    QDockWidget *applyDock = new QDockWidget(tr("Apply Filter"), this);
+    generateFilterControls();
+    applyDock->setWidget(filterControls_);
+    applyDock->setMaximumHeight(70);
+    addDockWidget(Qt::LeftDockWidgetArea, applyDock);
+    applyDockAction_ = applyDock->toggleViewAction();
+    connect(applyDockAction_, SIGNAL(toggled(bool)), applyDock, SLOT(setVisible(bool)));
+}
+
+void MainWindow::generateFilterControls()
+{
+    filterControls_ = new QWidget(this);
+    auto layout = new QHBoxLayout();
+    auto filterButton = new QPushButton(tr("Apply"), filterControls_);
+    connect(filterButton, SIGNAL(released()), this, SLOT(applyFilter()));
+
+    auto resetFilterButton = new QPushButton(tr("Reset"), filterControls_);
+    connect(resetFilterButton, SIGNAL(clicked()), this, SLOT(resetFilter()));
+    layout->addWidget(resetFilterButton);
+    layout->addWidget(filterButton);
+    filterControls_->setLayout(layout);
+}
+
+void MainWindow::applyFilter()
+{
+
+}
+
+void MainWindow::resetFilter()
+{
+
 }
 

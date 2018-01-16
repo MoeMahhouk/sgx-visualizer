@@ -373,12 +373,34 @@ void MainWindow::zoomAndScrollTofirstEvent()
 {
     if(db && !db->getThreads_().isEmpty())
     {
+        bool threadsEmpty = true;
+        int lastNotEmptyThreadIndex;
+        for (int i = 0; i < db->getThreads_().size(); ++i)
+        {
+            if (!db->getThreads_()[i].threadEcalls_.isEmpty())
+            {
+                lastNotEmptyThreadIndex = i;
+                threadsEmpty = false;
+            }
+        }
+        if (threadsEmpty) {
+            return;
+        }
         qreal yScaleNew;
-        qreal startTimeOfFirstEvent = db->getThreads_()[0].threadEcalls_[0]->start_time_;
-        int lastThreadIndex = db->getThreads_().length() - 1;
-        int lastEcallIndex = db->getThreads_()[lastThreadIndex].threadEcalls_.length() - 1;
-        qreal startTimeOfLastEvent = db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->start_time_;
-        qreal endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[lastThreadIndex].threadEcalls_[lastEcallIndex]->total_time_;
+        qreal startTimeOfFirstEvent;
+        for (int j = 0; j < db->getThreads_().size(); ++j)
+        {
+            if (!db->getThreads_()[j].threadEcalls_.isEmpty())
+            {
+                startTimeOfFirstEvent = db->getThreads_()[j].threadEcalls_[0]->start_time_;
+                break;
+            }
+        }
+
+        int lastEcallIndex = db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_.length() - 1;
+        lastEcallIndex = lastEcallIndex < 0 ? 0 : lastEcallIndex;
+        qreal startTimeOfLastEvent = db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_[lastEcallIndex]->start_time_;
+        qreal endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_[lastEcallIndex]->total_time_;
         yScaleNew = (qreal)db->getProgramTotalTime() / (endTimeOfLastEvent - startTimeOfFirstEvent);
         verticalZoom(yScaleNew,factor_);
         scrollTo(-startTimeOfFirstEvent * yScale_, factor_);

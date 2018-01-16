@@ -88,7 +88,7 @@ void MainWindow::createMenus()
     viewMenu_ = menuBar()->addMenu(tr("View"));
     viewMenu_->addAction(threadFilterAction_);
     viewMenu_->addAction(eCallFilterAction_);
-   // viewMenu_->addAction(oCallFilterAction_);
+    viewMenu_->addAction(oCallFilterAction_);
     viewMenu_->addAction(applyDockAction_);
 
 
@@ -256,6 +256,7 @@ void MainWindow::loadFile(const QString& fileName)
     zoomAndScrollTofirstEvent();
     generateThreadList();
     generateECallList();
+    generateOCallList();
     render();
 }
 
@@ -407,6 +408,40 @@ void MainWindow::zoomAndScrollTofirstEvent()
     }
 }
 
+void MainWindow::generateOCallList()
+{
+    if(db)
+    {
+        for (int i = 0; i < db->getOCallTypeList().size() ; ++i)
+        {
+            QString oCallItemName = db->getOCallTypeList()[i].symbol_name_;
+            QListWidgetItem *eCallItem = new QListWidgetItem(oCallItemName, oCallList_);
+            eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
+            eCallItem->setCheckState(Qt::Checked);
+            chosenOcalls.insert(i);
+        }
+    }
+}
+
+bool MainWindow::updateOCalls()
+{
+    bool isChanged = false;
+    for (int i = 0; i < oCallList_->count() ; ++i)
+    {
+        if(oCallList_->item(i)->checkState() == Qt::Unchecked && chosenOcalls.contains(i))
+        {
+            chosenOcalls.remove(i);
+            isChanged = true;
+
+        } else if(oCallList_->item(i)->checkState() == Qt::Checked && !chosenOcalls.contains(i))
+        {
+            chosenOcalls.insert(i);
+            isChanged = true;
+        }
+    }
+    return isChanged;}
+
+
 void MainWindow::generateECallList()
 {
     if(db)
@@ -417,32 +452,28 @@ void MainWindow::generateECallList()
             QListWidgetItem *eCallItem = new QListWidgetItem(eCallItemName, eCallList_);
             eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
             eCallItem->setCheckState(Qt::Checked);
-            chosenEcallsAndOcalls.insert(i);
+            chosenEcalls.insert(i);
         }
     }
 }
+
 bool MainWindow::updateECalls() {
     bool isChanged = false;
     for (int i = 0; i < eCallList_->count() ; ++i)
     {
-        /*if the thread got unchecked and still not removed from the chosen thread set,
-         * then it get removed from the set and method returns at the end so that the filter can be applied on the
-         * chosen threads and if the thread was rechecked then it should be readded and then filter will be applied :)
-         */
-        if(eCallList_->item(i)->checkState() == Qt::Unchecked && chosenEcallsAndOcalls.contains(i))
+        if(eCallList_->item(i)->checkState() == Qt::Unchecked && chosenEcalls.contains(i))
         {
-            chosenEcallsAndOcalls.remove(i);
+            chosenEcalls.remove(i);
             isChanged = true;
 
-        } else if(eCallList_->item(i)->checkState() == Qt::Checked && !chosenEcallsAndOcalls.contains(i))
+        } else if(eCallList_->item(i)->checkState() == Qt::Checked && !chosenEcalls.contains(i))
         {
-            chosenEcallsAndOcalls.insert(i);
+            chosenEcalls.insert(i);
             isChanged = true;
         }
     }
     return isChanged;
 }
-
 
 void MainWindow::generateThreadList()
 {
@@ -460,7 +491,8 @@ void MainWindow::generateThreadList()
     }
 }
 
-bool MainWindow::updateThreads() {
+bool MainWindow::updateThreads()
+{
     bool isChanged = false;
     for (int i = 0; i < threadList_->count() ; ++i)
     {
@@ -492,7 +524,7 @@ void MainWindow::createFilterDocks()
     threadFilterAction_ = threadDock_->toggleViewAction();
     connect(threadFilterAction_, SIGNAL(toggled(bool)), threadDock_, SLOT(setVisible(bool)));
 
-    eCallDock_ = new QDockWidget(tr("Ecall Filter"), this);
+    eCallDock_ = new QDockWidget(tr("ECall Filter"), this);
     eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     eCallList_ = new QListWidget();
     eCallDock_->setWidget(eCallList_);
@@ -500,9 +532,14 @@ void MainWindow::createFilterDocks()
     eCallFilterAction_ = eCallDock_->toggleViewAction();
     connect(eCallFilterAction_, SIGNAL(toggled(bool)), eCallDock_, SLOT(setVisible(bool)));
 
-    /* ToDO oCall_Dock implementation
-     * follows here
-     */
+
+    oCallDock_ = new QDockWidget(tr("OCall Filter"), this);
+    oCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    oCallList_ = new QListWidget();
+    oCallDock_->setWidget(oCallList_);
+    addDockWidget(Qt::LeftDockWidgetArea,oCallDock_);
+    oCallFilterAction_ = oCallDock_->toggleViewAction();
+    connect(oCallFilterAction_, SIGNAL(toggled(bool)), oCallDock_, SLOT(setVisible(bool)));
 
     QDockWidget *applyDock = new QDockWidget(tr("Apply Filter"), this);
     generateFilterControls();
@@ -539,10 +576,10 @@ void MainWindow::applyFilter()
         delete filter;
     }
 
-    if(updateECalls())
+    if(updateECalls() || updateOCalls())
     {
         updateScene = true;
-        filter = new moe::ECallFilter(db, chosenEcallsAndOcalls.toList().toVector());
+        filter = new moe::ECallFilter(db, chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
         filter->execute();
         delete filter;
     }

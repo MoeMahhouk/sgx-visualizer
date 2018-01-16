@@ -14,11 +14,14 @@ namespace moe {
 
     public:
 
-        ThreadFilter(IReciever *reciever, QVector<int> chosenElements);
+        ThreadFilter(IReciever *reciever, QVector<int> chosenThreads);
 
         void execute() override;
 
         virtual QString toSQLStatement() override;
+
+    private:
+        QVector<int> chosenThreads_;
 
     };
 

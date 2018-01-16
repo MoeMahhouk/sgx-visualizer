@@ -4,7 +4,7 @@
 
 #include "Filtering/SGX/ThreadFilter.h"
 
-moe::ThreadFilter::ThreadFilter(IReciever *reciever,QVector<int> chosenElements) : IFilter(reciever, chosenElements)
+moe::ThreadFilter::ThreadFilter(IReciever *reciever,QVector<int> chosenThreads) : IFilter(reciever), chosenThreads_(chosenThreads)
 {
 
 }
@@ -14,11 +14,11 @@ QString moe::ThreadFilter::toSQLStatement()
 {
     QString conditionQuery = "";
     conditionQuery.append(" AND t.id IN ( ");
-    if (!chosenElements_.isEmpty())
+    if (!chosenThreads_.isEmpty())
     {
 
-        for (int i = 0; i < chosenElements_.size() ; ++i) {
-            conditionQuery.append(QString::number(chosenElements_[i]));
+        for (int i = 0; i < chosenThreads_.size() ; ++i) {
+            conditionQuery.append(QString::number(chosenThreads_[i]));
             conditionQuery.append(" ,");
 
         }

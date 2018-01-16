@@ -15,7 +15,7 @@ namespace moe {
 
     public:
 
-        IFilter(IReciever *dreciever, QVector<int> chosenElements) : dReciever_(dreciever), chosenElements_(chosenElements){};
+        IFilter(IReciever *dreciever) : dReciever_(dreciever){};
 
         virtual ~IFilter()
         {
@@ -27,7 +27,6 @@ namespace moe {
         virtual void execute() = 0;
 
     protected:
-        QVector<int> chosenElements_;
         IReciever *dReciever_; //DataBank Reciever
     };
 }

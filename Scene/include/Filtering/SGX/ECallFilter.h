@@ -13,12 +13,17 @@ namespace moe {
     class ECallFilter : public IFilter {
 
     public:
-        ECallFilter(IReciever *reciever, QVector<int> chosenElements);
+        ECallFilter(IReciever *reciever, QVector<int> chosenECalls, QVector<int> chosenOCalls);
 
         QString toSQLStatement() override;
 
         void execute() override;
+
+    private:
+        QVector<int> chosenECalls_;
+        QVector<int> chosenOCalls_;
     };
+
 }
 
 

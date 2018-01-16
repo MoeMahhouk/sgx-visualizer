@@ -92,21 +92,26 @@ private:
      * test stuff
      */
     QSet<int> chosenThreads;
-    QSet<int> chosenEcallsAndOcalls;
+    QSet<int> chosenEcalls;
+    QSet<int> chosenOcalls;
     moe::IFilter *filter;
     QTabWidget* generateTabList();
     void generateECallList();
+    void generateOCallList();
     void generateThreadList();
     void generateFilterControls();
     bool updateThreads();
     bool updateECalls();
+    bool updateOCalls();
     void resetThreadsEcallsAndOcalls();
 
     QTabWidget *tabwidget_;
     QListWidget *eCallList_;
+    QListWidget *oCallList_;
     QListWidget *threadList_;
     QDockWidget *threadDock_;
     QDockWidget *eCallDock_;
+    QDockWidget *oCallDock_;
     QAction *threadFilterAction_;
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;

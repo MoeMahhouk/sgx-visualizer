@@ -34,11 +34,12 @@ void MainWindow::open()
 
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
+
     if (event->modifiers() & Qt::ControlModifier) {
         qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
         verticalZoom(yScaleFactor);
     } else {
-        verticalScroll(moe::signum(event->delta())*20,factor_); //ToDo scrolling schould be negative in the other direction
+        verticalScroll(moe::signum(event->delta())*40,factor_);
     }
 }
 
@@ -53,26 +54,11 @@ void MainWindow::resetPressed()
     sequenceListNode_->setTransform(moe::Transform2D());
     yOffset_ = 0;
     yScale_ = 1;
-   // moe::ResetEvent e = {sequenceDiagram->getSequenceLine_(),sequenceListNode_}; //ToDo the old ResetEvent
     moe::ResetEvent e;
     notify(&e);
     render();
 }
 
-void MainWindow::scrollUpPressed()
-{
-    verticalScroll(20, factor_);
-}
-
-void MainWindow::scrollDownPressed()
-{
-    verticalScroll(-20, factor_);
-    /**
-     * filter test ToDo should be later implemented with listitems and chosing method
-     */
-
-
-}
 
 void MainWindow::scrollRightPressed()
 {
@@ -231,32 +217,46 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
-void MainWindow::loadFile(const QString& fileName)
-{
-    resetPressed();
-    db = new moe::SgxDatabaseStructure(fileName);
-    factor_ = 500.0/db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),500,40);
-    registerObserver(measureLine_);
-    visualizeThreads(db->getThreads_(), factor_); //ToDo still should be tested
-   // scrollToNextEvent(db->getThreads_(), factor_);
-    //std::cerr << "factor is this small : " << 1000.0/db->getProgramTotalTime() << std::endl;
-    sceneRootNode_->children_.push_back(measureLine_);
-    zoomAndScrollTofirstEvent();
-    generateThreadList();
-    generateECallList();
-    render();
-}
-
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     writeSettings();
     event->accept();
 }
+
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
+
+    if (db)
+    {
+        measureLine_->setPixel_line_depth_(this->height() - 250);
+        factor_ = (double)(this->height() - 250)/db->getProgramTotalTime();
+        render();
+    }
+    /* buggy a little bit and needs more rework
+    view_->setGeometry(0, 0, this->rect().width()*0.8, this->rect().height()*0.8);
+    //view_->setFrameStyle(0);
+    scene_->setSceneRect(view_->rect());
+     */
     QMainWindow::resizeEvent(event);
     view_->update();
+}
+
+void MainWindow::loadFile(const QString& fileName)
+{
+    resetPressed();
+    db = new moe::SgxDatabaseStructure(fileName);
+    /*
+     * testing window height
+     */
+    factor_ = (double)(this->height() - 250)/db->getProgramTotalTime();
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() - 250, 40);
+    registerObserver(measureLine_);
+    visualizeThreads(db->getThreads_(), factor_);
+    sceneRootNode_->children_.push_back(measureLine_);
+    zoomAndScrollTofirstEvent();
+    generateThreadList();
+    generateECallList();
+    render();
 }
 
 
@@ -270,7 +270,7 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
     for (int i = 0; i < threads.length() ; ++i)
     {
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
-        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (110 * (i+2)), 30));
+        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (135 * (i+1)), 30));
         sequenceListNode_->children_.push_back(thread);
     }
 }

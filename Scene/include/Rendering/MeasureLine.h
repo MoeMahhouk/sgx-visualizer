@@ -22,7 +22,7 @@ namespace moe{
         Line& getMeasureLine_();
 
         void generateScales(qreal yScale, qreal yOffset);
-        void resetScales();
+
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
 
@@ -31,7 +31,11 @@ namespace moe{
         virtual void onNotify(Event* event) override;
         Line measureLine_;
 		int pixel_line_depth_ = 0;
-        uint64_t total_timeline_ = 0; //ToDo i changed this from int to uint64_t
+	public:
+		void setPixel_line_depth_(int pixel_line_depth_);
+
+	private:
+		uint64_t total_timeline_ = 0;
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
     };
 

@@ -32,8 +32,7 @@ private slots:
     void applyFilter();
     void resetFilter();
     void resetPressed();
-    void scrollUpPressed();
-    void scrollDownPressed();
+
     void scrollRightPressed();
     void scrollLeftPressed();
     void scrollToNextEvent();

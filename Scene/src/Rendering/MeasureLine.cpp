@@ -13,7 +13,6 @@ void moe::MeasureLine::draw(moe::SceneData &sceneData, moe::Transform2D &parentT
 moe::MeasureLine::MeasureLine(Transform2D transform, uint64_t total_timeline, int pixel_line_depth, int scaleLines) :
         Renderable(transform), total_timeline_(total_timeline), pixel_line_depth_(pixel_line_depth),
         measureLine_ (Transform2D(),0 ,pixel_line_depth,2)
-//ToDo i changed the hardcoded 500 from above and added new class variable for the line depth in pixel and not nano second
 {
     name = "MeasureLine";
 
@@ -46,11 +45,6 @@ void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset) {
         i += step;
     }
 
-}
-//ToDo delete this method later if it appears to be useless
-void moe::MeasureLine::resetScales() {
-    measureLine_.getTransform().setYScale(1);
-    measureLine_.getTransform().setXScale(1);
 }
 
 void moe::MeasureLine::onNotify(Event* event) {
@@ -86,4 +80,9 @@ QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
     } else {
         return QString::number(0,'f',2);
     }
+}
+
+void moe::MeasureLine::setPixel_line_depth_(int pixel_line_depth_) {
+    MeasureLine::pixel_line_depth_ = pixel_line_depth_;
+    measureLine_.setYTarget(pixel_line_depth_);
 }

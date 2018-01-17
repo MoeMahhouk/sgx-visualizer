@@ -38,7 +38,7 @@ private slots:
     void scrollToNextEvent();
 
 protected:
-    void wheelEvent ( QWheelEvent * event );
+    void wheelEvent ( QWheelEvent * event ) override;
 private:
 
     moe::Renderable *sceneRootNode_;

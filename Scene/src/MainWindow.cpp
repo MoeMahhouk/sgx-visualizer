@@ -123,31 +123,6 @@ void MainWindow::generateGraphicsView()
     viewToolbar_ = new QToolBar(viewArea_);
     addZoomAndScrollOptions(viewToolbar_);
     layout->addWidget(viewToolbar_);
-    /*QPushButton* scrollUp = new QPushButton(tr("Scroll Up"), this);
-    QPushButton* scrollDown = new QPushButton(tr("Scroll Down"), this);
-    QPushButton* zoomIn = new QPushButton(tr("Zoom In"), this);
-    QPushButton* zoomOut = new QPushButton(tr("Zoom Out") , this);
-    QPushButton* reset = new QPushButton(tr("Reset"), this);
-    QPushButton* scrollRight = new QPushButton(tr("Scroll Right"), this);
-    QPushButton* scrollLeft = new QPushButton(tr("Scroll Left"), this);
-    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next Event"), this);*/
-
-    /*reset->move(0,155);
-    zoomOut->move(0,105);
-    zoomIn->move(0,55);
-    scrollUp->move(0,205);
-    scrollDown->move(0,255);
-    scrollRight->move(0,305);
-    scrollLeft->move(0,355);
-    scrollToNextEventButton->move(0,405);
-    zoomIn->connect(zoomIn, SIGNAL(clicked()) , this, SLOT(onZoomInPressed()));
-    zoomOut->connect(zoomOut, SIGNAL(clicked()), this, SLOT(onZoomOutPressed()));
-    reset->connect(reset,SIGNAL(clicked()),this, SLOT(resetPressed()));
-    scrollUp->connect(scrollUp,SIGNAL(clicked()), this,SLOT(scrollUpPressed()));
-    scrollDown->connect(scrollDown,SIGNAL(clicked()), this,SLOT(scrollDownPressed()));
-    scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
-    scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
-    scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));*/
     scene_ = new QGraphicsScene(this);
     view_ = new QGraphicsView(scene_,this);
     view_->setRenderHint(QPainter::Antialiasing);
@@ -161,6 +136,7 @@ void MainWindow::generateGraphicsView()
 
     layout->addWidget(view_);
     viewArea_->setLayout(layout);
+    viewArea_->show();
     setCentralWidget(viewArea_);
 
     render();
@@ -226,10 +202,14 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
 
+    QMainWindow::resizeEvent(event);
+    view_->setGeometry(0, 0, this->rect().width()*0.9, this->rect().height()*0.9);
+    view_->setFrameStyle(0);
+    scene_->setSceneRect(view_->rect());
     if (db)
     {
-        measureLine_->setPixel_line_depth_(this->height() - 250);
-        factor_ = (double)(this->height() - 250)/db->getProgramTotalTime();
+        measureLine_->setPixel_line_depth_(this->height() - 200);
+        factor_ = (double)(this->height() - 200)/db->getProgramTotalTime();
         render();
     }
     /* buggy a little bit and needs more rework
@@ -237,7 +217,6 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     //view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
      */
-    QMainWindow::resizeEvent(event);
     view_->update();
 }
 
@@ -248,8 +227,8 @@ void MainWindow::loadFile(const QString& fileName)
     /*
      * testing window height
      */
-    factor_ = (double)(this->height() - 250)/db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() - 250, 40);
+    factor_ = (double)(this->height() - 200)/db->getProgramTotalTime();
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() - 200, 40);
     registerObserver(measureLine_);
     visualizeThreads(db->getThreads_(), factor_);
     sceneRootNode_->children_.push_back(measureLine_);

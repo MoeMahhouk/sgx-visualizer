@@ -224,26 +224,27 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     if (!conditionQuery.isEmpty())
     {
         newQueryString.append(conditionQuery);
+        newQueryString.append( "union all "
+                "select e2.id, e2.type, e2.time, e2.call_id, e2.eid, e2.call_event, e2.involved_thread, e2.aex_count, _level-1 "
+                "from events as e2 inner join events_children ON e2.id = events_children.call_event" );
     }
     newQueryString.append(
-            " union all "
-            "select e2.id, e2.type, e2.time, e2.call_id, e2.eid, e2.call_event, e2.involved_thread, e2.aex_count, _level-1 "
-                    "from events as e2 inner join events_children ON e2.id = events_children.call_event ), "
+            " ), "
             "filtered_events as ( select e_.id, e_.type, e_.time as start_time, e.time as end_time, e_.call_id,"
                     " e_.call_event, e.return_value, e_.involved_thread, e_.eid, e.aex_count "
                     "from events_children as e_ inner join events as e on e.call_event = e_.id "
             "where e.type IN (15, 17) ) "
             "select distinct e.id, e.type, e.start_time, e.end_time, e.call_id, e.call_event, e.return_value, e.involved_thread, e.eid, e.aex_count, "
             "IFNULL(ec.symbol_name, oc.symbol_name) as symbol_name, IFNULL(ec.symbol_address, oc.symbol_address_normalized),"
-            " oc.symbol_file_name as symbol_address "
+            " oc.symbol_file_name as symbol_file_name "
                     "from filtered_events as e left join ecalls as ec on ec.id = e.call_id and e.type = 14 "
                     "left join ocalls as oc on oc.id = e.call_id and e.type = 16 "
                     "order by start_time ASC");
 
-    //ToDo aex_count should be IFNULL(aex_count , 0) ?? and what should be done with it exactly ?
-    //ToDo ask nico why we took symbol_address_normalized instead of symbol address of the ocalls ?
-    //ToDo ask nico is it on purpose that symbol_file_name is addressed as symbol_address or is it not right
-    //ToDo what about isPrivate from ecalls and symbol Address from Ocalls
+    //ToDo aex_count should be IFNULL(aex_count , 0) ?? and what should be done with it exactly ? (still open  :| )
+    //ToDo ask nico why we took symbol_address_normalized instead of symbol address of the ocalls ? (done :) )
+    //ToDo ask nico is it on purpose that symbol_file_name is addressed as symbol_address or is it not right (it was fast typing issue :) )
+    //ToDo what about isPrivate from ecalls and symbol Address from Ocalls (still open :| )
     /*queryString.append(getInvolvedThreads());
     if (!conditionQuery.isEmpty())
     {
@@ -299,7 +300,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
 
             case (int)EventMap::EnclaveOCallEvent : {
                 std::string symbol_file_name = query.value(12).toString().toStdString();
-                uint64_t symbol_address_normalized = symbol_address; //ToDo fix this later
+                uint64_t symbol_address_normalized = symbol_address; //ToDo fix this later (only normalized is important for ocalls and it represents the real symbol address)
 
                 OCall *oCall = new OCall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,symbol_name,
                                          symbol_address_normalized,symbol_file_name, isFail);
@@ -439,7 +440,7 @@ void moe::SgxDatabaseStructure::getResult(QString conditionQuery)
     {
         threads_.clear();
         initializeThreads(conditionQuery);
-        initializeECallsAndOCalls();
+        //initializeECallsAndOCalls();
 
     } else if (currentAction == TYPES::ACTION_LIST::ECALLFILTER)
     {

@@ -133,7 +133,6 @@ void MainWindow::generateGraphicsView()
     sequenceListNode_ = new moe::EmptyRenderable(moe::Transform2D(1,0,0,1,0,0));
     std::cout << "MainWindow 1" << std::endl;
     sceneRootNode_->children_.push_back(sequenceListNode_);
-
     layout->addWidget(view_);
     viewArea_->setLayout(layout);
     viewArea_->show();
@@ -171,12 +170,12 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
 void MainWindow::render()
 {
     scene_->clear();
-    scene_->setBackgroundBrush(Qt::lightGray);
+    scene_->setBackgroundBrush(Qt::white);
     moe::SceneData data{scene_};
     sceneRootNode_->render(data, sceneTransformation);
     scene_->update();
     viewArea_->show();
-    //view_->show(); ToDo replaced it with viewArea.show (needs testing a little bit)
+    //view_->show(); //ToDo replaced it with viewArea.show (needs testing a little bit)
 }
 
 void MainWindow::applySettings()
@@ -201,22 +200,32 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-
+    std::cerr << "yoffset before the resize was " << yOffset_ << " and the yscale before was "  << yScale_ << std::endl;
     QMainWindow::resizeEvent(event);
-    view_->setGeometry(0, 0, this->rect().width()*0.9, this->rect().height()*0.9);
+
+    viewArea_->setGeometry(0, 0, this->rect().width()*0.8 , this->rect().height()*0.8);
+    view_->setGeometry(0, 0, this->rect().width()*0.8 , this->rect().height()*0.8);
     view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
+    /*
+     * a little bit buggy and should be refined later when writing the view seperate class :/
+     */
     if (db)
     {
-        measureLine_->setPixel_line_depth_(this->height() - 200);
-        factor_ = (double)(this->height() - 200)/db->getProgramTotalTime();
-        render();
+        qreal oldYoffset = yOffset_;
+        qreal oldYscale = yScale_;
+        measureLine_->setPixel_line_depth_(this->height()*0.7);
+        factor_ = (double)(this->height()*0.7)/db->getProgramTotalTime();
+        clearSequenceListNode();
+        visualizeThreads(db->getThreads_(),factor_);
+        resetPressed();
+        verticalZoom(oldYscale,factor_);
+        scrollTo(oldYoffset,factor_);
     }
-    /* buggy a little bit and needs more rework
-    view_->setGeometry(0, 0, this->rect().width()*0.8, this->rect().height()*0.8);
-    //view_->setFrameStyle(0);
-    scene_->setSceneRect(view_->rect());
-     */
+
+    std::cerr << "yoffset after the resize was " << yOffset_ << " and the yscale after was "  << yScale_ << std::endl;
+
+    render();
     view_->update();
 }
 
@@ -227,8 +236,8 @@ void MainWindow::loadFile(const QString& fileName)
     /*
      * testing window height
      */
-    factor_ = (double)(this->height() - 200)/db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() - 200, 40);
+    factor_ = (double)(this->height()*0.7)/db->getProgramTotalTime();
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
     registerObserver(measureLine_);
     visualizeThreads(db->getThreads_(), factor_);
     sceneRootNode_->children_.push_back(measureLine_);
@@ -497,18 +506,53 @@ bool MainWindow::updateThreads()
 
 void MainWindow::createFilterDocks()
 {
+    //thread dock which will have double layout later
     threadDock_ = new QDockWidget(tr("Thread Filter"), this);
     threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     threadList_ = new QListWidget();
-    threadDock_->setWidget(threadList_);
+    //multiThreadDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
+    QWidget *multiThreadDockWidget = new QWidget();
+    auto multiThreadWidgetLayout = new QVBoxLayout();
+    multiThreadWidgetLayout->addWidget(threadList_);
+    //multiThreadButtonWidget has the horizontal layout and the 2 push buttons
+    QWidget *multiThreadButtonWidget = new QWidget();
+    QHBoxLayout *multiThreadButtonLayout = new QHBoxLayout();
+    auto selectAllThread = new QPushButton(tr("Select All"), this);
+    connect(selectAllThread, &QPushButton::pressed, [this]() { selectAll(threadList_);});
+    auto unSelectAllThread = new QPushButton(tr("Unselect All"), this);
+    connect(unSelectAllThread, &QPushButton::pressed, [this]() { unSelectAll(threadList_);});
+    multiThreadButtonLayout->addWidget(selectAllThread);
+    multiThreadButtonLayout->addWidget(unSelectAllThread);
+    multiThreadButtonWidget->setLayout(multiThreadButtonLayout);
+    multiThreadWidgetLayout->addWidget(multiThreadButtonWidget);
+    multiThreadDockWidget->setLayout(multiThreadWidgetLayout);
+    threadDock_->setWidget(multiThreadDockWidget);
     addDockWidget(Qt::LeftDockWidgetArea, threadDock_);
     threadFilterAction_ = threadDock_->toggleViewAction();
     connect(threadFilterAction_, SIGNAL(toggled(bool)), threadDock_, SLOT(setVisible(bool)));
 
+
+
     eCallDock_ = new QDockWidget(tr("ECall Filter"), this);
     eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     eCallList_ = new QListWidget();
-    eCallDock_->setWidget(eCallList_);
+    //multiECallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
+    QWidget *multiECallDockWidget = new QWidget();
+    auto multiECallWidgetLayout = new QVBoxLayout();
+    multiECallWidgetLayout->addWidget(eCallList_);
+    //multiECallButtonWidget has the horizontal layout and the 2 push buttons
+    QWidget *multiECallButtonWidget = new QWidget();
+    QHBoxLayout *multiECallButtonLayout = new QHBoxLayout();
+    auto selectAllECalls = new QPushButton(tr("Select All"), this);
+    connect(selectAllECalls, &QPushButton::pressed, [this]() { selectAll(eCallList_);});
+    auto unSelectAllECalls = new QPushButton(tr("Unselect All"), this);
+    connect(unSelectAllECalls, &QPushButton::pressed, [this]() { unSelectAll(eCallList_);});
+    multiECallButtonLayout->addWidget(selectAllECalls);
+    multiECallButtonLayout->addWidget(unSelectAllECalls);
+    multiECallButtonWidget->setLayout(multiECallButtonLayout);
+    multiECallWidgetLayout->addWidget(multiECallButtonWidget);
+    multiECallDockWidget->setLayout(multiECallWidgetLayout);
+    eCallDock_->setWidget(multiECallDockWidget);
     addDockWidget(Qt::LeftDockWidgetArea, eCallDock_);
     eCallFilterAction_ = eCallDock_->toggleViewAction();
     connect(eCallFilterAction_, SIGNAL(toggled(bool)), eCallDock_, SLOT(setVisible(bool)));
@@ -517,7 +561,23 @@ void MainWindow::createFilterDocks()
     oCallDock_ = new QDockWidget(tr("OCall Filter"), this);
     oCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     oCallList_ = new QListWidget();
-    oCallDock_->setWidget(oCallList_);
+    //multiOCallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
+    QWidget *multiOCallDockWidget = new QWidget();
+    auto multiOCallWidgetLayout = new QVBoxLayout();
+    multiOCallWidgetLayout->addWidget(oCallList_);
+    //multiOCallButtonWidget has the horizontal layout and the 2 push buttons
+    QWidget *multiOCallButtonWidget = new QWidget();
+    QHBoxLayout *multiOCallButtonLayout = new QHBoxLayout();
+    auto selectAllOCalls = new QPushButton(tr("Select All"), this);
+    connect(selectAllOCalls, &QPushButton::pressed, [this]() { selectAll(oCallList_);});
+    auto unSelectAllOCalls = new QPushButton(tr("Unselect All"), this);
+    connect(unSelectAllOCalls, &QPushButton::pressed, [this]() { unSelectAll(oCallList_);});
+    multiOCallButtonLayout->addWidget(selectAllOCalls);
+    multiOCallButtonLayout->addWidget(unSelectAllOCalls);
+    multiOCallButtonWidget->setLayout(multiOCallButtonLayout);
+    multiOCallWidgetLayout->addWidget(multiOCallButtonWidget);
+    multiOCallDockWidget->setLayout(multiOCallWidgetLayout);
+    oCallDock_->setWidget(multiOCallDockWidget);
     addDockWidget(Qt::LeftDockWidgetArea,oCallDock_);
     oCallFilterAction_ = oCallDock_->toggleViewAction();
     connect(oCallFilterAction_, SIGNAL(toggled(bool)), oCallDock_, SLOT(setVisible(bool)));
@@ -560,23 +620,10 @@ void MainWindow::applyFilter()
         delete filter;
     }
 
-    /*if(updateECalls() || updateOCalls())
-    {
-        updateScene = true;
-        filter = new moe::ECallOCallFilter(db, chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
-        filter->execute();
-        delete filter;
-    }*/
 
     if(updateScene)
     {
-        auto it = sequenceListNode_->children_.begin();
-        while (it != sequenceListNode_->children_.end())
-        {
-            delete *it;
-            it++;
-        }
-        sequenceListNode_->children_.clear();
+        clearSequenceListNode();
         resetPressed();
         visualizeThreads(db->getThreads_(),factor_);
         zoomAndScrollTofirstEvent();
@@ -600,5 +647,32 @@ void MainWindow::resetThreadsEcallsAndOcalls()
     {
         eCallList_->item(j)->setCheckState(Qt::Checked);
     }
+}
+
+void MainWindow::unSelectAll(QListWidget *list)
+{
+    for (int i = 0; i < list->count() ; ++i)
+    {
+        list->item(i)->setCheckState(Qt::Unchecked);
+    }
+}
+
+void MainWindow::selectAll(QListWidget *list)
+{
+    for (int i = 0; i < list->count() ; ++i)
+    {
+        list->item(i)->setCheckState(Qt::Checked);
+    }
+}
+
+void MainWindow::clearSequenceListNode()
+{
+    auto it = sequenceListNode_->children_.begin();
+    while (it != sequenceListNode_->children_.end())
+    {
+        delete *it;
+        it++;
+    }
+    sequenceListNode_->children_.clear();
 }
 

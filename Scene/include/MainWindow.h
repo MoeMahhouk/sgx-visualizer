@@ -27,6 +27,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+
+    void unSelectAll(QListWidget *list);
+    void selectAll(QListWidget *list);
+
 private slots:
     void open();
     void applyFilter();
@@ -67,7 +72,7 @@ private:
     void loadFile(const QString &fileName);
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
-
+    void clearSequenceListNode();
 
     QListView *filterListView;
     moe::SgxDatabaseStructure* db = 0;
@@ -104,6 +109,7 @@ private:
     bool updateECalls();
     bool updateOCalls();
     void resetThreadsEcallsAndOcalls();
+
 
     QTabWidget *tabwidget_;
     QListWidget *eCallList_;

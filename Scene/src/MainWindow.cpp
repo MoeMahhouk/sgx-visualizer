@@ -315,7 +315,9 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
             }
         }
     } else {
-        new_yOffset = threads[0].threadEcalls_[0]->start_time_;
+        yOffset_ = 1;
+        scrollToNextEvent();
+        return;
     }
     scrollTo(-new_yOffset * yScale_, factor);
     render();
@@ -568,21 +570,24 @@ void MainWindow::generateFilterControls()
 void MainWindow::applyFilter()
 {
     bool updateScene = false;
-    if(updateThreads())
+    if(updateThreads() | updateECalls() | updateOCalls())
     {
         updateScene = true;
         filter = new moe::ThreadFilter(db,chosenThreads.toList().toVector());
         filter->execute();
         delete filter;
-    }
-
-    if(updateECalls() || updateOCalls())
-    {
-        updateScene = true;
-        filter = new moe::ECallFilter(db, chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
+        filter  = new moe::ECallOCallFilter(db,chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
         filter->execute();
         delete filter;
     }
+
+    /*if(updateECalls() || updateOCalls())
+    {
+        updateScene = true;
+        filter = new moe::ECallOCallFilter(db, chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
+        filter->execute();
+        delete filter;
+    }*/
 
     if(updateScene)
     {

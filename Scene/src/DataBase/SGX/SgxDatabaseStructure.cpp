@@ -261,7 +261,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     }
     while(query.next())
     {
-       
+
         id = query.value(0).toInt(); //line unique id in the table events
         relative_start_time = start_time = (uint64_t) query.value(2).toDouble() - programStratTime;
         total_time = (uint64_t) query.value(3).toDouble() - query.value(2).toDouble();

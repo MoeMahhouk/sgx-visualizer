@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include <Filtering/IFilter.h>
-#include <Filtering/SGX/ECallFilter.h>
+#include <Filtering/SGX/ECallOCallFilter.h>
 
 #include "Rendering/Renderable.h"
 #include "Rendering/Rect.h"

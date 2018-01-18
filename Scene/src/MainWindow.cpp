@@ -200,7 +200,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-    std::cerr << "yoffset before the resize was " << yOffset_ << " and the yscale before was "  << yScale_ << std::endl;
     QMainWindow::resizeEvent(event);
 
     viewArea_->setGeometry(0, 0, this->rect().width()*0.8 , this->rect().height()*0.8);
@@ -222,8 +221,6 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         verticalZoom(oldYscale,factor_);
         scrollTo(oldYoffset,factor_);
     }
-
-    std::cerr << "yoffset after the resize was " << yOffset_ << " and the yscale after was "  << yScale_ << std::endl;
 
     render();
     view_->update();

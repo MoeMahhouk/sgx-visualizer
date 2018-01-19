@@ -233,7 +233,7 @@ void MainWindow::loadFile(const QString& fileName)
     /*
      * testing window height
      */
-    factor_ = (double)(this->height()*0.7)/db->getProgramTotalTime();
+    factor_ = (double)(this->height() * 0.7) / db->getProgramTotalTime();
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
     registerObserver(measureLine_);
     visualizeThreads(db->getThreads_(), factor_);
@@ -316,8 +316,25 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
  */
 void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 {
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, yOffset));
-    yOffset_ += (yOffset/factor);
+    qreal pixelScroll = yOffset;
+    if (yOffset_ + (yOffset/factor) > 0) {
+        pixelScroll = 0;
+        yOffset_ = 0;
+    } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) < (db->getProgramTotalTime() * yScale_)){
+        /*qreal print = (yOffset_ + (yOffset/factor));
+        std::cerr << " yoffset_ + (yOffset/factor) " << print << " db->getProgramTotalTime() * yScale_" << db->getProgramTotalTime() * yScale_ << std::endl;
+        std::cerr << " yoffset_ is now at " << yOffset_ << " and the program total length is" << db->getProgramTotalTime() * yScale_ << std::endl;
+        pixelScroll = (((db->getProgramTotalTime() * yScale_) + yOffset_) * factor_) * -1;
+        std::cerr << "pixel Scroll is now " << pixelScroll << std::endl;
+        yOffset_ -= (db->getProgramTotalTime() * yScale_) + yOffset_;*/
+        yOffset_ += (yOffset/factor);
+    } else {
+        /*if(yOffset_ == db->getProgramTotalTime()*yScale_ *-1)
+            return;
+        scrollTo(-1*(db->getProgramTotalTime())*yScale_,factor_);*/
+        return;
+    }
+    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, pixelScroll));
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
     render();

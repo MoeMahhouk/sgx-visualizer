@@ -72,7 +72,8 @@ void MainWindow::scrollLeftPressed()
     render();
 }
 
-void MainWindow::scrollToNextEvent() {
+void MainWindow::scrollToNextEvent()
+{
     if(db)
     {
        // std::cerr << "data base is not null" << std::endl;
@@ -130,15 +131,15 @@ void MainWindow::generateGraphicsView()
     view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
     sceneRootNode_ = new moe::EmptyRenderable();
-    sequenceListNode_ = new moe::EmptyRenderable(moe::Transform2D(1,0,0,1,0,0));
+    sequenceListNode_ = new moe::EmptyRenderable();
     std::cout << "MainWindow 1" << std::endl;
     sceneRootNode_->children_.push_back(sequenceListNode_);
     layout->addWidget(view_);
     viewArea_->setLayout(layout);
     viewArea_->show();
     setCentralWidget(viewArea_);
-
-    render();
+    //ToDo testing the initialize update methods
+    //render();
 }
 
 void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
@@ -169,7 +170,8 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
 
 void MainWindow::render()
 {
-    scene_->clear();
+    //toDo testing the new update initialize method
+    //scene_->clear();
     scene_->setBackgroundBrush(Qt::white);
     moe::SceneData data{scene_};
     sceneRootNode_->render(data, sceneTransformation);
@@ -208,41 +210,36 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     scene_->setSceneRect(view_->rect());
     /*
      * a little bit buggy and should be refined later when writing the view seperate class :/
+     * ToDo sometimes qt resize causes some shit scrolling issues -_-
      */
     if (db)
     {
         qreal oldYoffset = yOffset_;
         qreal oldYscale = yScale_;
-        measureLine_->setPixel_line_depth_(this->height()*0.7);
-        factor_ = (double)(this->height()*0.7)/db->getProgramTotalTime();
-        clearSequenceListNode();
-        visualizeThreads(db->getThreads_(),factor_);
         resetPressed();
+        measureLine_->setPixel_line_depth_(this->height()*0.75);
+        factor_ = (double)(this->height()*0.75)/db->getProgramTotalTime();
+        clearSequenceListNode();
+        scene_->clear();
+        visualizeThreads(db->getThreads_(),factor_);
+        moe::SceneData data{scene_};
+        sceneRootNode_->initialize(data, sceneTransformation);
         verticalZoom(oldYscale,factor_);
         scrollTo(oldYoffset,factor_);
+        render();
     }
-
-    render();
     view_->update();
 }
 
 void MainWindow::loadFile(const QString& fileName)
 {
-    resetPressed();
-    db = new moe::SgxDatabaseStructure(fileName);
-    /*
-     * testing window height
-     */
-    factor_ = (double)(this->height() * 0.7) / db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
-    registerObserver(measureLine_);
-    visualizeThreads(db->getThreads_(), factor_);
-    sceneRootNode_->children_.push_back(measureLine_);
-    zoomAndScrollTofirstEvent();
-    generateThreadList();
-    generateECallList();
-    generateOCallList();
-    render();
+    if(fileName.contains(".db")) {
+        if (db) {
+            delete db;
+        }
+        db = new moe::SgxDatabaseStructure(fileName);
+        updateTraces();
+    }
 }
 
 
@@ -305,6 +302,7 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
         return;
     }
     scrollTo(-new_yOffset * yScale_, factor);
+
     render();
 }
 
@@ -367,7 +365,7 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor)
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
-    //render();
+    render();
 }
 
 /**
@@ -378,19 +376,7 @@ void MainWindow::zoomAndScrollTofirstEvent()
 {
     if(db && !db->getThreads_().isEmpty())
     {
-        bool threadsEmpty = true;
-        int lastNotEmptyThreadIndex;
-        for (int i = 0; i < db->getThreads_().size(); ++i)
-        {
-            if (!db->getThreads_()[i].threadEcalls_.isEmpty())
-            {
-                lastNotEmptyThreadIndex = i;
-                threadsEmpty = false;
-            }
-        }
-        if (threadsEmpty) {
-            return;
-        }
+        bool threadsChildrenEmpty = true;
         qreal yScaleNew;
         qreal startTimeOfFirstEvent;
         for (int j = 0; j < db->getThreads_().size(); ++j)
@@ -398,15 +384,34 @@ void MainWindow::zoomAndScrollTofirstEvent()
             if (!db->getThreads_()[j].threadEcalls_.isEmpty())
             {
                 startTimeOfFirstEvent = db->getThreads_()[j].threadEcalls_[0]->start_time_;
+                threadsChildrenEmpty = false;
                 break;
             }
         }
+        if (threadsChildrenEmpty)
+        {
+            return;
+        }
 
-        int lastEcallIndex = db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_.length() - 1;
-        lastEcallIndex = lastEcallIndex < 0 ? 0 : lastEcallIndex;
-        qreal startTimeOfLastEvent = db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_[lastEcallIndex]->start_time_;
-        qreal endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[lastNotEmptyThreadIndex].threadEcalls_[lastEcallIndex]->total_time_;
-        yScaleNew = (qreal)db->getProgramTotalTime() / (endTimeOfLastEvent - startTimeOfFirstEvent);
+        int lastEcallIndex;
+        qreal startTimeOfLastEvent;
+        qreal endTimeOfLastEvent;
+        qreal endTimeOfLongestEcall = 0;
+        for (int i = 0; i < db->getThreads_().size(); ++i)
+        {
+            if (!db->getThreads_()[i].threadEcalls_.isEmpty())
+            {
+                lastEcallIndex = db->getThreads_()[i].threadEcalls_.length() - 1;
+                lastEcallIndex = lastEcallIndex < 0 ? 0 : lastEcallIndex;
+                startTimeOfLastEvent = db->getThreads_()[i].threadEcalls_[lastEcallIndex]->start_time_;
+                endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[i].threadEcalls_[lastEcallIndex]->total_time_;
+                if (endTimeOfLongestEcall < endTimeOfLastEvent)
+                {
+                    endTimeOfLongestEcall = endTimeOfLastEvent;
+                }
+            }
+        }
+        yScaleNew = (qreal)db->getProgramTotalTime() / (endTimeOfLongestEcall - startTimeOfFirstEvent);
         verticalZoom(yScaleNew,factor_);
         scrollTo(-startTimeOfFirstEvent * yScale_, factor_);
     }
@@ -414,6 +419,7 @@ void MainWindow::zoomAndScrollTofirstEvent()
 
 void MainWindow::generateOCallList()
 {
+    oCallList_->clear();
     if(db)
     {
         for (int i = 0; i < db->getOCallTypeList().size() ; ++i)
@@ -448,6 +454,7 @@ bool MainWindow::updateOCalls()
 
 void MainWindow::generateECallList()
 {
+    eCallList_->clear();
     if(db)
     {
         for (int i = 0; i < db->getECallTypeList().size() ; ++i)
@@ -481,6 +488,7 @@ bool MainWindow::updateECalls() {
 
 void MainWindow::generateThreadList()
 {
+    threadList_->clear();
     if(db)
     {
         for (int i = 0; i <db->getThreads_().size() ; ++i)
@@ -634,14 +642,17 @@ void MainWindow::applyFilter()
         delete filter;
     }
 
-
     if(updateScene)
     {
-        clearSequenceListNode();
-        resetPressed();
-        visualizeThreads(db->getThreads_(),factor_);
+        resetPressed(); //reset the scales and offsets
+        clearSequenceListNode(); //delete all renderables without leak
+        scene_->clear(); //clear the scene so that no duplication
+        visualizeThreads(db->getThreads_(),factor_); //load the filtered objects
+        moe::SceneData data{scene_};
+        sceneRootNode_->initialize(data, sceneTransformation); //reintialize the objects and add them to the scene
         zoomAndScrollTofirstEvent();
-        render();
+        render(); //render the objects to their right places
+
     }
 }
 
@@ -660,6 +671,10 @@ void MainWindow::resetThreadsEcallsAndOcalls()
     for (int j = 0; j < eCallList_->count() ; ++j)
     {
         eCallList_->item(j)->setCheckState(Qt::Checked);
+    }
+    for (int k = 0; k < oCallList_->count() ; ++k)
+    {
+        oCallList_->item(k)->setCheckState(Qt::Checked);
     }
 }
 
@@ -688,5 +703,32 @@ void MainWindow::clearSequenceListNode()
         it++;
     }
     sequenceListNode_->children_.clear();
+}
+
+void MainWindow::updateTraces() {
+    resetPressed();
+    clearSequenceListNode();
+    scene_->clear();
+    if(measureLine_)
+    {
+        sceneRootNode_->children_.removeAll(measureLine_);
+        unRegisterObersver(measureLine_);
+        delete measureLine_;
+    }
+    /*
+     * testing window height
+     */
+    factor_ = (double)(this->height() * 0.7) / db->getProgramTotalTime();
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
+    registerObserver(measureLine_);
+    sceneRootNode_->children_.push_back(measureLine_);
+    visualizeThreads(db->getThreads_(), factor_);
+    generateThreadList();
+    generateECallList();
+    generateOCallList();
+    moe::SceneData data{scene_};
+    sceneRootNode_->initialize(data, sceneTransformation);
+    zoomAndScrollTofirstEvent();
+    render();
 }
 

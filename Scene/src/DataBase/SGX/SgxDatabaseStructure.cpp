@@ -177,7 +177,7 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
  * @param index
  * @return the number of Ecalls which are called from the thread at the given index
  */
-//ToDo this methode should be reworked later for the failed Ecall Creation etc...
+//ToDo this methode should be reworked later for the failed Ecall Creation etc... (not used, later maybe for optimization phase)
 int moe::SgxDatabaseStructure::getEcallsNumberOfThreadAtIndex(int index) {
     QSqlQuery query;
     //this returns only the successfull Ecalls that operate directly on the thread and not children from Ocalls
@@ -311,8 +311,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                    // if (calls.count(call_event))
                     //{
                         //here i calculate the relative start time of the child according to his parent start time
-                        oCall->relative_start_time_ -= calls[call_event]->start_time_;
-                        calls[call_event]->children_.push_back(oCall);
+                    oCall->relative_start_time_ -= calls[call_event]->start_time_;
+                    calls[call_event]->children_.push_back(oCall);
                    // } else {
                      //   calls.remove(id);
                        // delete oCall;
@@ -361,7 +361,8 @@ uint64_t moe::SgxDatabaseStructure::getThreadTotalTime(int index) {
     }
 }
 
-const QVector<moe::MyThread> &moe::SgxDatabaseStructure::getThreads_() const {
+const QVector<moe::MyThread> &moe::SgxDatabaseStructure::getThreads_() const
+{
     return threads_;
 }
 
@@ -470,7 +471,7 @@ QString moe::SgxDatabaseStructure::getInvolvedThreads()
         }
         availableThreads.remove(availableThreads.length()-1,1);
         availableThreads.append(")");
-        std::cerr << " involved Threads are " << availableThreads.toStdString() << std::endl;
+       // std::cerr << " involved Threads are " << availableThreads.toStdString() << std::endl;
         return availableThreads;
     } else {
         availableThreads.append(")");

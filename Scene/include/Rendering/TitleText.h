@@ -23,11 +23,14 @@ namespace moe {
         const QString &getTitle_() const;
 
     protected:
-        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+
+        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:
         QString title_;
         int fontSize_, xOffset_, yOffset_;
+        QGraphicsSimpleTextItem *text_;
     };
 
 }

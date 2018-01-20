@@ -29,6 +29,10 @@ namespace moe {
 
     private:
         Line scaleLine_;
+    protected:
+        void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
+    private:
         TitleText scaleText_;
 
     };

@@ -35,7 +35,8 @@ namespace moe {
        // Renderable* offsetForLine_;
         QPen* pen_;
         QBrush* brush_;
-
+        QGraphicsRectItem *rect;
+        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
     };
 }
 

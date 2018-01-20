@@ -11,12 +11,16 @@ moe::Line::Line(Transform2D transform,qreal xTarget,qreal yTarget, qreal penWidt
 
 void moe::Line::draw(SceneData& sceneData, Transform2D &parentTransform)
 {
-    sceneData.scene->addLine(
+    /*sceneData.scene->addLine(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
             absoluteTransform_.getX() + xTarget_ * absoluteTransform_.xScale(),
             absoluteTransform_.getY() + yTarget_ * absoluteTransform_.yScale(),
-                   *pen_);
+                   *pen_);*/
+    line_->setLine(absoluteTransform_.getX(),
+                   absoluteTransform_.getY(),
+                   absoluteTransform_.getX() + xTarget_ * absoluteTransform_.xScale(),
+                   absoluteTransform_.getY() + yTarget_ * absoluteTransform_.yScale());
 }
 
 qreal moe::Line::yTarget() const
@@ -31,4 +35,13 @@ void moe::Line::setYTarget(const qreal &height)
 
 void moe::Line::setXTarget_(qreal xTarget) {
     xTarget_ = xTarget;
+}
+
+void moe::Line::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+    line_ = sceneData.scene->addLine(
+            absoluteTransform_.getX(),
+            absoluteTransform_.getY(),
+            absoluteTransform_.getX() + xTarget_ * absoluteTransform_.xScale(),
+            absoluteTransform_.getY() + yTarget_ * absoluteTransform_.yScale(),
+            *pen_);
 }

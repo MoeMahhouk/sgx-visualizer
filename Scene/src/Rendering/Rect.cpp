@@ -14,12 +14,18 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
 void moe::Rect::draw(SceneData& sceneData, Transform2D &parentTransform)
 {
     //add and render the items in the scene according to their relative position with transformation methods
-    sceneData.scene->addRect(
+     /* sceneData.scene->addRect(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
             width_ * absoluteTransform_.xScale(),
             height_ * absoluteTransform_.yScale(),
-            *pen_, *brush_);
+            *pen_, *brush_);*/
+    rect->setRect(absoluteTransform_.getX(),
+                 absoluteTransform_.getY(),
+                 width_ * absoluteTransform_.xScale(),
+                 height_ * absoluteTransform_.yScale());
+
+
 }
 
 
@@ -41,6 +47,16 @@ qreal moe::Rect::getWidth() const
 void moe::Rect::setWidth(const qreal& width)
 {
     width_ = width;
+}
+
+void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+    rect = sceneData.scene->addRect(
+            absoluteTransform_.getX(),
+            absoluteTransform_.getY(),
+            width_ * absoluteTransform_.xScale(),
+            height_ * absoluteTransform_.yScale(),
+            *pen_, *brush_);
+
 }
 
 /*void moe::Rect::addBlock(moe::Renderable *innerBlock) {

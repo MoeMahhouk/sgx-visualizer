@@ -26,3 +26,7 @@ void moe::MeasureScaleLine::setXTarget(qreal xTarget) {
 void moe::MeasureScaleLine::setText(const QString &title) {
     scaleText_.setTitle_(title);
 }
+
+void moe::MeasureScaleLine::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+    return;
+}

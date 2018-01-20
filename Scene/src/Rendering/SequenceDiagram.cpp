@@ -70,4 +70,8 @@ void moe::SequenceDiagram::addLabeledBlock(moe::Renderable *childBlock) {
     sequenceLine_->children_.push_back(childBlock);
 }
 
+void moe::SequenceDiagram::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+    return;
+}
+
 

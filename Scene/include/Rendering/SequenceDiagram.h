@@ -30,6 +30,10 @@ namespace moe{
     protected:
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
     private:
+    protected:
+        void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
+    private:
         LabeledBlock topBlock_;
         Renderable* offsetForLine_;
         Renderable* sequenceLine_;

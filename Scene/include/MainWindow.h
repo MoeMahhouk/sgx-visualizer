@@ -48,7 +48,7 @@ private:
 
     moe::Renderable *sceneRootNode_;
     moe::Renderable *sequenceListNode_;
-    moe::MeasureLine *measureLine_;
+    moe::MeasureLine *measureLine_ = 0;
 
 
     moe::Transform2D sceneTransformation = moe::Transform2D(1,0,0,1,0,0);
@@ -61,6 +61,7 @@ private:
     void createFilterDocks();
     void generateGraphicsView();
     void render();
+    void updateTraces();
     void verticalScroll(qreal yOffset, qreal factor = 1);
     void verticalZoom(qreal yScale, qreal factor = 1); // ToDo added factor just incase (this method still needs more work)
     void scrollToNextEvent(const QVector<moe::MyThread> threads, qreal factor = 1); //ToDo implement it later as a button with Slots and Signals
@@ -109,7 +110,7 @@ private:
     bool updateECalls();
     bool updateOCalls();
     void resetThreadsEcallsAndOcalls();
-
+    void clearQList();
 
     QTabWidget *tabwidget_;
     QListWidget *eCallList_;

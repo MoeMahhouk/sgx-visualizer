@@ -35,7 +35,6 @@ moe::Line & moe::MeasureLine::getMeasureLine_() {
 
 void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset) {
     int scaleLines = measureLines_.size();
-
     qreal i = 0;
     qreal step = total_timeline_ / (scaleLines-1);
     for (MeasureScaleLine *scaleLine : measureLines_) {
@@ -85,4 +84,8 @@ QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
 void moe::MeasureLine::setPixel_line_depth_(int pixel_line_depth_) {
     MeasureLine::pixel_line_depth_ = pixel_line_depth_;
     measureLine_.setYTarget(pixel_line_depth_);
+}
+
+void moe::MeasureLine::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+    return;
 }

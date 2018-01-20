@@ -2,6 +2,7 @@
 #define LINE_H
 
 #include "Renderable.h"
+#include <QGraphicsLineItem>
 
 namespace moe {
 
@@ -25,10 +26,13 @@ namespace moe {
     protected:
         virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
 
+        void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
     private:
         qreal xTarget_;
         qreal yTarget_;
         QPen* pen_;
+        QGraphicsLineItem *line_;
     };
 
 }

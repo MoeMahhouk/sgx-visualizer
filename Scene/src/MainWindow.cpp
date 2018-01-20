@@ -314,25 +314,34 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
  */
 void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 {
-    qreal pixelScroll = yOffset;
-    if (yOffset_ + (yOffset/factor) > 0) {
-        pixelScroll = 0;
+    qreal pixelScroll=0;
+    if (yOffset_ + (yOffset/factor) >= 0) {
+        qreal oldXCordinate = sequenceListNode_->getTransform().getX();
+        std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
+        sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCordinate,0));
+        std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ = 0;
-    } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) < (db->getProgramTotalTime() * yScale_)){
+
+    } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) <= (db->getProgramTotalTime() * yScale_)){
+        pixelScroll = yOffset;
         /*qreal print = (yOffset_ + (yOffset/factor));
         std::cerr << " yoffset_ + (yOffset/factor) " << print << " db->getProgramTotalTime() * yScale_" << db->getProgramTotalTime() * yScale_ << std::endl;
         std::cerr << " yoffset_ is now at " << yOffset_ << " and the program total length is" << db->getProgramTotalTime() * yScale_ << std::endl;
         pixelScroll = (((db->getProgramTotalTime() * yScale_) + yOffset_) * factor_) * -1;
         std::cerr << "pixel Scroll is now " << pixelScroll << std::endl;
         yOffset_ -= (db->getProgramTotalTime() * yScale_) + yOffset_;*/
+        std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
+        sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, pixelScroll));
+        std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ += (yOffset/factor);
     } else {
         /*if(yOffset_ == db->getProgramTotalTime()*yScale_ *-1)
             return;
         scrollTo(-1*(db->getProgramTotalTime())*yScale_,factor_);*/
+        std::cerr << "we are heeeeeeeere boys " << std::endl;
+
         return;
     }
-    sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, pixelScroll));
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
     render();

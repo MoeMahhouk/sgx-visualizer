@@ -10,6 +10,7 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
     pen_ = pen;
     brush_ = brush;
     setAcceptHoverEvents(true);
+    setFlags(QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
 void moe::Rect::draw(Transform2D &parentTransform)
@@ -25,6 +26,8 @@ void moe::Rect::draw(Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
+    std::cerr << "block y cooridnate is at " << boundingRect().y() << std::endl;
+    std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;
 
     /*
      * ToDo this doesnt solve the clustering problem but might be also a relative solution to it

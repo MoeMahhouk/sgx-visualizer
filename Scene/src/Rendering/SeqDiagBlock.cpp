@@ -16,7 +16,6 @@ moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal h
 void moe::SeqDiagBlock::draw(moe::Transform2D &parentTransform)
 {
     Rect::draw(parentTransform);
-
 }
 
 void moe::SeqDiagBlock::addBlock(moe::Renderable *innerBlock)
@@ -63,4 +62,8 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     //setZValue(0.0);
     //topLevelItem()->setZValue(0.0);
     delete mouseOver_;
+}
+
+QRectF moe::SeqDiagBlock::boundingRect() const {
+    return Rect::boundingRect();
 }

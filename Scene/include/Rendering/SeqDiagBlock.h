@@ -21,6 +21,8 @@ namespace moe {
 
         void initializeStats(int childrenCounter, uint64_t childrenTotalRuntime);
 
+        virtual QRectF boundingRect() const override;
+
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

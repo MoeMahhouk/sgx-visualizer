@@ -29,7 +29,7 @@ namespace moe {
 
         //void addBlock(Renderable *innerBlock);
 
-        QRectF boundingRect() const override;
+        virtual QRectF boundingRect() const override;
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                    QWidget* widget) override;
 

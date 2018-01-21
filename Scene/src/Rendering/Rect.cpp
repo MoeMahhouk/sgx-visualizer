@@ -24,8 +24,6 @@ void moe::Rect::draw(SceneData& sceneData, Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
-
-
 }
 
 

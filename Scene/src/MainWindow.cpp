@@ -1,8 +1,9 @@
 
 
-#include <Filtering/SGX/ThreadFilter.h>
+
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
+
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -13,7 +14,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     createStatusBar();
     applySettings();
     generateGraphicsView();
-
 }
 
 MainWindow::~MainWindow()
@@ -33,9 +33,10 @@ void MainWindow::open()
 }
 
 
-void MainWindow::wheelEvent(QWheelEvent *event) {
-
-    if (event->modifiers() & Qt::ControlModifier) {
+void MainWindow::wheelEvent(QWheelEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier)
+    {
         qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
         verticalZoom(yScaleFactor);
     } else {
@@ -317,9 +318,9 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
     qreal pixelScroll=0;
     if (yOffset_ + (yOffset/factor) >= 0) {
         qreal oldXCordinate = sequenceListNode_->getTransform().getX();
-        std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
+        //std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
         sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCordinate,0));
-        std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
+        //std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ = 0;
 
     } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) <= (db->getProgramTotalTime() * yScale_)){
@@ -330,15 +331,15 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
         pixelScroll = (((db->getProgramTotalTime() * yScale_) + yOffset_) * factor_) * -1;
         std::cerr << "pixel Scroll is now " << pixelScroll << std::endl;
         yOffset_ -= (db->getProgramTotalTime() * yScale_) + yOffset_;*/
-        std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
+        //std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
         sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, pixelScroll));
-        std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
+        //std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ += (yOffset/factor);
     } else {
         /*if(yOffset_ == db->getProgramTotalTime()*yScale_ *-1)
             return;
         scrollTo(-1*(db->getProgramTotalTime())*yScale_,factor_);*/
-        std::cerr << "we are heeeeeeeere boys " << std::endl;
+       // std::cerr << "we are heeeeeeeere boys " << std::endl;
 
         return;
     }

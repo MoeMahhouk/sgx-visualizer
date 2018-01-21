@@ -37,6 +37,7 @@ namespace moe{
         LabeledBlock topBlock_;
         Renderable* offsetForLine_;
         Renderable* sequenceLine_;
+        //Renderable* blocksOffset_; //ToDo test for adding blocks without offset (use this later as global offset for all children blocks) this allows later the switch to other view options :)
     };
 
 }

@@ -31,6 +31,7 @@ namespace moe {
 
         virtual ~SgxDatabaseStructure() {
             close();
+
         };
 
         uint64_t getProgramTotalTime();

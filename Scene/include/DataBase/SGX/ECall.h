@@ -34,7 +34,7 @@ namespace moe  {
             } else {
                 qBrush = new QBrush(Qt::blue);
             }*/
-            SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, -2, relative_start_time_*factor)
+            SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
                                                         , 50, total_time_*factor, new QPen(Qt::green),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;

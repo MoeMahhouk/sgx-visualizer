@@ -12,10 +12,10 @@ moe::SequenceDiagram::SequenceDiagram(Transform2D transform, QString topBlockLab
 {
     name = "SequenceDiagram";
     this->children_.push_back(&topBlock_);
-    offsetForLine_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, topBlock_.getWidth() / 2 - 1,
-                                                                     topBlock_.getHeight()));
+    offsetForLine_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1,0,topBlock_.getHeight()));/* topBlock_.getWidth() / 2 - 1,
+                                                                     topBlock_.getHeight()));*/
     topBlock_.children_.push_back(offsetForLine_);
-    sequenceLine_ = new moe::Line(Transform2D(),0,sequenceLineDepth,2);
+    sequenceLine_ = new moe::Line(Transform2D(1,0,0,1,topBlock_.getWidth() / 2 - 1,0),0,sequenceLineDepth,2);
     offsetForLine_->children_.push_back(sequenceLine_);
     //std::cout << "sequence diagram created" << std::endl;
 }
@@ -29,7 +29,8 @@ qreal moe::SequenceDiagram::getLineScale() {
 }
 
 void moe::SequenceDiagram::setLineScale(qreal scale) {
-    sequenceLine_->getTransform().scale(1,scale);
+    //sequenceLine_->getTransform().scale(1,scale);
+    offsetForLine_->getTransform().scale(1,scale);
 }
 
 void moe::SequenceDiagram::draw(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
@@ -46,8 +47,10 @@ const moe::LabeledBlock &moe::SequenceDiagram::getTopBlock_() const {
 }
 
 void moe::SequenceDiagram::resetLineScales() {
-    sequenceLine_->getTransform().setYScale(1);
-    sequenceLine_->getTransform().setXScale(1);
+    /*sequenceLine_->getTransform().setYScale(1);
+    sequenceLine_->getTransform().setXScale(1);*/
+    offsetForLine_->getTransform().setXScale(1);
+    offsetForLine_->getTransform().setYScale(1);
 }
 
 moe::SequenceDiagram::~SequenceDiagram() {
@@ -63,7 +66,8 @@ void moe::SequenceDiagram::addLabeledBlock(qreal createdTime, qreal endTime, QSt
 }
 
 void moe::SequenceDiagram::addBlock(moe::Renderable *childBlock) {
-    sequenceLine_->children_.push_back(childBlock);
+    //sequenceLine_->children_.push_back(childBlock);
+    offsetForLine_->children_.push_back(childBlock);
 }
 
 void moe::SequenceDiagram::addLabeledBlock(moe::Renderable *childBlock) {

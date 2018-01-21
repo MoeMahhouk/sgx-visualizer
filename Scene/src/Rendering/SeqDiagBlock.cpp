@@ -8,7 +8,7 @@ moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal h
         Rect(transform, width, height, pen, brush)
 {
     name = "Sequence Diagram Block";
-    lineOffset_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, ((width) - 1), 0));
+    lineOffset_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, 0/*((width) - 1)*/, 0));//ToDo set the x Coordinate to 0 so the blocks will be rendered as one block
     children_.push_back(lineOffset_);
 
 }

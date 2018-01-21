@@ -5,6 +5,7 @@
 #include <QtWidgets>
 #include <Filtering/IFilter.h>
 #include <Filtering/SGX/ECallOCallFilter.h>
+#include <Filtering/SGX/ThreadFilter.h>
 
 #include "Rendering/Renderable.h"
 #include "Rendering/Rect.h"

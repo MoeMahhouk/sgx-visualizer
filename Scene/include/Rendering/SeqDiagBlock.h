@@ -19,11 +19,21 @@ namespace moe {
 
         void addBlock(Renderable *innerBlock);
 
+        void initializeStats(int childrenCounter, uint64_t childrenTotalRuntime);
+
     protected:
-        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+
+        virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+
+        virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
+        void draw(Transform2D &parentTransform) override;
 
     private:
+        int childrenCounter_;
+        uint64_t totalChildrenRuntime_;
         Renderable *lineOffset_;
+        QGraphicsRectItem *mouseOver_;
     };
 }
 

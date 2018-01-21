@@ -23,7 +23,7 @@ namespace moe {
         const QString &getTitle_() const;
 
     protected:
-        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+        virtual void draw(Transform2D &parentTransform) override;
 
         virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 

@@ -27,10 +27,9 @@ namespace moe{
         void addLabeledBlock(qreal createdTime, qreal endTime, QString blockLabel); //ToDo this method was protected moved to public for test issues
         void addBlock(Renderable *childBlock);
         void addLabeledBlock(Renderable *childBlock);
+
     protected:
-        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
-    private:
-    protected:
+        void draw(Transform2D &parentTransform) override;
         void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:

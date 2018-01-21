@@ -24,7 +24,7 @@ namespace moe {
         void setXTarget_(qreal xTarget);
 
     protected:
-        virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
+        virtual void draw(Transform2D &parentTransform) override;
 
         void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 

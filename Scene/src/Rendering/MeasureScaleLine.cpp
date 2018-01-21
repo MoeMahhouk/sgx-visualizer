@@ -15,7 +15,7 @@ moe::MeasureScaleLine::MeasureScaleLine(Transform2D transform, qreal yPos, qreal
     this->children_.push_back(&scaleLine_);
 }
 
-void moe::MeasureScaleLine::draw(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+void moe::MeasureScaleLine::draw(Transform2D &parentTransform) {
     return;
 }
 

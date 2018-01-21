@@ -206,16 +206,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     std::string symbol_name;
     uint64_t programStratTime = getProgramStartTime();
     QSqlQuery query;
-    /*QString queryString = "SELECT e1.id, e1.type, e1.time AS start_time, e2.time AS end_time, e1.call_id,"
-            "IFNULL(e1.call_event, 0) AS call_event, e2.return_value, e1.involved_thread, ec.eid AS eCall_eid,"
-            "ec.symbol_address AS eCall_symbol_address, ec.symbol_name AS eCall_symbol_name,"
-            "ec.is_private AS eCall_is_private,oc.eid AS oCall_eid, oc.symbol_name AS oCall_symbol_name,"
-            "oc.symbol_file_name AS oCall_symbol_file_name,oc.symbol_address AS oCall_symbolAddress,"
-            "oc.symbol_address_normalized AS oCall_symbol_address_normalized"
-            " FROM events AS e1 JOIN events AS e2 ON e1.id = e2.call_event LEFT JOIN ecalls AS ec ON ec.id = e1.call_id"
-            " LEFT JOIN ocalls AS oc ON oc.id = e1.call_id"
-            " WHERE e2.return_value IS NOT NULL ";
-    */
+
 
     QString newQueryString = "with recursive events_children as ("
             " select e1.id, e1.type, e1.time, e1.call_id, e1.eid, e1.call_event, e1.involved_thread, e1.aex_count, 0 as _level from events as e1";
@@ -245,16 +236,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     //ToDo ask nico why we took symbol_address_normalized instead of symbol address of the ocalls ? (done :) )
     //ToDo ask nico is it on purpose that symbol_file_name is addressed as symbol_address or is it not right (it was fast typing issue :) )
     //ToDo what about isPrivate from ecalls and symbol Address from Ocalls (still open :| )
-    /*queryString.append(getInvolvedThreads());
-    if (!conditionQuery.isEmpty())
-    {
-        queryString.append(conditionQuery);
-    }
-    queryString.append(" ORDER BY e1.id");
-    query.prepare(queryString);
-    */
     query.prepare(newQueryString);
-    std::cerr << newQueryString.toStdString() << std::endl;
     if(!query.exec())
     {
         std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
@@ -262,7 +244,6 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     }
     while(query.next())
     {
-
         id = query.value(0).toInt(); //line unique id in the table events
         relative_start_time = start_time = (uint64_t) query.value(2).toDouble() - programStratTime;
         total_time = (uint64_t) query.value(3).toDouble() - query.value(2).toDouble();
@@ -280,18 +261,32 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                 //bool is_private = query.value(11).toInt();
                 ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,0,symbol_name,isFail);
                 calls[id] = eCall;
-
+                //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
+                if (!callStatsMap.count(id))
+                {
+                    CallStats *callStat = new CallStats;
+                    callStatsMap[id] = callStat;
+                } else {
+                    calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
+                    calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
+                }
                 if(call_event != 0)
                 {
-                    //if (calls.count(call_event))
-                    //{
-                        //here i calculate the relative start time of the child according to his parent start time
-                        eCall->relative_start_time_ -= calls[call_event]->start_time_;
-                        calls[call_event]->children_.push_back(eCall);
-                    //} else {
-                      //  calls.remove(id);
-                        //delete eCall;
-                    //}
+                    //here i calculate the relative start time of the child according to his parent start time
+                    eCall->relative_start_time_ -= calls[call_event]->start_time_;
+                    calls[call_event]->children_.push_back(eCall);
+                    /*
+                     * ToDo add these for the statistic implementation later
+                     * ToDo ask nico, after filtering those infos will be deleted and zeros will be
+                     */
+                    //because we only need to gather these information at the initilizing the database phase and then they should stay untouched
+                    if (conditionQuery.isEmpty())
+                    {
+                        callStatsMap[call_event]->childrenCounter += 1;
+                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
+                        calls[call_event]->childrenCounter += 1;
+                        calls[call_event]->childrenTotalRuntime += total_time;
+                    }
                 } else {
                     threads_[searchThreadIndex(involvedThreadId)].threadEcalls_.push_back(eCall);
                 }
@@ -305,18 +300,30 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                 OCall *oCall = new OCall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,symbol_name,
                                          symbol_address_normalized,symbol_file_name, isFail);
                 calls[id] = oCall;
-
+                //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
+                if (!callStatsMap.count(id)) {
+                    CallStats *callStat = new CallStats;
+                    callStatsMap[id] = callStat;
+                } else {
+                    calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
+                    calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
+                }
                 if(call_event != 0)
                 {
-                   // if (calls.count(call_event))
-                    //{
-                        //here i calculate the relative start time of the child according to his parent start time
+                    //here i calculate the relative start time of the child according to his parent start time
                     oCall->relative_start_time_ -= calls[call_event]->start_time_;
                     calls[call_event]->children_.push_back(oCall);
-                   // } else {
-                     //   calls.remove(id);
-                       // delete oCall;
-                   // }
+                    /*
+                     * ToDo add these for the statistic implementation later
+                     */
+                    if (conditionQuery.isEmpty())
+                    {
+                        callStatsMap[call_event]->childrenCounter += 1;
+                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
+                        calls[call_event]->childrenCounter += 1;
+                        calls[call_event]->childrenTotalRuntime += total_time;
+                    }
+
                 } else { //this should never be reachable unless the database is corrupted
                     std::cerr << "OCall has no ecall id from which its triggered " << std::endl;
                 }
@@ -443,7 +450,7 @@ void moe::SgxDatabaseStructure::getResult(QString conditionQuery)
         initializeThreads(conditionQuery);
         //initializeECallsAndOCalls();
 
-    } else if (currentAction == TYPES::ACTION_LIST::ECALLFILTER)
+    } else if (currentAction == TYPES::ACTION_LIST::ECALLOCALLFILTER)
     {
         for (int i = 0; i < threads_.length() ; ++i)
         {

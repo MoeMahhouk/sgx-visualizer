@@ -38,6 +38,7 @@ namespace moe  {
                                                         , 50, total_time_*factor, new QPen(Qt::green),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
+            callBlock->initializeStats(childrenCounter,childrenTotalRuntime);
             for (Call *call : children_) {
                 Renderable *childRenderable = call->toRenderable(factor);
                 callBlock->addBlock(childRenderable);

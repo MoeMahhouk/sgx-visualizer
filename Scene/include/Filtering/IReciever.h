@@ -10,8 +10,7 @@ namespace TYPES
     enum ACTION_LIST
     {
         THREADFILTER,
-        ECALLFILTER,
-        OCALLFILTER
+        ECALLOCALLFILTER,
     };
 };
 

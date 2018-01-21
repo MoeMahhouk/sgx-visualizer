@@ -23,6 +23,11 @@
 
 namespace moe {
 
+    struct CallStats {
+        int childrenCounter = 0;
+        uint64_t childrenTotalRuntime = 0;
+    };
+
     class SgxDatabaseStructure : public DataBaseManager, public IReciever{
 
     public:
@@ -60,9 +65,11 @@ namespace moe {
         void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
         void loadOCallTypeList();
+        void loadEcallsOcallsStats();
         QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
 
+        QMap<int, CallStats*> callStatsMap;
         TYPES::ACTION_LIST currentAction;
         QVector<OCallTypes> oCallTypeList; // this list is not for rendering, it is for the filtering stuff
         QVector<ECallTypes> eCallTypeList; //this list is not for rendering, it is for the filtering stuff

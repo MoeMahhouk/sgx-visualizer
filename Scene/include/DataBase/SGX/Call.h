@@ -17,6 +17,11 @@ namespace moe {
         std::string symbol_name_;
         QVector<Call*> children_;
         int isFail_;
+        /*
+         * ToDO under progress for hover and statistics later implementation
+         */
+        int childrenCounter = 0;
+        uint64_t childrenTotalRuntime = 0;
         //QBrush *blockColor;
 
         Call(int id, int eid, uint64_t symbol_address, uint64_t start_time, uint64_t relative_start_time,

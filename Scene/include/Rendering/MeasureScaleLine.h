@@ -25,7 +25,7 @@ namespace moe {
         void setText(const QString &title);
 
     protected:
-        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+        void draw(Transform2D &parentTransform) override;
 
     private:
         Line scaleLine_;

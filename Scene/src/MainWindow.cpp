@@ -174,8 +174,7 @@ void MainWindow::render()
     //toDo testing the new update initialize method
     //scene_->clear();
     scene_->setBackgroundBrush(Qt::white);
-    moe::SceneData data{scene_};
-    sceneRootNode_->render(data, sceneTransformation);
+    sceneRootNode_->render(sceneTransformation);
     scene_->update();
     viewArea_->show();
     //view_->show(); //ToDo replaced it with viewArea.show (needs testing a little bit)
@@ -217,6 +216,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     {
         qreal oldYoffset = yOffset_;
         qreal oldYscale = yScale_;
+        qreal oldXoffset = sequenceListNode_->getTransform().getX();
         resetPressed();
         measureLine_->setPixel_line_depth_(this->height()*0.75);
         factor_ = (double)(this->height()*0.75)/db->getProgramTotalTime();
@@ -225,6 +225,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         visualizeThreads(db->getThreads_(),factor_);
         moe::SceneData data{scene_};
         sceneRootNode_->initialize(data, sceneTransformation);
+        sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXoffset,0));
         verticalZoom(oldYscale,factor_);
         scrollTo(oldYoffset,factor_);
         render();

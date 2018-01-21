@@ -9,9 +9,10 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
     height_ = height;
     pen_ = pen;
     brush_ = brush;
+    setAcceptHoverEvents(true);
 }
 
-void moe::Rect::draw(SceneData& sceneData, Transform2D &parentTransform)
+void moe::Rect::draw(Transform2D &parentTransform)
 {
     //add and render the items in the scene according to their relative position with transformation methods
      /* sceneData.scene->addRect(
@@ -24,6 +25,16 @@ void moe::Rect::draw(SceneData& sceneData, Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
+
+    /*
+     * ToDo this doesnt solve the clustering problem but might be also a relative solution to it
+
+    if (rect->rect().height() < 5) {
+        rect->hide();
+    } else {
+        rect->show();
+    }
+    */
 }
 
 
@@ -47,17 +58,25 @@ void moe::Rect::setWidth(const qreal& width)
     width_ = width;
 }
 
-void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
+void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform)
+{
+
     rect = sceneData.scene->addRect(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
             width_ * absoluteTransform_.xScale(),
             height_ * absoluteTransform_.yScale(),
             *pen_, *brush_);
+    sceneData.scene->addItem(this);
+}
+
+QRectF moe::Rect::boundingRect() const {
+    return rect->boundingRect();
+}
+
+void moe::Rect::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
 }
 
-/*void moe::Rect::addBlock(moe::Renderable *innerBlock) {
-    offsetForLine_->children_.push_back(innerBlock);
-}*/
+
 

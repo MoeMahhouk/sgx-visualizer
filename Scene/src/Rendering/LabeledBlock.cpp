@@ -8,7 +8,7 @@ moe::LabeledBlock::LabeledBlock(Transform2D transform, qreal width, qreal height
                               QBrush *brush)
         : SeqDiagBlock(transform, width, height, pen, brush), label_(Transform2D(),title)
 {
-
+    setAcceptHoverEvents(false);
     name = "LabeledBlock";
     this->children_.push_back(&label_);
     //std::cout << "labeledRect born "<< this << std::endl;
@@ -23,8 +23,8 @@ const moe::TitleText &moe::LabeledBlock::getLabel_() const {
     return label_;
 }
 
-void moe::LabeledBlock::draw(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
-    Rect::draw(sceneData, parentTransform);
+void moe::LabeledBlock::draw(moe::Transform2D &parentTransform) {
+    Rect::draw(parentTransform);
 }
 
 void moe::LabeledBlock::setLabelText(const QString &labelText) {

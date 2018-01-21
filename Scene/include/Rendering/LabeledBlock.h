@@ -20,7 +20,7 @@ namespace moe {
         void setLabelText (const QString &labelText);
 
     protected:
-        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
+        void draw(Transform2D &parentTransform) override;
     private:
         TitleText label_;
     };

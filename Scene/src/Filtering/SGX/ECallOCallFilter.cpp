@@ -10,7 +10,8 @@ moe::ECallOCallFilter::ECallOCallFilter(IReciever *reciever, QVector<int> chosen
 
 }
 
-QString moe::ECallOCallFilter::toSQLStatement() {
+QString moe::ECallOCallFilter::toSQLStatement()
+{
     QString conditionQuery = "";
     conditionQuery.append(" AND ( (e1.type = 14 AND e1.call_id IN ( ");
     if (!chosenECalls_.isEmpty())
@@ -26,7 +27,9 @@ QString moe::ECallOCallFilter::toSQLStatement() {
         conditionQuery.append("))");
     }
     conditionQuery.append(" OR ( e1.type = 16 AND e1.call_id IN ( ");
-    if (!chosenOCalls_.isEmpty()) {
+
+    if (!chosenOCalls_.isEmpty())
+    {
         for (int i = 0; i < chosenOCalls_.size() ; ++i)
         {
             conditionQuery.append(QString::number(chosenOCalls_[i]));
@@ -41,8 +44,9 @@ QString moe::ECallOCallFilter::toSQLStatement() {
     return conditionQuery;
 }
 
-void moe::ECallOCallFilter::execute() {
-    dReciever_->SetAction(TYPES::ACTION_LIST::ECALLFILTER);
+void moe::ECallOCallFilter::execute()
+{
+    dReciever_->SetAction(TYPES::ACTION_LIST::ECALLOCALLFILTER);
     dReciever_->getResult(toSQLStatement());
 }
 

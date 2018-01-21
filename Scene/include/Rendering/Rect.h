@@ -7,7 +7,7 @@
 #include <QGraphicsSimpleTextItem>
 
 namespace moe {
-    class Rect :public Renderable {
+    class Rect :public Renderable, public QGraphicsItem {
 
     public:
 
@@ -29,14 +29,22 @@ namespace moe {
 
         //void addBlock(Renderable *innerBlock);
 
+        QRectF boundingRect() const override;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                   QWidget* widget) override;
+
+
     protected:
-        virtual void draw(SceneData& sceneData, Transform2D &parentTransform) override;
+
+        virtual void draw(Transform2D &parentTransform) override;
+        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
         qreal width_, height_;
-       // Renderable* offsetForLine_;
+        // Renderable* offsetForLine_;
         QPen* pen_;
         QBrush* brush_;
         QGraphicsRectItem *rect;
-        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
     };
 }
 

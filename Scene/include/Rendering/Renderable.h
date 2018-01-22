@@ -68,33 +68,38 @@ namespace moe {
             sceneData.indent = myIndent;
         }
 
-        void render( Transform2D &parentTransform)
+        void render(SceneData& sceneData, Transform2D &parentTransform)
         {
             absoluteTransform_ =  relativeTransform_ * parentTransform;
 
-            draw(parentTransform);
+            draw(sceneData, parentTransform);
             //std::cout << myIndent << name << " " << this << std::endl;
 
             for(Renderable* child: children_) {
                // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
-                child->render(absoluteTransform_);
+                child->render(sceneData, absoluteTransform_);
             }
 
             //std::cout << myIndent << "done" << std::endl;
         }
     protected:
+
         virtual void initializeRenderable(SceneData& sceneData, Transform2D &parentTransform) = 0;
-        virtual void draw(Transform2D &parentTransform) = 0;
+
+        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) = 0;
+
         Transform2D relativeTransform_;
         Transform2D absoluteTransform_;
     };
 
     class EmptyRenderable : public Renderable {
+
     protected:
 
         virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) {}
 
-        virtual void draw(Transform2D &parentTransform) {}
+        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) {}
+
     public:
 
         EmptyRenderable(Transform2D transform = Transform2D()) : Renderable(transform) {

@@ -23,8 +23,8 @@ const moe::TitleText &moe::LabeledBlock::getLabel_() const {
     return label_;
 }
 
-void moe::LabeledBlock::draw(moe::Transform2D &parentTransform) {
-    Rect::draw(parentTransform);
+void moe::LabeledBlock::draw(SceneData &data,moe::Transform2D &parentTransform) {
+    Rect::draw(data, parentTransform);
 }
 
 void moe::LabeledBlock::setLabelText(const QString &labelText) {

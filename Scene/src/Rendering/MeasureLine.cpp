@@ -6,7 +6,7 @@
 #include "Rendering/Line.h"
 #include "Rendering/MeasureLine.h"
 
-void moe::MeasureLine::draw(Transform2D &parentTransform) {
+void moe::MeasureLine::draw(SceneData &sceneData, Transform2D &parentTransform) {
     return;
 }
 

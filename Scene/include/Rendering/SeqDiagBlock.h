@@ -29,7 +29,7 @@ namespace moe {
 
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
-        void draw(Transform2D &parentTransform) override;
+        void draw(SceneData &data, Transform2D &parentTransform) override;
 
     private:
         int childrenCounter_;

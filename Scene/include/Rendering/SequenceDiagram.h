@@ -29,7 +29,7 @@ namespace moe{
         void addLabeledBlock(Renderable *childBlock);
 
     protected:
-        void draw(Transform2D &parentTransform) override;
+        void draw(SceneData &sceneData, Transform2D &parentTransform) override;
         void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:

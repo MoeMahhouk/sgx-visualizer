@@ -13,9 +13,9 @@ moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal h
     children_.push_back(lineOffset_);
 }
 
-void moe::SeqDiagBlock::draw(moe::Transform2D &parentTransform)
+void moe::SeqDiagBlock::draw(SceneData &data, moe::Transform2D &parentTransform)
 {
-    Rect::draw(parentTransform);
+    Rect::draw(data, parentTransform);
 }
 
 void moe::SeqDiagBlock::addBlock(moe::Renderable *innerBlock)

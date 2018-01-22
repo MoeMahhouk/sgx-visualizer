@@ -33,7 +33,7 @@ void moe::SequenceDiagram::setLineScale(qreal scale) {
     offsetForLine_->getTransform().scale(1,scale);
 }
 
-void moe::SequenceDiagram::draw(Transform2D &parentTransform) {
+void moe::SequenceDiagram::draw(SceneData &sceneData, Transform2D &parentTransform) {
     return;
 }
 

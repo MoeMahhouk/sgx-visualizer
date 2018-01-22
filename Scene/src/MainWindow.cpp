@@ -177,8 +177,12 @@ void MainWindow::render()
 {
     //toDo testing the new update initialize method
     //scene_->clear();
+    for(auto i: scene_->items()) {
+        scene_->removeItem(i);
+    }
     scene_->setBackgroundBrush(Qt::white);
-    sceneRootNode_->render(sceneTransformation);
+    moe::SceneData data{scene_};
+    sceneRootNode_->render(data,sceneTransformation);
     scene_->update();
     viewArea_->show();
     //view_->show(); //ToDo replaced it with viewArea.show (needs testing a little bit)

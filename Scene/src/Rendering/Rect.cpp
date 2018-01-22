@@ -13,7 +13,7 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
     setFlags(QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
-void moe::Rect::draw(Transform2D &parentTransform)
+void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
 {
     //add and render the items in the scene according to their relative position with transformation methods
      /* sceneData.scene->addRect(
@@ -26,6 +26,11 @@ void moe::Rect::draw(Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
+    /*
+     * another hopless test
+     */
+    sceneData.scene->addItem(rect);
+    sceneData.scene->addItem(this);
     //std::cerr << "block y cooridnate is at " << boundingRect().y() << std::endl;
     //scene()->addItem(this);
     //std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;

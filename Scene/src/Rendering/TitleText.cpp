@@ -4,7 +4,7 @@
 
 #include "Rendering/TitleText.h"
 
-void moe::TitleText::draw(Transform2D &parentTransform) {
+void moe::TitleText::draw(SceneData &sceneData, Transform2D &parentTransform) {
    /* sceneData.scene->addSimpleText(title_,QFont("Times", fontSize_,QFont::ExtraBold))->setPos(
             absoluteTransform_.getX() + xOffset_,
             absoluteTransform_.getY() + yOffset_);*/
@@ -12,6 +12,11 @@ void moe::TitleText::draw(Transform2D &parentTransform) {
             absoluteTransform_.getX() + xOffset_,
             absoluteTransform_.getY() + yOffset_);
     text_->setText(title_);
+
+    /*
+     * hopless try
+     */
+    sceneData.scene->addItem(text_);
 }
 
 moe::TitleText::TitleText(moe::Transform2D transform, const QString &title_, int fontSize, int xOffset, int yOffset) :

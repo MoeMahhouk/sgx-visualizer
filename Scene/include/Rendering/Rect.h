@@ -36,7 +36,7 @@ namespace moe {
 
     protected:
 
-        virtual void draw(Transform2D &parentTransform) override;
+        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) override;
         virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
         qreal width_, height_;

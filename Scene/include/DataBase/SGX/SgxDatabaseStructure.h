@@ -35,8 +35,12 @@ namespace moe {
         SgxDatabaseStructure(const QString& path = "newDataBaseCreated", const QString& type = "QSQLITE");
 
         virtual ~SgxDatabaseStructure() {
+            for (int i = 0; i < callStatsMap.size() ; ++i) {
+                auto it = callStatsMap[i];
+                delete it;
+            }
+            callStatsMap.clear();
             close();
-
         };
 
         uint64_t getProgramTotalTime();

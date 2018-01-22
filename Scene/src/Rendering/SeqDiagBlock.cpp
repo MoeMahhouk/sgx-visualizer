@@ -38,8 +38,8 @@ void moe::SeqDiagBlock::initializeStats(int childrenCounter, uint64_t childrenTo
 void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
     mouseOver_ = new QGraphicsRectItem(this);
-    /*topLevelItem()->setZValue(10.0);
-    setZValue(11.0);*/
+    topLevelItem()->setZValue(10.0);
+    setZValue(11.0);
     mouseOver_->setBrush(Qt::lightGray);
     mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
     auto callChildsCounter = new QGraphicsTextItem(mouseOver_);
@@ -52,15 +52,17 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     childrenTotalTime->setY(callChildsCounter->boundingRect().bottomLeft().y() + 15);
 
     mouseOver_->setRect(-5,-5, childrenTotalTime->boundingRect().right()+10, childrenTotalTime->boundingRect().bottomLeft().y()+50);
-    std::cerr << "we are here boooooooooyz mouse Pos : " << event->pos().y() << "mouse Over coordination is y:" << mouseOver_->pos().y() << "  x:" << mouseOver_->pos().x()<< std::endl;
+    scene()->update();
+    /*std::cerr << "we are here boooooooooyz mouse Pos : " << event->pos().y() << " mouse Over coordination is y : " << mouseOver_->pos().y() << "  x:" << mouseOver_->pos().x()<< std::endl;
+
     std::cerr << "this object coordinations x" << this->boundingRect().x() << std::endl;
-    std::cerr << "this object coordinations y" << this->boundingRect().y() << std::endl;
+    std::cerr << "this object coordinations y" << this->boundingRect().y() << std::endl;*/
 }
 
 void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     scene()->removeItem(mouseOver_);
-    //setZValue(0.0);
-    //topLevelItem()->setZValue(0.0);
+    setZValue(0.0);
+    topLevelItem()->setZValue(0.0);
     delete mouseOver_;
 }
 

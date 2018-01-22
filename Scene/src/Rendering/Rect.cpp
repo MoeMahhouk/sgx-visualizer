@@ -26,8 +26,10 @@ void moe::Rect::draw(Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
-    std::cerr << "block y cooridnate is at " << boundingRect().y() << std::endl;
-    std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;
+    //std::cerr << "block y cooridnate is at " << boundingRect().y() << std::endl;
+    //scene()->addItem(this);
+    //std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;
+    //std::cerr << "this rect is visible " << this->isVisible() << std::endl;
 
     /*
      * ToDo this doesnt solve the clustering problem but might be also a relative solution to it
@@ -63,7 +65,6 @@ void moe::Rect::setWidth(const qreal& width)
 
 void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform)
 {
-
     rect = sceneData.scene->addRect(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
@@ -74,11 +75,11 @@ void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D
 }
 
 QRectF moe::Rect::boundingRect() const {
+
     return rect->boundingRect();
 }
 
 void moe::Rect::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-
 }
 
 

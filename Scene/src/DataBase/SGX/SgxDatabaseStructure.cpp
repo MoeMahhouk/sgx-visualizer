@@ -318,8 +318,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                      */
                     if (conditionQuery.isEmpty())
                     {
-                        callStatsMap[call_event]->childrenCounter += 1;
-                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
+                        //callStatsMap[call_event]->childrenCounter += 1;
+                        //callStatsMap[call_event]->childrenTotalRuntime += total_time;
                         calls[call_event]->childrenCounter += 1;
                         calls[call_event]->childrenTotalRuntime += total_time;
                     }

@@ -177,9 +177,9 @@ void MainWindow::render()
 {
     //toDo testing the new update initialize method
     //scene_->clear();
-    for(auto i: scene_->items()) {
+    /*for(auto i: scene_->items()) {
         scene_->removeItem(i);
-    }
+    }*/
     scene_->setBackgroundBrush(Qt::white);
     moe::SceneData data{scene_};
     sceneRootNode_->render(data,sceneTransformation);

@@ -25,7 +25,7 @@ void moe::Line::draw(SceneData &sceneData, Transform2D &parentTransform)
     /*
      * hopeless try
      */
-    sceneData.scene->addItem(line_);
+    //sceneData.scene->addItem(line_);
 }
 
 qreal moe::Line::yTarget() const

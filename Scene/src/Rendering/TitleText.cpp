@@ -16,7 +16,7 @@ void moe::TitleText::draw(SceneData &sceneData, Transform2D &parentTransform) {
     /*
      * hopless try
      */
-    sceneData.scene->addItem(text_);
+    //sceneData.scene->addItem(text_);
 }
 
 moe::TitleText::TitleText(moe::Transform2D transform, const QString &title_, int fontSize, int xOffset, int yOffset) :

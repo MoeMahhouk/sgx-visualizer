@@ -26,11 +26,14 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
+    prepareGeometryChange();
     /*
      * another hopless test
      */
-    sceneData.scene->addItem(rect);
-    sceneData.scene->addItem(this);
+
+    //sceneData.scene->addItem(rect);
+    //sceneData.scene->addItem(this);
+
     //std::cerr << "block y cooridnate is at " << boundingRect().y() << std::endl;
     //scene()->addItem(this);
     //std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;

@@ -23,11 +23,6 @@
 
 namespace moe {
 
-    struct CallStats {
-        int childrenCounter = 0;
-        uint64_t childrenTotalRuntime = 0;
-    };
-
     class SgxDatabaseStructure : public DataBaseManager, public IReciever{
 
     public:
@@ -35,11 +30,11 @@ namespace moe {
         SgxDatabaseStructure(const QString& path = "newDataBaseCreated", const QString& type = "QSQLITE");
 
         virtual ~SgxDatabaseStructure() {
-            for (int i = 0; i < callStatsMap.size() ; ++i) {
+            /*for (int i = 0; i < callStatsMap.size() ; ++i) {
                 auto it = callStatsMap[i];
                 delete it;
             }
-            callStatsMap.clear();
+            callStatsMap.clear();*/
             close();
         };
 
@@ -53,12 +48,13 @@ namespace moe {
 
         const QVector<ECallTypes> &getECallTypeList() const;
 
+        const QMap<int, QString> &getEnclavesMap() const;
+
         void SetAction(TYPES::ACTION_LIST action) override;
 
         void getResult(QString conditionQuery) override;
 
     private:
-
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
         uint64_t getProgramStartTime();
@@ -69,11 +65,15 @@ namespace moe {
         void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
         void loadOCallTypeList();
+        void loadExistingEnclaves();
         void loadEcallsOcallsStats();
         QString getInvolvedThreads();
-        int searchThreadIndex(int threadId);
 
-        QMap<int, CallStats*> callStatsMap;
+        int searchThreadIndex(int threadId);
+        QSet<int> availableEcalls;
+        QSet<int> availableOcalls;
+        QMap<int, QString> enclavesList; //stores the pair eid and enclave name
+        QHash<int, CallStats> callStatsMap;
         TYPES::ACTION_LIST currentAction;
         QVector<OCallTypes> oCallTypeList; // this list is not for rendering, it is for the filtering stuff
         QVector<ECallTypes> eCallTypeList; //this list is not for rendering, it is for the filtering stuff

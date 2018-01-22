@@ -101,8 +101,10 @@ private:
     QSet<int> chosenThreads;
     QSet<int> chosenEcalls;
     QSet<int> chosenOcalls;
+    QSet<int> chosenEnclaves;
     moe::IFilter *filter;
     QTabWidget* generateTabList();
+    void generateEncalveList();
     void generateECallList();
     void generateOCallList();
     void generateThreadList();
@@ -110,19 +112,23 @@ private:
     bool updateThreads();
     bool updateECalls();
     bool updateOCalls();
+    bool updateEnclaves();
     void resetThreadsEcallsAndOcalls();
     void clearQList();
 
     QTabWidget *tabwidget_;
+    QListWidget *enclavesList_;
     QListWidget *eCallList_;
     QListWidget *oCallList_;
     QListWidget *threadList_;
     QDockWidget *threadDock_;
     QDockWidget *eCallDock_;
     QDockWidget *oCallDock_;
+    QDockWidget *enclaveDock_;
     QAction *threadFilterAction_;
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;
+    QAction *enclaveFilterAction_;
     QAction *applyDockAction_;
     QWidget *filterControls_;
 

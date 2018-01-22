@@ -30,7 +30,7 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
     std::cerr << "rect bottom right y " << rect->rect().bottomRight().y() << std::endl;
     std::cerr << "scene height " << scene()->height() << std::endl;*/
     prepareGeometryChange();
-    if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < scene()->height() && rect->rect().height() > 5) {
+    if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < scene()->height() /*&& rect->rect().height() > 5*/) {
         show();
         rect->show();
     } else {

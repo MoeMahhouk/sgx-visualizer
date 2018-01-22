@@ -14,11 +14,13 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
         std::cout << "Database: Connection Ok" << std::endl;
     }
     //threads_ = QVector<MyThread>(getNumberOfRows("threads"),MyThread());
+    loadExistingEnclaves();
+    loadECallTypeList();
+    loadOCallTypeList();
+
     initializeThreads();
     initializeECallsAndOCalls();
 
-    loadECallTypeList();
-    loadOCallTypeList();
 }
 
 
@@ -203,7 +205,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     QMap<int, Call*> calls;
     int id,call_id,call_event,isFail, involvedThreadId, eid;
     uint64_t start_time, relative_start_time, total_time, symbol_address;
-    std::string symbol_name;
+    QString symbol_name;
     uint64_t programStratTime = getProgramStartTime();
     QSqlQuery query;
 
@@ -252,7 +254,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
         isFail = query.value(6).toInt();
         involvedThreadId = query.value(7).toInt();
         eid = query.value(8).toInt();
-        symbol_name = query.value(10).toString().toStdString();
+        symbol_name = query.value(10).toString();
         symbol_address = (uint64_t)query.value(11).toDouble(); //ToDo maybe should be fixed later because of Ocall normalized address
 
         switch(query.value(1).toInt()) { //EventType
@@ -262,13 +264,26 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                 ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,0,symbol_name,isFail);
                 calls[id] = eCall;
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
-                if (!callStatsMap.count(id))
+                if (!callStatsMap.count(id) && conditionQuery.isEmpty())
                 {
-                    CallStats *callStat = new CallStats;
-                    callStatsMap[id] = callStat;
+                    /*CallStats callStat;
+                    callStat.callTotalTime = total_time;
+                    callStat.callName = symbol_name;
+                    callStat.enclaveId = eid;
+                    callStat.enclaveBinaryName = enclavesList[eid];
+
+                    callStatsMap[id] = callStat;*/
+                    callStatsMap[id].callTotalTime += total_time;
+                    callStatsMap[id].callName += symbol_name;
+                    callStatsMap[id].enclaveId += eid;
+                    callStatsMap[id].enclaveBinaryName += enclavesList[eid];
+                    eCall->callInfo = callStatsMap[id];
+
                 } else {
-                    calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
-                    calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
+
+                    calls[id]->callInfo = callStatsMap[id];
+                    //eCall->callInfo = callStatsMap[id];
+                    //std::cerr << callStatsMap[id].callName.toStdString() << std::endl;
                 }
 
                 if(call_event != 0)
@@ -283,10 +298,11 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     //because we only need to gather these information at the initilizing the database phase and then they should stay untouched
                     if (conditionQuery.isEmpty())
                     {
-                        callStatsMap[call_event]->childrenCounter += 1;
-                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
-                        calls[call_event]->childrenCounter += 1;
-                        calls[call_event]->childrenTotalRuntime += total_time;
+                        calls[call_event]->callInfo.childrenCounter += 1;
+                        calls[call_event]->callInfo.childrenTotalRuntime += total_time;
+
+                        callStatsMap[call_event].childrenCounter += 1;
+                        callStatsMap[call_event].childrenTotalRuntime += total_time;
                     }
                 } else {
                     threads_[searchThreadIndex(involvedThreadId)].threadEcalls_.push_back(eCall);
@@ -302,13 +318,17 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                                          symbol_address_normalized,symbol_file_name, isFail);
                 calls[id] = oCall;
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
-                if (!callStatsMap.count(id))
+                if (!callStatsMap.count(id) && conditionQuery.isEmpty())
                 {
-                    CallStats *callStat = new CallStats;
-                    callStatsMap[id] = callStat;
+                   /* CallStats callStat;
+                    //callStat.callTotalTime = total_time;
+                    //callStat.callName = symbol_name;
+                    callStatsMap[id] = callStat;*/
+                    callStatsMap[id].callTotalTime = total_time;
+                    callStatsMap[id].callName = symbol_name;
+                    oCall->callInfo = callStatsMap[id];
                 } else {
-                    calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
-                    calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
+                    calls[id]->callInfo = callStatsMap[id];
                 }
 
                 if(call_event != 0)
@@ -321,10 +341,11 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                      */
                     if (conditionQuery.isEmpty())
                     {
-                        callStatsMap[call_event]->childrenCounter += 1;
-                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
-                        calls[call_event]->childrenCounter += 1;
-                        calls[call_event]->childrenTotalRuntime += total_time;
+                        calls[call_event]->callInfo.childrenCounter += 1;
+                        calls[call_event]->callInfo.childrenTotalRuntime += total_time;
+
+                        callStatsMap[call_event].childrenCounter += 1;
+                        callStatsMap[call_event].childrenTotalRuntime += total_time;
                     }
 
                 } else { //this should never be reachable unless the database is corrupted
@@ -499,4 +520,25 @@ int moe::SgxDatabaseStructure::searchThreadIndex(int threadId)
         }
     }
     return -1;
+}
+
+void moe::SgxDatabaseStructure::loadExistingEnclaves() {
+    QSqlQuery query;
+    query.prepare("SELECT eid, file_name as enclave_name FROM events WHERE type = 8 ORDER BY eid");
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        while (query.next())
+        {
+            int eid = query.value(0).toInt();
+            QString enclaveName = query.value(1).toString();
+            enclavesList[eid] = enclaveName;
+        }
+    }
+}
+
+const QMap<int, QString> &moe::SgxDatabaseStructure::getEnclavesMap() const {
+    return enclavesList;
 }

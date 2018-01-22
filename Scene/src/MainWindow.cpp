@@ -91,8 +91,8 @@ void MainWindow::createMenus()
     viewMenu_->addAction(threadFilterAction_);
     viewMenu_->addAction(eCallFilterAction_);
     viewMenu_->addAction(oCallFilterAction_);
+    viewMenu_->addAction(enclaveFilterAction_);
     viewMenu_->addAction(applyDockAction_);
-
 
     menuBar()->addSeparator();
     helpMenu_ = menuBar()->addMenu(tr("Help"));
@@ -260,11 +260,16 @@ void MainWindow::loadFile(const QString& fileName)
  */
 void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor)
 {
+    //ToDo ask nico if the other threads should still out of the list or not
+    int counter = 0;
     for (int i = 0; i < threads.length() ; ++i)
     {
-        moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
-        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (135 * (i+1)), 30));
-        sequenceListNode_->children_.push_back(thread);
+        if(!threads[i].threadEcalls_.isEmpty()) {
+            moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
+            thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (135 * (counter + 1)), 30));
+            sequenceListNode_->children_.push_back(thread);
+            counter++;
+        }
     }
 }
 
@@ -325,14 +330,12 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
 void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 {
     qreal pixelScroll=0;
-    if (yOffset_ + (yOffset/factor) >= 0) {
+    if (yOffset_ + (yOffset/factor) >= 0)
+    {
         qreal oldXCordinate = sequenceListNode_->getTransform().getX();
-        //std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
         sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCordinate,0));
-        //std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ = 0;
-
-    } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) <= (db->getProgramTotalTime() * yScale_)){
+    } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) <= (db->getProgramTotalTime() * yScale_)) {
         pixelScroll = yOffset;
         /*qreal print = (yOffset_ + (yOffset/factor));
         std::cerr << " yoffset_ + (yOffset/factor) " << print << " db->getProgramTotalTime() * yScale_" << db->getProgramTotalTime() * yScale_ << std::endl;
@@ -516,7 +519,7 @@ void MainWindow::generateThreadList()
             threadItemName.append(QString::number(i));
             QListWidgetItem *threadItem = new QListWidgetItem(threadItemName, threadList_);
             threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
-            threadItem->setCheckState(Qt::Checked);
+            threadItem->setCheckState(db->getThreads_()[i].threadEcalls_.isEmpty() ? Qt::Unchecked :Qt::Checked);
             chosenThreads.insert(i);
         }
     }
@@ -541,6 +544,40 @@ bool MainWindow::updateThreads()
             chosenThreads.insert(i);
             isChanged = true;
         }
+    }
+    return isChanged;
+}
+
+void MainWindow::generateEncalveList()
+{
+    enclavesList_->clear();
+    if(db)
+    {
+        for (auto e : db->getEnclavesMap().keys()) {
+            QString enclaveName = db->getEnclavesMap().value(e);
+            QListWidgetItem *enclaveItem = new QListWidgetItem(enclaveName, enclavesList_);
+            enclaveItem->setFlags(enclaveItem->flags() | Qt::ItemIsUserCheckable);
+            enclaveItem->setCheckState(Qt::Checked);
+            chosenEnclaves.insert(e);
+        }
+    }
+}
+
+bool MainWindow::updateEnclaves() {
+    bool isChanged = false;
+    int counter = 0; //because the QMap has only the enclaves that really were used in db and not all kinds of enclaves that exists
+    for (auto e : db->getEnclavesMap().keys()) {
+        if(enclavesList_->item(counter)->checkState() == Qt::Unchecked && chosenEnclaves.contains(e))
+        {
+            chosenEnclaves.remove(e);
+            isChanged = true;
+
+        } else if(enclavesList_->item(counter)->checkState() == Qt::Checked && !chosenEnclaves.contains(e))
+        {
+            chosenEnclaves.insert(e);
+            isChanged = true;
+        }
+        counter++;
     }
     return isChanged;
 }
@@ -571,6 +608,31 @@ void MainWindow::createFilterDocks()
     addDockWidget(Qt::LeftDockWidgetArea, threadDock_);
     threadFilterAction_ = threadDock_->toggleViewAction();
     connect(threadFilterAction_, SIGNAL(toggled(bool)), threadDock_, SLOT(setVisible(bool)));
+
+
+    enclaveDock_ = new QDockWidget(tr("Enclave Filter"), this);
+    enclaveDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    enclavesList_ = new QListWidget();
+    //multiECallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
+    QWidget *multiEnclaveDockWidget = new QWidget();
+    auto multiEnclaveWidgetLayout = new QVBoxLayout();
+    multiEnclaveWidgetLayout->addWidget(enclavesList_);
+    //multiECallButtonWidget has the horizontal layout and the 2 push buttons
+    QWidget *multiEnclaveButtonWidget = new QWidget();
+    QHBoxLayout *multiEnclaveButtonLayout = new QHBoxLayout();
+    auto selectAllEnclaves = new QPushButton(tr("Select All"), this);
+    connect(selectAllEnclaves, &QPushButton::pressed, [this]() { selectAll(enclavesList_);});
+    auto unSelectAllEnclaves = new QPushButton(tr("Unselect All"), this);
+    connect(unSelectAllEnclaves, &QPushButton::pressed, [this]() { unSelectAll(enclavesList_);});
+    multiEnclaveButtonLayout->addWidget(selectAllEnclaves);
+    multiEnclaveButtonLayout->addWidget(unSelectAllEnclaves);
+    multiEnclaveButtonWidget->setLayout(multiEnclaveButtonLayout);
+    multiEnclaveWidgetLayout->addWidget(multiEnclaveButtonWidget);
+    multiEnclaveDockWidget->setLayout(multiEnclaveWidgetLayout);
+    enclaveDock_->setWidget(multiEnclaveDockWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, enclaveDock_);
+    enclaveFilterAction_ = enclaveDock_->toggleViewAction();
+    connect(enclaveFilterAction_, SIGNAL(toggled(bool)), enclaveDock_, SLOT(setVisible(bool)));
 
 
 
@@ -650,13 +712,13 @@ void MainWindow::generateFilterControls()
 void MainWindow::applyFilter()
 {
     bool updateScene = false;
-    if(updateThreads() | updateECalls() | updateOCalls())
+    if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves())
     {
         updateScene = true;
         filter = new moe::ThreadFilter(db,chosenThreads.toList().toVector());
         filter->execute();
         delete filter;
-        filter  = new moe::ECallOCallFilter(db,chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector());
+        filter  = new moe::ECallOCallFilter(db,chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector(), chosenEnclaves.toList().toVector());
         filter->execute();
         delete filter;
     }
@@ -741,13 +803,15 @@ void MainWindow::updateTraces() {
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
-    visualizeThreads(db->getThreads_(), factor_);
     generateThreadList();
     generateECallList();
     generateOCallList();
+    generateEncalveList();
+    visualizeThreads(db->getThreads_(), factor_);
     moe::SceneData data{scene_};
     sceneRootNode_->initialize(data, sceneTransformation);
     zoomAndScrollTofirstEvent();
     render();
-}
 
+
+}

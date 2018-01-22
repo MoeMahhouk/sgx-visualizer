@@ -16,7 +16,7 @@ namespace moe {
         std::string  symbol_file_name_;
 
         OCall(int id, int eid, uint64_t symbol_address, uint64_t start_time, uint64_t relative_start_time , uint64_t total_time,
-              std::string symbol_name, uint64_t symbol_address_normalized, std::string symbol_file_name, int isFail) :
+              QString symbol_name, uint64_t symbol_address_normalized, std::string symbol_file_name, int isFail) :
                 Call(id, eid, symbol_address,start_time,relative_start_time , total_time, symbol_name,isFail),
                                               symbol_address_normalized_(symbol_address_normalized),
                                               symbol_file_name_(symbol_file_name)
@@ -29,7 +29,7 @@ namespace moe {
                                                         , 50, total_time_*factor, new QPen(Qt::gray),
                                                        isFail_? new QBrush(Qt::red) : new QBrush(Qt::yellow));
             //std::cerr << "OCALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
-            callBlock->initializeStats(childrenCounter,childrenTotalRuntime);
+            callBlock->initializeStats(callInfo);
             for (Call *call : children_)
             {
                 Renderable *childRenderable = call->toRenderable(factor);

@@ -21,22 +21,10 @@ namespace moe {
                                               symbol_address_normalized_(symbol_address_normalized),
                                               symbol_file_name_(symbol_file_name)
         {
-           // blockColor = new QBrush(Qt::yellow);
         }
-
-        /*virtual ~OCall() {
-            delete blockColor;
-        }*/
 
         virtual SeqDiagBlock* toRenderable(qreal factor) const override //ToDo added factor for test purposes
         {
-            /*QBrush *qBrush;
-            if (isFail_ != 0) {
-                qBrush = new QBrush(Qt::red);
-                //blockColor->setColor(Qt::red);
-            } else {
-                qBrush = new QBrush(Qt::yellow);
-            }*/
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
                                                         , 50, total_time_*factor, new QPen(Qt::gray),
                                                        isFail_? new QBrush(Qt::red) : new QBrush(Qt::yellow));

@@ -19,21 +19,11 @@ namespace moe  {
                 Call(id, eid, symbol_address,start_time,relative_start_time, total_time, symbol_name, isFail),
                 is_private_(is_private)
         {
-            //blockColor = new QBrush(Qt::blue);
         }
-
-        /*virtual ~ECall() {
-            delete blockColor;
-        }*/
 
         virtual SeqDiagBlock* toRenderable(qreal factor) const override //ToDo added factor for test purposes
         {
-            /*QBrush *qBrush;
-            if (isFail_ != 0) {
-                qBrush = new QBrush(Qt::red);
-            } else {
-                qBrush = new QBrush(Qt::blue);
-            }*/
+
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
                                                         , 50, total_time_*factor, new QPen(Qt::green),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));

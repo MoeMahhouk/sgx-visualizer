@@ -38,8 +38,8 @@ void moe::SeqDiagBlock::initializeStats(int childrenCounter, uint64_t childrenTo
 void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
     mouseOver_ = new QGraphicsRectItem(this);
-    topLevelItem()->setZValue(10.0);
-    setZValue(11.0);
+    //topLevelItem()->setZValue(10.0);
+    setZValue(topLevelItem()->zValue() + 10);
     mouseOver_->setBrush(Qt::lightGray);
     mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
     auto callChildsCounter = new QGraphicsTextItem(mouseOver_);
@@ -63,6 +63,7 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     scene()->removeItem(mouseOver_);
     setZValue(0.0);
     topLevelItem()->setZValue(0.0);
+    mouseOver_->setZValue(0);
     delete mouseOver_;
 }
 

@@ -26,7 +26,18 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
                  height_ * absoluteTransform_.yScale());
+    /*std::cerr << "rect top right y " << rect->rect().topRight().y() << std::endl;
+    std::cerr << "rect bottom right y " << rect->rect().bottomRight().y() << std::endl;
+    std::cerr << "scene height " << scene()->height() << std::endl;*/
     prepareGeometryChange();
+    if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < scene()->height()) {
+        show();
+        rect->show();
+    } else {
+        hide();
+        rect->hide();
+
+    }
     /*
      * another hopless test
      */

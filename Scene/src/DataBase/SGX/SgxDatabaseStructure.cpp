@@ -270,6 +270,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
                     calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
                 }
+
                 if(call_event != 0)
                 {
                     //here i calculate the relative start time of the child according to his parent start time
@@ -301,13 +302,15 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                                          symbol_address_normalized,symbol_file_name, isFail);
                 calls[id] = oCall;
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
-                if (!callStatsMap.count(id)) {
+                if (!callStatsMap.count(id))
+                {
                     CallStats *callStat = new CallStats;
                     callStatsMap[id] = callStat;
                 } else {
                     calls[id]->childrenTotalRuntime = callStatsMap[id]->childrenTotalRuntime;
                     calls[id]->childrenCounter = callStatsMap[id]->childrenCounter;
                 }
+
                 if(call_event != 0)
                 {
                     //here i calculate the relative start time of the child according to his parent start time
@@ -318,8 +321,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                      */
                     if (conditionQuery.isEmpty())
                     {
-                        //callStatsMap[call_event]->childrenCounter += 1;
-                        //callStatsMap[call_event]->childrenTotalRuntime += total_time;
+                        callStatsMap[call_event]->childrenCounter += 1;
+                        callStatsMap[call_event]->childrenTotalRuntime += total_time;
                         calls[call_event]->childrenCounter += 1;
                         calls[call_event]->childrenTotalRuntime += total_time;
                     }

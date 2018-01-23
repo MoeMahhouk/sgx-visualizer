@@ -114,7 +114,8 @@ private:
     bool updateECalls();
     bool updateOCalls();
     bool updateEnclaves();
-    uint64_t getTime(QLineEdit &inputTime);
+    bool updateTime();
+    uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsAndOcalls();
     void clearQList();
 

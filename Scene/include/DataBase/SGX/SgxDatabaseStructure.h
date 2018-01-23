@@ -54,11 +54,13 @@ namespace moe {
 
         void getResult(QString conditionQuery) override;
 
+        uint64_t getProgramStartTime();
+
+        uint64_t getProgramEndTime();
+
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
-        uint64_t getProgramStartTime();
-        uint64_t getProgramEndTime();
         uint64_t  getThreadTotalTime(int index);
         int getEcallsNumberOfThreadAtIndex(int index);
         void initializeECallsAndOCalls(QString conditionQuery = nullptr);

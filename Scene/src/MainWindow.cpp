@@ -564,7 +564,8 @@ void MainWindow::generateEncalveList()
     }
 }
 
-bool MainWindow::updateEnclaves() {
+bool MainWindow::updateEnclaves()
+{
     bool isChanged = false;
     int counter = 0; //because the QMap has only the enclaves that really were used in db and not all kinds of enclaves that exists
     for (auto e : db->getEnclavesMap().keys()) {
@@ -583,6 +584,28 @@ bool MainWindow::updateEnclaves() {
     return isChanged;
 }
 
+uint64_t MainWindow::getTime(const QLineEdit &inputTime) const
+{
+    if (!inputTime.text().isEmpty())
+    {
+        return inputTime.text().toULong();
+    } else {
+        return 0;
+    }
+}
+
+bool MainWindow::updateTime()
+{
+    if(db)
+    {
+        uint64_t  start_time = getTime(*startTimeFilter);
+        start_time != 0 ? chosenTimeFilter.first = start_time : chosenTimeFilter.first = db->getProgramStartTime();
+        uint64_t end_time = getTime(*endTimeFilter);
+        end_time != 0 ? chosenTimeFilter.second = end_time : chosenTimeFilter.second = db->getProgramEndTime();
+    }
+}
+
+
 void MainWindow::createFilterDocks()
 {
     timeDock_ = new QDockWidget(tr("Time Filter"),this);
@@ -591,6 +614,7 @@ void MainWindow::createFilterDocks()
     timeDock_->setMaximumHeight(100);
     timeDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     auto timeFilterLayout = new QHBoxLayout();
+    //QValidator *timeValidator = new Qvalidator
     startTimeFilter = new QLineEdit(timeDock_);
     startTimeFilter->setPlaceholderText(tr("From ECall Starttime (ns)"));
     endTimeFilter = new QLineEdit(timeDock_);
@@ -733,6 +757,8 @@ void MainWindow::generateFilterControls()
 void MainWindow::applyFilter()
 {
     bool updateScene = false;
+    if(!db)
+        return;
     if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves())
     {
         updateScene = true;
@@ -835,3 +861,5 @@ void MainWindow::updateTraces() {
     render();
 
 }
+
+

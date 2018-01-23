@@ -88,6 +88,7 @@ void MainWindow::createMenus()
     fileMenu_->addAction(openAction_);
 
     viewMenu_ = menuBar()->addMenu(tr("View"));
+    viewMenu_->addAction(timeFilterAction_);
     viewMenu_->addAction(threadFilterAction_);
     viewMenu_->addAction(eCallFilterAction_);
     viewMenu_->addAction(oCallFilterAction_);
@@ -584,6 +585,26 @@ bool MainWindow::updateEnclaves() {
 
 void MainWindow::createFilterDocks()
 {
+    timeDock_ = new QDockWidget(tr("Time Filter"),this);
+    QWidget *timeDockWidget = new QWidget();
+    timeDock_->setMinimumWidth(380);
+    timeDock_->setMaximumHeight(100);
+    timeDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    auto timeFilterLayout = new QHBoxLayout();
+    startTimeFilter = new QLineEdit(timeDock_);
+    startTimeFilter->setPlaceholderText(tr("From ECall Starttime (ns)"));
+    endTimeFilter = new QLineEdit(timeDock_);
+    endTimeFilter->setPlaceholderText(tr("To ECall Starttime (ns)"));
+    timeFilterLayout->addWidget(startTimeFilter);
+    timeFilterLayout->addWidget(endTimeFilter);
+    timeDockWidget->setLayout(timeFilterLayout);
+    timeDock_->setWidget(timeDockWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, timeDock_);
+    timeFilterAction_ = timeDock_->toggleViewAction();
+    connect(timeFilterAction_, SIGNAL(toggled(bool)), timeDock_ , SLOT(setVisible(bool)));
+
+
+
     //thread dock which will have double layout later
     threadDock_ = new QDockWidget(tr("Thread Filter"), this);
     threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -812,6 +833,5 @@ void MainWindow::updateTraces() {
     sceneRootNode_->initialize(data, sceneTransformation);
     zoomAndScrollTofirstEvent();
     render();
-
 
 }

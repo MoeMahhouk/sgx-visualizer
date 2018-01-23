@@ -102,6 +102,7 @@ private:
     QSet<int> chosenEcalls;
     QSet<int> chosenOcalls;
     QSet<int> chosenEnclaves;
+    QPair<uint64_t ,uint64_t > chosenTimeFilter;
     moe::IFilter *filter;
     QTabWidget* generateTabList();
     void generateEncalveList();
@@ -113,10 +114,13 @@ private:
     bool updateECalls();
     bool updateOCalls();
     bool updateEnclaves();
+    uint64_t getTime(QLineEdit &inputTime);
     void resetThreadsEcallsAndOcalls();
     void clearQList();
 
     QTabWidget *tabwidget_;
+    QLineEdit *startTimeFilter;
+    QLineEdit *endTimeFilter;
     QListWidget *enclavesList_;
     QListWidget *eCallList_;
     QListWidget *oCallList_;
@@ -125,10 +129,12 @@ private:
     QDockWidget *eCallDock_;
     QDockWidget *oCallDock_;
     QDockWidget *enclaveDock_;
+    QDockWidget *timeDock_;
     QAction *threadFilterAction_;
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;
     QAction *enclaveFilterAction_;
+    QAction *timeFilterAction_;
     QAction *applyDockAction_;
     QWidget *filterControls_;
 

@@ -74,12 +74,7 @@ namespace moe {
 
             draw(sceneData, parentTransform);
             //std::cout << myIndent << name << " " << this << std::endl;
-
-            for(Renderable* child: children_) {
-               // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
-                child->render(sceneData, absoluteTransform_);
-            }
-
+            drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
     protected:
@@ -87,6 +82,36 @@ namespace moe {
         virtual void initializeRenderable(SceneData& sceneData, Transform2D &parentTransform) = 0;
 
         virtual void draw(SceneData &sceneData, Transform2D &parentTransform) = 0;
+
+        virtual void drawChildren(SceneData& sceneData) {
+            for(Renderable* child: children_) {
+                // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
+                child->render(sceneData, absoluteTransform_);
+            }
+        }
+
+        /*{
+            class ClustNode : Renderable {
+                QTRect rect;
+                bool isClustered = false;
+
+                void onZoomed() {
+                    if near && isClustered:
+                        qtscene.remove(&rect);
+                        isClustered = true;
+                    else if far away and !isClustered
+                        qtscene.add(&rect);
+                        isClustered = false;
+                }
+
+                virtual void drawChildren() override  {
+                    if (!isClustered)
+                        Renderable::drawChildren();
+                    else
+                        update rect
+                }
+            };
+        }*/
 
         Transform2D relativeTransform_;
         Transform2D absoluteTransform_;

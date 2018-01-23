@@ -116,7 +116,7 @@ private:
     bool updateEnclaves();
     bool updateTime();
     uint64_t getTime(const QLineEdit &inputTime) const;
-    void resetThreadsEcallsAndOcalls();
+    void resetThreadsEcallsOcallsEnclavesAndTimeline();
     void clearQList();
 
     QTabWidget *tabwidget_;

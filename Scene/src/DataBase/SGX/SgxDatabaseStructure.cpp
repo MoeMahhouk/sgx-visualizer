@@ -217,7 +217,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     if (!conditionQuery.isEmpty())
     {
         newQueryString.append(conditionQuery);
-        newQueryString.append( "union all "
+        newQueryString.append( " union all "
                 "select e2.id, e2.type, e2.time, e2.call_id, e2.eid, e2.call_event, e2.involved_thread, e2.aex_count, _level-1 "
                 "from events as e2 inner join events_children ON e2.id = events_children.call_event" );
     }
@@ -238,6 +238,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
     //ToDo ask nico why we took symbol_address_normalized instead of symbol address of the ocalls ? (done :) )
     //ToDo ask nico is it on purpose that symbol_file_name is addressed as symbol_address or is it not right (it was fast typing issue :) )
     //ToDo what about isPrivate from ecalls and symbol Address from Ocalls (still open :| )
+    std::cerr << newQueryString.toStdString() << std::endl;
     query.prepare(newQueryString);
     if(!query.exec())
     {

@@ -4,8 +4,9 @@
 
 #include "Filtering/SGX/ECallOCallFilter.h"
 
-moe::ECallOCallFilter::ECallOCallFilter(IReciever *reciever, QVector<int> chosenECalls, QVector<int> chosenOCalls, QVector<int> chosenEnclaves) :
-        IFilter(reciever), chosenECalls_(chosenECalls), chosenOCalls_(chosenOCalls), chosenEnclaves_(chosenEnclaves)
+moe::ECallOCallFilter::ECallOCallFilter(IReciever *reciever, QVector<int> chosenECalls, QVector<int> chosenOCalls,
+                                        QVector<int> chosenEnclaves, QPair<uint64_t ,uint64_t> chosenTimeline) :
+        IFilter(reciever), chosenECalls_(chosenECalls), chosenOCalls_(chosenOCalls), chosenEnclaves_(chosenEnclaves), chosenTimeline_(chosenTimeline)
 {
 
 }
@@ -55,6 +56,11 @@ QString moe::ECallOCallFilter::toSQLStatement()
         conditionQuery.append("))");
     }
     conditionQuery.append(")");
+
+    conditionQuery.append(" AND e1.time BETWEEN ");
+    conditionQuery.append(QString::number(chosenTimeline_.first));
+    conditionQuery.append(" AND ");
+    conditionQuery.append(QString::number(chosenTimeline_.second));
     return conditionQuery;
 }
 

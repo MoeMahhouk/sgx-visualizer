@@ -596,13 +596,24 @@ uint64_t MainWindow::getTime(const QLineEdit &inputTime) const
 
 bool MainWindow::updateTime()
 {
+    bool isChanged = false;
     if(db)
     {
-        uint64_t  start_time = getTime(*startTimeFilter);
-        start_time != 0 ? chosenTimeFilter.first = start_time : chosenTimeFilter.first = db->getProgramStartTime();
+        uint64_t  programStartTime = db->getProgramStartTime();
+        uint64_t start_time = getTime(*startTimeFilter);
+        //start_time != 0 ? chosenTimeFilter.first = start_time + db->getProgramStartTime() : chosenTimeFilter.first = db->getProgramStartTime();
+        chosenTimeFilter.first = start_time + programStartTime;
         uint64_t end_time = getTime(*endTimeFilter);
-        end_time != 0 ? chosenTimeFilter.second = end_time : chosenTimeFilter.second = db->getProgramEndTime();
+        //end_time != 0 ? chosenTimeFilter.second = end_time + db->getProgramStartTime() : chosenTimeFilter.second = db->getProgramEndTime();
+        chosenTimeFilter.second = end_time + programStartTime;
+        if (start_time || end_time)
+        {
+            isChanged = true;
+            startTimeFilter->clear();
+            endTimeFilter->clear();
+        }
     }
+    return isChanged;
 }
 
 
@@ -759,13 +770,14 @@ void MainWindow::applyFilter()
     bool updateScene = false;
     if(!db)
         return;
-    if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves())
+    if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves() | updateTime())
     {
         updateScene = true;
         filter = new moe::ThreadFilter(db,chosenThreads.toList().toVector());
         filter->execute();
         delete filter;
-        filter  = new moe::ECallOCallFilter(db,chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector(), chosenEnclaves.toList().toVector());
+        filter  = new moe::ECallOCallFilter(db,chosenEcalls.toList().toVector(), chosenOcalls.toList().toVector(),
+                                            chosenEnclaves.toList().toVector(), chosenTimeFilter);
         filter->execute();
         delete filter;
     }
@@ -786,11 +798,11 @@ void MainWindow::applyFilter()
 
 void MainWindow::resetFilter()
 {
-    resetThreadsEcallsAndOcalls();
+    resetThreadsEcallsOcallsEnclavesAndTimeline();
     applyFilter();
 }
 
-void MainWindow::resetThreadsEcallsAndOcalls()
+void MainWindow::resetThreadsEcallsOcallsEnclavesAndTimeline()
 {
     for (int i = 0; i < threadList_->count() ; ++i)
     {
@@ -803,6 +815,14 @@ void MainWindow::resetThreadsEcallsAndOcalls()
     for (int k = 0; k < oCallList_->count() ; ++k)
     {
         oCallList_->item(k)->setCheckState(Qt::Checked);
+    }
+    for (int l = 0; l < enclavesList_->count() ; ++l)
+    {
+        enclavesList_->item(l)->setCheckState(Qt::Checked);
+    }
+    if(db)
+    {
+        endTimeFilter->setText(QString::number(db->getProgramEndTime()));
     }
 }
 

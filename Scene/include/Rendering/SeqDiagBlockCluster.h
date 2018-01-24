@@ -14,7 +14,7 @@ namespace moe {
     public:
 
         SeqDiagBlockCluster(Transform2D transform = Transform2D(), qreal width = 0, qreal height= 0,
-                            QPen* pen = new QPen(Qt::red), QBrush* brush = new QBrush(Qt::blue));
+                            QPen* pen = new QPen(Qt::green), QBrush* brush = new QBrush(Qt::blue));
 
         virtual ~SeqDiagBlockCluster();
 
@@ -22,6 +22,7 @@ namespace moe {
 
         void addBlock(SeqDiagBlock *innerBlock);
 
+        bool checkClusterCriteria(Renderable * innerBlock);
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
@@ -30,7 +31,7 @@ namespace moe {
 
         //virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
-        void draw(SceneData &data, Transform2D &parentTransform) override;
+        virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 
         virtual void drawChildren(SceneData& sceneData) override;
 

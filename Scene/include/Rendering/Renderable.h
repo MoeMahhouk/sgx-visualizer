@@ -81,12 +81,14 @@ namespace moe {
             drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
+        virtual void hideRenderable(){}
+        virtual void showRenderable(){}
+
     protected:
 
         virtual void initializeRenderable(SceneData& sceneData, Transform2D &parentTransform) = 0;
 
         virtual void draw(SceneData &sceneData, Transform2D &parentTransform) = 0;
-
         virtual void drawChildren(SceneData& sceneData) {
             for(Renderable* child: children_) {
                 // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;

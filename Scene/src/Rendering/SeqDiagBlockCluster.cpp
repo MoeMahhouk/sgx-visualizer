@@ -20,8 +20,8 @@ moe::SeqDiagBlockCluster::~SeqDiagBlockCluster() {
 }
 
 void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
-    if(!isClustered) {
-        isClustered = true;
+    if(height_ == 0) {
+        //isClustered = true;
         Renderable::setTransform(innerBlock->getTransform());
         setHeight(innerBlock->getHeight());
         setWidth(innerBlock->getWidth());
@@ -37,7 +37,7 @@ void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
     //rect->setRect(rect->boundingRect().united(innerBlock->boundingRect()));
     //height_ = rect->boundingRect().height();
     //width_ = rect->boundingRect().width();
-    std::cerr << "clusters new size is " << getTransform().getY() << " and its height is " << getHeight() << std::endl;
+    //std::cerr << "clusters new size is " << getTransform().getY() << " and its height is " << getHeight() << std::endl;
     lineOffset_->children_.push_back(innerBlock);
 }
 
@@ -48,6 +48,10 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
         if(!isClustered)
         {
             //scene()->addItem(this);
+            for (Renderable* child : lineOffset_->children_) {
+                static_cast<SeqDiagBlock*>(child)->hideRenderable();
+            }
+            scene()->update();
             scene()->addItem(rect);
             isClustered = true;
             std::cerr << "reclusted and readded rect to scene " << std::endl;
@@ -65,7 +69,11 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
                       height_ * absoluteTransform_.yScale());
         if(isClustered) {
             scene()->removeItem(rect);
+            for (Renderable* child : lineOffset_->children_) {
+                static_cast<SeqDiagBlock*>(child)->showRenderable();
+            }
             //scene()->removeItem(this);
+            scene()->update();
             isClustered = false;
             std::cerr << "not clustered anymore and removed from scene " << std::endl;
         }

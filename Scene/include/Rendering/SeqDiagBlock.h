@@ -27,6 +27,11 @@ namespace moe {
 
         virtual QRectF boundingRect() const override;
 
+        virtual void hideRenderable() override;
+
+        virtual void showRenderable() override;
+
+
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

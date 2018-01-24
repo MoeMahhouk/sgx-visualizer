@@ -32,18 +32,16 @@ namespace moe {
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                    QWidget* widget) override;
 
-
     protected:
 
         virtual void draw(SceneData &sceneData, Transform2D &parentTransform) override;
-        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
+        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
         qreal width_, height_;
         // Renderable* offsetForLine_;
         QPen* pen_;
         QBrush* brush_;
         QGraphicsRectItem *rect;
-
     };
 }
 

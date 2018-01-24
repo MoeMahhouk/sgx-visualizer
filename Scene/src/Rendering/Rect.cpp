@@ -102,3 +102,6 @@ void moe::Rect::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 
 
+
+
+

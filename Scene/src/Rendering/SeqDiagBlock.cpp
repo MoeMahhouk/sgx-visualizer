@@ -95,6 +95,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
 void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     scene()->removeItem(mouseOver_);
+    mouseOver_->hide();
     setZValue(0.0);
     topLevelItem()->setZValue(0.0);
     delete mouseOver_;
@@ -102,4 +103,25 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
 QRectF moe::SeqDiagBlock::boundingRect() const {
     return Rect::boundingRect();
+}
+
+void moe::SeqDiagBlock::hideRenderable() {
+    //std::cerr << "ahhhhhhh we are getting removed from scene" << std::endl;
+    //scene()->removeItem(rect);
+    rect->hide();
+    hide();
+    for (Renderable *child : lineOffset_->children_) {
+        child->hideRenderable();
+    }
+
+}
+
+void moe::SeqDiagBlock::showRenderable() {
+    //std::cerr << "year we are getting readded to the scene" << std::endl;
+    //scene()->addItem(rect);
+    rect->show();
+    show();
+    for (Renderable *child : lineOffset_->children_) {
+        child->showRenderable();
+    }
 }

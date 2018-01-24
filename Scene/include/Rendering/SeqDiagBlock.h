@@ -23,7 +23,7 @@ namespace moe {
 
         void addBlock(Renderable *innerBlock);
 
-        void initializeStats(const CallStats &callsInfos);
+        virtual void initializeStats(const CallStats &callsInfos);
 
         virtual QRectF boundingRect() const override;
 
@@ -33,11 +33,15 @@ namespace moe {
 
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
-        void draw(SceneData &data, Transform2D &parentTransform) override;
-    private:
+        virtual void draw(SceneData &data, Transform2D &parentTransform) override;
+
         CallStats callsInfos_;
+
         Renderable *lineOffset_;
+
         QGraphicsRectItem *mouseOver_;
+
+    private:
     };
 }
 

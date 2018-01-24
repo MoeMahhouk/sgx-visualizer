@@ -604,8 +604,8 @@ bool MainWindow::updateTime()
         //start_time != 0 ? chosenTimeFilter.first = start_time + db->getProgramStartTime() : chosenTimeFilter.first = db->getProgramStartTime();
         chosenTimeFilter.first = start_time + programStartTime;
         uint64_t end_time = getTime(*endTimeFilter);
-        //end_time != 0 ? chosenTimeFilter.second = end_time + db->getProgramStartTime() : chosenTimeFilter.second = db->getProgramEndTime();
-        chosenTimeFilter.second = end_time + programStartTime;
+        end_time != 0 ? chosenTimeFilter.second = end_time + db->getProgramStartTime() : chosenTimeFilter.second = db->getProgramEndTime();
+        //chosenTimeFilter.second = end_time + programStartTime;
         if (start_time || end_time)
         {
             isChanged = true;
@@ -877,7 +877,7 @@ void MainWindow::updateTraces() {
     visualizeThreads(db->getThreads_(), factor_);
     moe::SceneData data{scene_};
     sceneRootNode_->initialize(data, sceneTransformation);
-    zoomAndScrollTofirstEvent();
+    //zoomAndScrollTofirstEvent();
     render();
 
 }

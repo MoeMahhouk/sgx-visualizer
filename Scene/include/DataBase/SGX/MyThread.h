@@ -7,6 +7,7 @@
 
 
 #include <string>
+#include <Rendering/SeqDiagBlockCluster.h>
 #include "Rendering/SequenceDiagram.h"
 #include "ECall.h"
 
@@ -44,10 +45,14 @@ namespace moe {
                                                                 ,"ThreadNr --" + QString::number(id_)
                                                                 ,total_time_ * factor
                                                                 );
+
+            SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green));
+            threadSeqDiag->addBlock(clusterTest);
             for (ECall *eCall : threadEcalls_)
             {
-                Renderable *eCallRenderable = eCall->toRenderable(factor);
-                threadSeqDiag->addBlock(eCallRenderable);
+                SeqDiagBlock *eCallRenderable = eCall->toRenderable(factor);
+                //threadSeqDiag->addBlock(eCallRenderable);
+                clusterTest->addBlock(eCallRenderable);
             }
             return threadSeqDiag;
          }

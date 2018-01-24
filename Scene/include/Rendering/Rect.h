@@ -27,7 +27,6 @@ namespace moe {
         qreal getWidth() const;
         void setWidth(const qreal& width);
 
-        //void addBlock(Renderable *innerBlock);
 
         virtual QRectF boundingRect() const override;
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,

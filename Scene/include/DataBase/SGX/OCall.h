@@ -32,7 +32,7 @@ namespace moe {
             callBlock->initializeStats(callInfo);
             for (Call *call : children_)
             {
-                Renderable *childRenderable = call->toRenderable(factor);
+                SeqDiagBlock *childRenderable = call->toRenderable(factor);
                 callBlock->addBlock(childRenderable);
             }
             return callBlock;

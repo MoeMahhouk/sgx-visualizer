@@ -46,6 +46,10 @@ namespace moe {
             return relativeTransform_;
         }
 
+        const Transform2D &getAbsoluteTransform_() const {
+            return absoluteTransform_;
+        }
+
         void setTransform(const Transform2D &transform) {
             relativeTransform_ = transform;
         }
@@ -115,6 +119,7 @@ namespace moe {
 
         Transform2D relativeTransform_;
         Transform2D absoluteTransform_;
+
     };
 
     class EmptyRenderable : public Renderable {

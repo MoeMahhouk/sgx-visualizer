@@ -28,9 +28,14 @@ namespace moe  {
                                                         , 50, total_time_*factor, new QPen(Qt::green),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
+            //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_  << std::endl;
+            //std::cerr << " ECALL position mulitplicated with factor : " << (relative_start_time_ + total_time_)  << std::endl;
+            std::cerr << " ECALL totaltime mulitplicated with factor (height) : " << (total_time_ * factor)  << std::endl;
+            //SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow));
+
             callBlock->initializeStats(callInfo);
             for (Call *call : children_) {
-                Renderable *childRenderable = call->toRenderable(factor);
+                SeqDiagBlock *childRenderable = call->toRenderable(factor);
                 callBlock->addBlock(childRenderable);
             }
             return callBlock;

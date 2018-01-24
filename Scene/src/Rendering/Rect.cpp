@@ -11,6 +11,10 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
     brush_ = brush;
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+    /*rect = new QGraphicsRectItem(absoluteTransform_.getX(),
+                                 absoluteTransform_.getY(),
+                                 width_ * absoluteTransform_.xScale(),
+                                 height_ * absoluteTransform_.yScale());*/
 }
 
 void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
@@ -28,8 +32,8 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
                  height_ * absoluteTransform_.yScale());
     //std::cerr << "rect absoluteTransform y " << absoluteTransform_.getY() << std::endl;
     //std::cerr << "rect top  y " << rect->rect().topLeft().y() << std::endl;
-    /*std::cerr << "rect bottom right y " << rect->rect().bottomRight().y() << std::endl;
-    std::cerr << "scene height " << scene()->height() << std::endl;*/
+    //std::cerr << "rect bottom right y " << rect->rect().bottomRight().y() << std::endl;
+    //std::cerr << "scene height " << scene()->height() << std::endl;*/
     prepareGeometryChange();
     if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < scene()->height() /*&& rect->rect().height() > 5*/) {
         show();
@@ -38,6 +42,10 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
         hide();
         rect->hide();
     }
+/*
+    std::cerr << " rect height with get height  " << getHeight() << std::endl;
+    std::cerr << " rect height manually  " << rect->rect().height() << std::endl;
+    std::cerr << " rect height with multiplication  " << height_ * absoluteTransform_.yScale() << std::endl;
     /*
      * another hopless test
      */
@@ -50,15 +58,6 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
     //std::cerr << "this rect y cooridnate is at " << rect->y() << std::endl;
     //std::cerr << "this rect is visible " << this->isVisible() << std::endl;
 
-    /*
-     * ToDo this doesnt solve the clustering problem but might be also a relative solution to it
-
-    if (rect->rect().height() < 5) {
-        rect->hide();
-    } else {
-        rect->show();
-    }
-    */
 }
 
 
@@ -93,8 +92,8 @@ void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D
     sceneData.scene->addItem(this);
 }
 
-QRectF moe::Rect::boundingRect() const {
-
+QRectF moe::Rect::boundingRect() const
+{
     return rect->boundingRect();
 }
 

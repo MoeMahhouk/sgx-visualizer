@@ -19,7 +19,7 @@ void moe::SeqDiagBlock::draw(SceneData &data, moe::Transform2D &parentTransform)
     Rect::draw(data, parentTransform);
 }
 
-void moe::SeqDiagBlock::addBlock(moe::Renderable *innerBlock)
+void moe::SeqDiagBlock::addBlock(Renderable *innerBlock)
 {
     lineOffset_->children_.push_back(innerBlock);
 }

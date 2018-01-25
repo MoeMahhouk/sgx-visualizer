@@ -133,8 +133,8 @@ void MainWindow::generateGraphicsView()
     //view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view_->setMouseTracking(true);
     view_->setInteractive(true);
-    view_->setGeometry(0, 0, this->rect().width()*0.8, this->rect().height()*0.8);
-    view_->setFrameStyle(0);
+   // view_->setGeometry(0, 0, this->rect().width()*0.7, this->rect().height()*0.8);
+   // view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
@@ -184,8 +184,10 @@ void MainWindow::render()
     scene_->setBackgroundBrush(Qt::white);
     moe::SceneData data{scene_};
     sceneRootNode_->render(data,sceneTransformation);
+    //update();
     scene_->update();
-    viewArea_->show();
+    view_->update();
+    //viewArea_->show();
     //view_->show(); //ToDo replaced it with viewArea.show (needs testing a little bit)
 }
 
@@ -193,6 +195,7 @@ void MainWindow::applySettings()
 {
     QSettings settings("BachelorArbeit IBR", "SGX AnalysisTool");
     QSize size = settings.value("size", QSize(800, 600)).toSize();
+    std::cerr << "size is " << size.width() << " "<< size.height() << std::endl;
     resize(size);
 }
 
@@ -212,9 +215,8 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
-
-    viewArea_->setGeometry(0, 0, this->rect().width()*0.8 , this->rect().height()*0.8);
-    view_->setGeometry(0, 0, this->rect().width()*0.8 , this->rect().height()*0.8);
+    viewArea_->setGeometry(0, 0, this->rect().width()*0.8 - 50 , this->rect().height()*0.8);
+    view_->setGeometry(0, 0, this->rect().width()*0.8 - 50, this->rect().height()*0.8);
     view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
     /*
@@ -239,7 +241,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         scrollTo(oldYoffset,factor_);
         render();
     }
-    view_->update();
+    //view_->update();
 }
 
 void MainWindow::loadFile(const QString& fileName)

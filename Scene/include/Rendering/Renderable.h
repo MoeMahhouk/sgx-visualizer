@@ -22,13 +22,15 @@ namespace moe {
 
         QVector<Renderable*> children_;
 
-        Renderable(Transform2D transform = Transform2D()) {
+        Renderable(Transform2D transform = Transform2D())
+        {
             relativeTransform_ = transform;
         }
         //does not allow copy constructor
         Renderable ( const Renderable & ) = delete;
 
-        virtual ~Renderable() {
+        virtual ~Renderable()
+        {
 	        auto it = children_.begin();
 	        while (it != children_.end())
 	        {
@@ -60,8 +62,8 @@ namespace moe {
 
             initializeRenderable(sceneData, parentTransform);
 
-            std::string myIndent = sceneData.indent;
-            sceneData.indent += "\t";
+            //std::string myIndent = sceneData.indent;
+            //sceneData.indent += "\t";
 
             //std::cout << myIndent << name << " " << this << std::endl;
 
@@ -69,7 +71,7 @@ namespace moe {
                 // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
                 child->initialize(sceneData, absoluteTransform_);
             }
-            sceneData.indent = myIndent;
+            //sceneData.indent = myIndent;
         }
 
         void render(SceneData& sceneData, Transform2D &parentTransform)
@@ -81,8 +83,8 @@ namespace moe {
             drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
-        virtual void hideRenderable(SceneData &sceneData) {}
-        virtual void showRenderable(SceneData &sceneData) {}
+        virtual void removeFromScene(SceneData &sceneData) {}
+        virtual void addToScene(SceneData &sceneData) {}
 
     protected:
 

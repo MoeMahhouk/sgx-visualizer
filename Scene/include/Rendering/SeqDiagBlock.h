@@ -27,9 +27,9 @@ namespace moe {
 
         virtual QRectF boundingRect() const override;
 
-        virtual void hideRenderable(SceneData& sceneData) override;
+        virtual void removeFromScene(SceneData& sceneData) override;
 
-        virtual void showRenderable(SceneData& sceneData) override;
+        virtual void addToScene(SceneData& sceneData) override;
 
 
     protected:
@@ -46,7 +46,6 @@ namespace moe {
 
         QGraphicsRectItem *mouseOver_;
 
-    private:
     };
 }
 

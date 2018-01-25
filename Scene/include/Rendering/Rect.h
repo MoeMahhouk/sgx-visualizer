@@ -16,6 +16,7 @@ namespace moe {
 
         virtual ~Rect()
         {
+            delete rect;
             delete pen_;
             delete brush_;
         };
@@ -37,11 +38,18 @@ namespace moe {
         virtual void draw(SceneData &sceneData, Transform2D &parentTransform) override;
 
         virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
+
+        void updateRectTranform();
+        void checkInSceneBorders(SceneData &sceneData);
+        void hideInScene();
+        void showInScene();
+
         qreal width_, height_;
         // Renderable* offsetForLine_;
         QPen* pen_;
         QBrush* brush_;
         QGraphicsRectItem *rect;
+        bool isInScene;
     };
 }
 

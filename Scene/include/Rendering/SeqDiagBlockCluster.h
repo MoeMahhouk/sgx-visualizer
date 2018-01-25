@@ -24,9 +24,9 @@ namespace moe {
 
         bool checkClusterCriteria(Renderable * innerBlock);
 
-       /* virtual void hideRenderable() override ;
+       /* virtual void removeFromScene() override ;
 
-        virtual void showRenderable() override;*/
+        virtual void addToScene() override;*/
 
     protected:
 

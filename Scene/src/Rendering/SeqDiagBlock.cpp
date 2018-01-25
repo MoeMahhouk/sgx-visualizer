@@ -42,6 +42,9 @@ void moe::SeqDiagBlock::initializeStats(const CallStats &callsInfos) {
 
 void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
+    /*if(!rect->isVisible()) { //so that it wont print anything if the item
+        return;
+    }*/
     mouseOver_ = new QGraphicsRectItem(this);
     topLevelItem()->setZValue(10.0);
     setZValue(11);
@@ -94,34 +97,45 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    scene()->removeItem(mouseOver_);
-    mouseOver_->hide();
-    setZValue(0.0);
-    topLevelItem()->setZValue(0.0);
-    delete mouseOver_;
+   // if(!rect->isVisible()) {
+        /*if(mouseOver_) {
+            scene()->removeItem(mouseOver_);
+            delete mouseOver_;
+        }*/
+     //   return;
+    //}
+    if(mouseOver_) {
+        scene()->removeItem(mouseOver_);
+        //mouseOver_->hide();
+        setZValue(0.0);
+        topLevelItem()->setZValue(0.0);
+        delete mouseOver_;
+    }
 }
 
 QRectF moe::SeqDiagBlock::boundingRect() const {
     return Rect::boundingRect();
 }
 
-void moe::SeqDiagBlock::hideRenderable() {
+void moe::SeqDiagBlock::hideRenderable(SceneData& sceneData) {
     //std::cerr << "ahhhhhhh we are getting removed from scene" << std::endl;
-    //scene()->removeItem(rect);
-    rect->hide();
-    hide();
+    sceneData.scene->removeItem(rect);
+    sceneData.scene->removeItem(this);
+    //rect->hide();
+    //hide();
     for (Renderable *child : lineOffset_->children_) {
-        child->hideRenderable();
+        child->hideRenderable(sceneData);
     }
 
 }
 
-void moe::SeqDiagBlock::showRenderable() {
+void moe::SeqDiagBlock::showRenderable(SceneData& sceneData) {
     //std::cerr << "year we are getting readded to the scene" << std::endl;
-    //scene()->addItem(rect);
-    rect->show();
-    show();
+    sceneData.scene->addItem(rect);
+    sceneData.scene->addItem(this);
+    //rect->show();
+    //show();
     for (Renderable *child : lineOffset_->children_) {
-        child->showRenderable();
+        child->showRenderable(sceneData);
     }
 }

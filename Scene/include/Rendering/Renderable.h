@@ -81,8 +81,8 @@ namespace moe {
             drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
-        virtual void hideRenderable(){}
-        virtual void showRenderable(){}
+        virtual void hideRenderable(SceneData &sceneData) {}
+        virtual void showRenderable(SceneData &sceneData) {}
 
     protected:
 

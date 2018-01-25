@@ -27,9 +27,9 @@ namespace moe {
 
         virtual QRectF boundingRect() const override;
 
-        virtual void hideRenderable() override;
+        virtual void hideRenderable(SceneData& sceneData) override;
 
-        virtual void showRenderable() override;
+        virtual void showRenderable(SceneData& sceneData) override;
 
 
     protected:

@@ -520,7 +520,7 @@ void MainWindow::generateThreadList()
             threadItemName.append(QString::number(i));
             QListWidgetItem *threadItem = new QListWidgetItem(threadItemName, threadList_);
             threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
-            threadItem->setCheckState(db->getThreads_()[i].threadEcalls_.isEmpty() ? Qt::Unchecked :Qt::Checked);
+            threadItem->setCheckState(db->getThreads_()[i].threadEcalls_.isEmpty() ? Qt::Unchecked :Qt::Checked); //ToDo here we checked out the empty threads
             chosenThreads.insert(i);
         }
     }

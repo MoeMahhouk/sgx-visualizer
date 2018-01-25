@@ -54,20 +54,27 @@ bool moe::SeqDiagBlockCluster::checkClusterCriteria(moe::Renderable *innerBlock)
 
 void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &parentTransform)
 {  //ToDo test it without the if, it might also work because we remove the item later from the scene when it hast height more than 150, so the ifs are redundant here
-    if (rect->rect().height() < 250)  //ToDo only for test , if the cluster height is more than 150 pixel, it should draw the children eventually with their clusters
+    static bool firstUsage = true;
+    if (rect->rect().height() / (lineOffset_->children_.size()+1) < 15)
     {
         if(!isClustered)
         {
-            //scene()->addItem(this);
-            for (Renderable* child : lineOffset_->children_) {
-                //static_cast<SeqDiagBlock*>(child)->hideRenderable();
-                child->hideRenderable();
-            }
-            scene()->update();
-            scene()->addItem(rect);
             isClustered = true;
-            //std::cerr << "reclusted and readded rect to scene " << std::endl;
+            if(!rect->isVisible())
+            {
+                scene()->addItem(rect);
+                rect->show();
+                this->show();
+            }
+            if(!firstUsage) {
+                for (Renderable* child : lineOffset_->children_) {
+                    //static_cast<SeqDiagBlock*>(child)->hideRenderable();
+                    child->hideRenderable(data);
+                }
 
+            }
+            firstUsage = false;
+            //std::cerr << "reclusted and readded rect to scene " << std::endl;
         }
 
         SeqDiagBlock::draw(data, parentTransform);
@@ -79,39 +86,33 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
                       absoluteTransform_.getY(),
                       width_ * absoluteTransform_.xScale(),
                       height_ * absoluteTransform_.yScale());
-        if(isClustered) {
-            scene()->removeItem(rect);
-            for (Renderable* child : lineOffset_->children_) {
-                //static_cast<SeqDiagBlock*>(child)->showRenderable();
-                child->showRenderable();
-            }
-            //scene()->removeItem(this);
-            scene()->update();
+
+        if(isClustered)
+        {
             isClustered = false;
+            if(rect->isVisible()) {
+                rect->hide();
+                scene()->removeItem(rect);
+                this->hide();
+            }
+            for (Renderable* child : lineOffset_->children_)
+            {
+                //static_cast<SeqDiagBlock*>(child)->showRenderable();
+                child->showRenderable(data);
+            }
             //std::cerr << "not clustered anymore and removed from scene " << std::endl;
         }
         //prepareGeometryChange();
     }
+    drawChildren(data);
 
 }
 
 void moe::SeqDiagBlockCluster::drawChildren(moe::SceneData &sceneData) {
-    if (/*rect->rect().height() > 150 &&*/ !isClustered)
+    if (!isClustered)
     {
-        //isClustered = false;
-        //sceneData.scene->removeItem(rect);
-        //std::cerr << "rect pointer must be still here " << rect << std::endl;
-        //sceneData.scene->removeItem(this);
-        //std::cerr << "cluster is big and children must now be printed instead of the cluster" << std::endl;
         Renderable::drawChildren(sceneData);
-    } /*else if (/*!isClustered && rect->rect().height() < 150) {
-        std::cerr << " readding the cluster back to the scene " << std::endl;
-        isClustered = true;
-        sceneData.scene->addItem(rect);
-        sceneData.scene->addItem(this);
-    } else {
-       // Renderable::drawChildren(sceneData);
-    }*/
+    }
 }
 
 void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
@@ -123,6 +124,18 @@ void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) 
     //SeqDiagBlock::hoverLeaveEvent(event);
     return;
 }
+
+/*void moe::SeqDiagBlockCluster::hideRenderable() {
+    for (Renderable *child : lineOffset_->children_) {
+        child->hideRenderable();
+    }
+}
+
+void moe::SeqDiagBlockCluster::showRenderable() {
+    for (Renderable *child : lineOffset_->children_) {
+        child->showRenderable();
+    }
+}*/
 
 /*void moe::SeqDiagBlockCluster::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
     sceneData.scene->addItem(rect);

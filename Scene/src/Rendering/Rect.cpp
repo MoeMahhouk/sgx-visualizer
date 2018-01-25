@@ -3,29 +3,18 @@
 moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBrush* brush) : Renderable(transform)
 {
     name = "Rect";
-    //offsetForLine_ = new moe::EmptyRenderable(Transform2D(1, 0, 0, 1, ((width) - 1), 0));
-    //children_.push_back(offsetForLine_);
     width_ = width;
     height_ = height;
     pen_ = pen;
     brush_ = brush;
     setAcceptHoverEvents(true);
     setFlags(QGraphicsItem::ItemSendsScenePositionChanges | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
-    /*rect = new QGraphicsRectItem(absoluteTransform_.getX(),
-                                 absoluteTransform_.getY(),
-                                 width_ * absoluteTransform_.xScale(),
-                                 height_ * absoluteTransform_.yScale());*/
+
 }
 
 void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
 {
-    //add and render the items in the scene according to their relative position with transformation methods
-     /* sceneData.scene->addRect(
-            absoluteTransform_.getX(),
-            absoluteTransform_.getY(),
-            width_ * absoluteTransform_.xScale(),
-            height_ * absoluteTransform_.yScale(),
-            *pen_, *brush_);*/
+
     rect->setRect(absoluteTransform_.getX(),
                  absoluteTransform_.getY(),
                  width_ * absoluteTransform_.xScale(),
@@ -33,15 +22,27 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
     //std::cerr << "rect absoluteTransform y " << absoluteTransform_.getY() << std::endl;
     //std::cerr << "rect top  y " << rect->rect().topLeft().y() << std::endl;
     //std::cerr << "rect bottom right y " << rect->rect().bottomRight().y() << std::endl;
+    //std::cerr << "rect y + height*scale " << rect->rect().y() + height_*absoluteTransform_.yScale() << std::endl;
     //std::cerr << "scene height " << scene()->height() << std::endl;*/
     prepareGeometryChange();
     if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < scene()->height() /*&& rect->rect().height() > 5*/) {
-        show();
-        rect->show();
+        std::cerr << "rect is visible " << rect->isVisible() << std::endl;
+        if(!rect->isVisible()) {
+            sceneData.scene->addItem(rect);
+            this->show();
+            rect->show();
+        }
+        std::cerr << "rect should now be visible " << rect->isVisible() << std::endl;
     } else {
-        hide();
-        rect->hide();
+        if (rect->isVisible()) {
+            sceneData.scene->removeItem(rect);
+            this->hide();
+            rect->hide();
+        }
+        std::cerr << "rect should now be not visible visible " << rect->isVisible() << std::endl;
     }
+
+
 /*
     std::cerr << " rect height with get height  " << getHeight() << std::endl;
     std::cerr << " rect height manually  " << rect->rect().height() << std::endl;
@@ -83,13 +84,20 @@ void moe::Rect::setWidth(const qreal& width)
 
 void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform)
 {
+
     rect = sceneData.scene->addRect(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
             width_ * absoluteTransform_.xScale(),
             height_ * absoluteTransform_.yScale(),
             *pen_, *brush_);
+    /*
+     * todo test remove the rect at the start and add it later if its inside the scene
+     */
+    rect->hide();
+    sceneData.scene->removeItem(rect);
     sceneData.scene->addItem(this);
+    this->hide();
 }
 
 QRectF moe::Rect::boundingRect() const

@@ -23,6 +23,11 @@ namespace moe {
         void addBlock(SeqDiagBlock *innerBlock);
 
         bool checkClusterCriteria(Renderable * innerBlock);
+
+       /* virtual void hideRenderable() override ;
+
+        virtual void showRenderable() override;*/
+
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

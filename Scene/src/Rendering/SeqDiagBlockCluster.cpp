@@ -60,7 +60,7 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
 
             if(!isInScene)
             {
-                std::cerr << "must reshown because it got reclustered now" << std::endl;
+               // std::cerr << "must reshown because it got reclustered now" << std::endl;
                 data.scene->addItem(rect);
                 data.scene->addItem(this);
                 isInScene = true;
@@ -71,10 +71,11 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
                 child->removeFromScene(data);
             }
 
-            std::cerr << "children should now vanish and only the cluster appear" << std::endl;
+            //std::cerr << "children should now vanish and only the cluster appear" << std::endl;
 
             isClustered = true;
         }
+        checkInSceneBorders(data);
     } else {
 
         if(this->isClustered)

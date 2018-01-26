@@ -16,7 +16,7 @@ void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
 {
 
     updateRectTranform();
-    //checkInSceneBorders(sceneData);
+    checkInSceneBorders(sceneData);
 
 }
 
@@ -87,7 +87,7 @@ void moe::Rect::updateRectTranform() {
 
 void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
     if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < sceneData.scene->height() /*&& rect->rect().height() > 5*/) {
-        std::cerr << " is this rect visible ? " << rect->isVisible() << std::endl;
+       // std::cerr << " is this rect visible ? " << rect->isVisible() << std::endl;
         if(!isInScene) {
             sceneData.scene->addItem(rect);
             sceneData.scene->addItem(this);
@@ -95,7 +95,7 @@ void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
             isInScene = true;
             //this->show();
             //rect->show();
-            std::cerr << "rect should now be visible " << rect->isVisible() << std::endl;
+            //std::cerr << "rect should now be visible " << rect->isVisible() << std::endl;
         }
     } else {
         if (isInScene) {
@@ -105,7 +105,7 @@ void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
             isInScene = false;
             //this->hide();
             //rect->hide();
-            std::cerr << "rect should now be not visible visible " << rect->isVisible() << std::endl;
+           // std::cerr << "rect should now be not visible visible " << rect->isVisible() << std::endl;
         }
     }
 

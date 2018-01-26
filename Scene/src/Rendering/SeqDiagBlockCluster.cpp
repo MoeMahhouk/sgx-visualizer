@@ -57,6 +57,7 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
     {
         if(!isClustered)
         {
+
             if(!isInScene)
             {
                 std::cerr << "must reshown because it got reclustered now" << std::endl;

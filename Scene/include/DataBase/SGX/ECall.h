@@ -32,14 +32,16 @@ namespace moe  {
             //std::cerr << " ECALL position mulitplicated with factor : " << (relative_start_time_ + total_time_)  << std::endl;
             //std::cerr << " ECALL totaltime mulitplicated with factor (height) : " << (total_time_ * factor)  << std::endl;
             //SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow));
-            SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::yellow));
-            callBlock->addBlock(clusterTest);
-            QVector<SeqDiagBlockCluster *> subClusterList;
             callBlock->initializeStats(callInfo);
-            if (!children_.isEmpty()) {
+            if (!children_.isEmpty())
+            {
+                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::yellow));
+                callBlock->addBlock(clusterTest);
+                QVector<SeqDiagBlockCluster *> subClusterList;
                 subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow)));
 
-                for (Call *call : children_) {
+                for (Call *call : children_)
+                {
                     SeqDiagBlock *childRenderable = call->toRenderable(factor);
 
                     if (subClusterList.back()->checkClusterCriteria(childRenderable))
@@ -51,9 +53,9 @@ namespace moe  {
                     }
                     //callBlock->addBlock(childRenderable);
                 }
-            }
-            for (SeqDiagBlockCluster *subCluster: subClusterList) {
-                clusterTest->addBlock(subCluster);
+                for (SeqDiagBlockCluster *subCluster: subClusterList) {
+                    clusterTest->addBlock(subCluster);
+                }
             }
             return callBlock;
         }

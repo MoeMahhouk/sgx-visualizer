@@ -43,11 +43,11 @@ namespace moe {
                                                                  total_time_ * factor
             );
 
-            SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster();
-            threadSeqDiag->addBlock(clusterTest);
-            QVector<SeqDiagBlockCluster *> subClusterList;
             if (!threadEcalls_.isEmpty())
             {
+                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster();
+                threadSeqDiag->addBlock(clusterTest);
+                QVector<SeqDiagBlockCluster *> subClusterList;
                 subClusterList.push_back(new SeqDiagBlockCluster());
                 for (ECall *eCall : threadEcalls_)
                 {
@@ -63,10 +63,9 @@ namespace moe {
                     //clusterTest->addBlock(eCallRenderable);
                     //threadSeqDiag->addBlock(eCallRenderable);
                 }
-
-            }
-            for (SeqDiagBlockCluster *subCluster: subClusterList) {
-                clusterTest->addBlock(subCluster);
+                for (SeqDiagBlockCluster *subCluster: subClusterList) {
+                    clusterTest->addBlock(subCluster);
+                }
             }
             return threadSeqDiag;
 

@@ -3,6 +3,7 @@
 //
 
 //#include <assert.h>
+#include <Utility/MathUtility.h>
 #include "DataBase/SGX/SgxDatabaseStructure.h"
 
 moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QString &type) : DataBaseManager(path) {
@@ -17,6 +18,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     loadExistingEnclaves();
     loadECallTypeList();
     loadOCallTypeList();
+    //loadEcallsStats(); //ToDo delete this later, this is only for test
 
     initializeThreads();
     initializeECallsAndOCalls();
@@ -550,9 +552,47 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
             CallStatistics ecallStats;
             ecallStats.callId_ = query.value(0).toInt();
             ecallStats.callSymbolName_ = query.value(1).toString();
-            ecallStats.callAvg_ = query.value(2).toDouble();
+            ecallStats.callAvg_ = query.value(2).toReal();
             ecallStatistics.push_back(ecallStats);
         }
     }
 
+    QMap<int, QVector<uint64_t >> medianTotalTimeListMap;
+    int id;
+    uint64_t totalTime;
+    QSqlQuery medianQuery;
+    medianQuery.prepare("SELECT e1.call_id as call_id ,(e2.time - e1.time) AS total_time "
+                                "FROM events AS e1 JOIN events as e2 ON e1.id = e2.call_event "
+                                "WHERE e1.type = 14 AND e2.type = 15 "
+                                "order BY call_id, total_time ");
+    if(!medianQuery.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        while (medianQuery.next())
+        {
+            id = medianQuery.value(0).toInt();
+            totalTime = (uint64_t) medianQuery.value(1).toDouble();
+            medianTotalTimeListMap[id].push_back(totalTime);
+            /*if(!medianTotalTimeListMap.count(id)){
+                QVector<uint64_t > totalTimeList;
+                totalTimeList.push_back(totalTime);
+                medianTotalTimeListMap.insert(id,totalTimeList);
+            } else {
+                medianTotalTimeListMap.value(id).push_back(totalTime);
+            }*/
+        }
+
+        for (CallStatistics ecallStats : ecallStatistics)
+        {
+            ecallStatistics[ecallStats.callId_].median_ = median(medianTotalTimeListMap[ecallStats.callId_]);
+            ecallStatistics[ecallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ecallStats.callId_],ecallStats.callAvg_);
+        }
+    }
+
+}
+
+const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getEcallStatistics() const {
+    return ecallStatistics;
 }

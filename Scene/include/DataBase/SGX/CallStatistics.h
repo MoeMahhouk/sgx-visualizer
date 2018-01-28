@@ -9,11 +9,11 @@
 #include <QtCore/QString>
 
 namespace moe {
-    typedef unsigned double udouble_t;
+
     struct CallStatistics {
         QString callSymbolName_;
         int callId_;
-        udouble_t callAvg_, meanValue_,standardDeviation_, _99thPercentile_, _95thPercentile_, _90thPercentile_;
+        qreal callAvg_, median_,standardDeviation_, _99thPercentile_, _95thPercentile_, _90thPercentile_;
     };
 }
 #endif //SCENE_CALLSTATISTICS_H

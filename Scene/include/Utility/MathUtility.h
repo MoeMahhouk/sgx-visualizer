@@ -5,8 +5,10 @@
 #ifndef SCENE_MATHUTILITY_H
 #define SCENE_MATHUTILITY_H
 
+#include <math.h>
 #include <type_traits>
-
+#include <QString>
+#include <QVector>
 
 namespace moe {
     template <typename T> inline constexpr
@@ -27,6 +29,27 @@ namespace moe {
         return signum(x, std::is_signed<T>());
     }
 
+    inline double median(QVector<uint64_t > sortedTotalTimeList)
+    {
+        int listSize = sortedTotalTimeList.size();
+        return listSize % 2 == 0 ? (sortedTotalTimeList[(listSize / 2) - 1] + sortedTotalTimeList[listSize/2]) / 2.0 : sortedTotalTimeList[(listSize-1) / 2];
+    }
+
+    inline double varianz(QVector<uint64_t> sortedTotaltimeList, qreal average)
+    {
+        int listSize = sortedTotaltimeList.length();
+        double varianz = 0;
+        for (uint64_t totalTimeElement : sortedTotaltimeList)
+        {
+            varianz += pow(totalTimeElement - average, 2);
+        }
+        return varianz / listSize;
+    }
+
+    inline double standardDeviation(QVector<uint64_t> sortedTotaltimeList, qreal average)
+    {
+        return sqrt(varianz(sortedTotaltimeList,average));
+    }
 
     inline QString checkTimeUnit(qreal time)
     {

@@ -56,6 +56,9 @@ namespace moe {
         uint64_t getProgramEndTime();
 
         void loadEcallsStats();
+
+        const QVector<CallStatistics> &getEcallStatistics() const;
+
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -66,10 +69,12 @@ namespace moe {
         void loadECallTypeList();
         void loadOCallTypeList();
         void loadExistingEnclaves();
-        QString getInvolvedThreads();
 
+        QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
         QVector<CallStatistics> ecallStatistics;
+
+    private:
         QVector<CallStatistics> ocallStatistics;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;

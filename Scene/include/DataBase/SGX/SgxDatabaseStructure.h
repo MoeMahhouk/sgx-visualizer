@@ -57,6 +57,8 @@ namespace moe {
 
         void loadEcallsStats();
 
+        void loadOcallsStats();
+
         const QVector<CallStatistics> &getEcallStatistics() const;
 
     private:
@@ -73,8 +75,6 @@ namespace moe {
         QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
         QVector<CallStatistics> ecallStatistics;
-
-    private:
         QVector<CallStatistics> ocallStatistics;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;

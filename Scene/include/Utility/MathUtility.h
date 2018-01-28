@@ -51,6 +51,12 @@ namespace moe {
         return sqrt(varianz(sortedTotaltimeList,average));
     }
 
+    template <typename T> inline constexpr
+    bool isInteger(T x)
+    {
+        return floorf(x) == x;
+    }
+
     inline QString checkTimeUnit(qreal time)
     {
         if (time == 0) {

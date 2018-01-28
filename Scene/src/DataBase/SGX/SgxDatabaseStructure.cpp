@@ -590,9 +590,59 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
             ecallStatistics[ecallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ecallStats.callId_],ecallStats.callAvg_);
         }
     }
-
 }
 
-const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getEcallStatistics() const {
+const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getEcallStatistics() const
+{
     return ecallStatistics;
+}
+
+void moe::SgxDatabaseStructure::loadOcallsStats()
+{
+    QSqlQuery query;
+    query.prepare("SELECT oc.id, oc.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average "
+                          "FROM ocalls AS oc JOIN events AS e1 ON oc.id = e1.call_id JOIN events AS e2 ON e1.id = e2.call_event "
+                          "WHERE e1.type = 16 AND e2.type = 17 GROUP BY oc.id");
+
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        while(query.next())
+        {
+            CallStatistics ocallStats;
+            ocallStats.callId_ = query.value(0).toInt();
+            ocallStats.callSymbolName_ = query.value(1).toString();
+            ocallStats.callAvg_ = query.value(2).toReal();
+            ocallStatistics.push_back(ocallStats);
+        }
+    }
+
+    QMap<int, QVector<uint64_t >> medianTotalTimeListMap;
+    int id;
+    uint64_t totalTime;
+    QSqlQuery medianQuery;
+    medianQuery.prepare("SELECT e1.call_id as call_id ,(e2.time - e1.time) AS total_time "
+                                "FROM events AS e1 JOIN events as e2 ON e1.id = e2.call_event "
+                                "WHERE e1.type = 16 AND e2.type = 17 "
+                                "order BY call_id, total_time ");
+    if(!medianQuery.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        while (medianQuery.next())
+        {
+            id = medianQuery.value(0).toInt();
+            totalTime = (uint64_t) medianQuery.value(1).toDouble();
+            medianTotalTimeListMap[id].push_back(totalTime);
+        }
+
+        for (CallStatistics ocallStats : ocallStatistics)
+        {
+            ocallStatistics[ocallStats.callId_].median_ = median(medianTotalTimeListMap[ocallStats.callId_]);
+            ocallStatistics[ocallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ocallStats.callId_],ocallStats.callAvg_);
+        }
+    }
 }

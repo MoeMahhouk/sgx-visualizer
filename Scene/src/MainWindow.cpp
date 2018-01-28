@@ -881,7 +881,6 @@ void MainWindow::updateTraces() {
     sceneRootNode_->initialize(data, sceneTransformation);
     //zoomAndScrollTofirstEvent();
     render();
-
 }
 
 

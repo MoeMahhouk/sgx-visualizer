@@ -18,7 +18,7 @@ namespace moe {
 
         virtual ~SeqDiagBlockCluster();
 
-        //virtual void initializeStats(const CallStats &callsInfos) override ;
+        //virtual void initializeStats(const CallHoverInfo &callsInfos) override ;
 
         void addBlock(SeqDiagBlock *innerBlock);
 

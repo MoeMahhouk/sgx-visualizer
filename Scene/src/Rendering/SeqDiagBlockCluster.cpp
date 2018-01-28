@@ -10,7 +10,7 @@ moe::SeqDiagBlockCluster::SeqDiagBlockCluster(moe::Transform2D transform, qreal 
     //isClustered = false;
 }
 
-/*void moe::SeqDiagBlockCluster::initializeStats(const moe::CallStats &callsInfos) {
+/*void moe::SeqDiagBlockCluster::initializeStats(const moe::CallHoverInfo &callsInfos) {
     SeqDiagBlock::initializeStats(callsInfos);
 }*/
 

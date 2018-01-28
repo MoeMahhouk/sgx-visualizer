@@ -20,6 +20,7 @@
 #include "EventMap.h"
 #include "OCallTypes.h"
 #include "ECallTypes.h"
+#include "CallStatistics.h"
 
 namespace moe {
 
@@ -29,12 +30,8 @@ namespace moe {
 
         SgxDatabaseStructure(const QString& path = "newDataBaseCreated", const QString& type = "QSQLITE");
 
-        virtual ~SgxDatabaseStructure() {
-            /*for (int i = 0; i < callStatsMap.size() ; ++i) {
-                auto it = callStatsMap[i];
-                delete it;
-            }
-            callStatsMap.clear();*/
+        virtual ~SgxDatabaseStructure()
+        {
             close();
         };
 
@@ -58,6 +55,7 @@ namespace moe {
 
         uint64_t getProgramEndTime();
 
+        void loadEcallsStats();
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -68,14 +66,15 @@ namespace moe {
         void loadECallTypeList();
         void loadOCallTypeList();
         void loadExistingEnclaves();
-        void loadEcallsOcallsStats();
         QString getInvolvedThreads();
 
         int searchThreadIndex(int threadId);
+        QVector<CallStatistics> ecallStatistics;
+        QVector<CallStatistics> ocallStatistics;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;
         QMap<int, QString> enclavesList; //stores the pair eid and enclave name
-        QHash<int, CallStats> callStatsMap;
+        QHash<int, CallHoverInfo> callHoverInfoMap;
         TYPES::ACTION_LIST currentAction;
         QVector<OCallTypes> oCallTypeList; // this list is not for rendering, it is for the filtering stuff
         QVector<ECallTypes> eCallTypeList; //this list is not for rendering, it is for the filtering stuff

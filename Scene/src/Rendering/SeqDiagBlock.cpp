@@ -37,7 +37,7 @@ moe::SeqDiagBlock::~SeqDiagBlock()
     delete lineOffset_;
 }
 
-void moe::SeqDiagBlock::initializeStats(const CallStats &callsInfos) {
+void moe::SeqDiagBlock::initializeStats(const CallHoverInfo &callsInfos) {
     callsInfos_.childrenCounter = callsInfos.childrenCounter;
     callsInfos_.childrenTotalRuntime = callsInfos.childrenTotalRuntime;
     callsInfos_.callName = callsInfos.callName;

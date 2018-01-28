@@ -6,7 +6,7 @@
 #define SCENE_SEQDIAGBLOCK_H
 
 
-#include "DataBase/SGX/CallStats.h"
+#include "DataBase/SGX/CallHoverInfo.h"
 #include "Rect.h"
 
 namespace moe {
@@ -23,7 +23,7 @@ namespace moe {
 
         void addBlock(Renderable *innerBlock);
 
-        virtual void initializeStats(const CallStats &callsInfos);
+        virtual void initializeStats(const CallHoverInfo &callsInfos);
 
         virtual QRectF boundingRect() const override;
 
@@ -40,7 +40,7 @@ namespace moe {
 
         virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 
-        CallStats callsInfos_;
+        CallHoverInfo callsInfos_;
 
         Renderable *lineOffset_;
 

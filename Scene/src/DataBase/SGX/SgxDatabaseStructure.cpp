@@ -265,26 +265,17 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                 ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,0,symbol_name,isFail);
                 calls[id] = eCall;
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
-                if (!callStatsMap.count(id) && conditionQuery.isEmpty())
+                if (!callHoverInfoMap.count(id) && conditionQuery.isEmpty())
                 {
-                    /*CallStats callStat;
-                    callStat.callTotalTime = total_time;
-                    callStat.callName = symbol_name;
-                    callStat.enclaveId = eid;
-                    callStat.enclaveBinaryName = enclavesList[eid];
-
-                    callStatsMap[id] = callStat;*/
-                    callStatsMap[id].callTotalTime += total_time;
-                    callStatsMap[id].callName += symbol_name;
-                    callStatsMap[id].enclaveId += eid;
-                    callStatsMap[id].enclaveBinaryName += enclavesList[eid];
-                    eCall->callInfo = callStatsMap[id];
+                    callHoverInfoMap[id].callTotalTime += total_time;
+                    callHoverInfoMap[id].callName += symbol_name;
+                    callHoverInfoMap[id].enclaveId += eid;
+                    callHoverInfoMap[id].enclaveBinaryName += enclavesList[eid];
+                    eCall->callInfo = callHoverInfoMap[id];
 
                 } else {
 
-                    calls[id]->callInfo = callStatsMap[id];
-                    //eCall->callInfo = callStatsMap[id];
-                    //std::cerr << callStatsMap[id].callName.toStdString() << std::endl;
+                    calls[id]->callInfo = callHoverInfoMap[id];
                 }
 
                 if(call_event != 0)
@@ -302,8 +293,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                         calls[call_event]->callInfo.childrenCounter += 1;
                         calls[call_event]->callInfo.childrenTotalRuntime += total_time;
 
-                        callStatsMap[call_event].childrenCounter += 1;
-                        callStatsMap[call_event].childrenTotalRuntime += total_time;
+                        callHoverInfoMap[call_event].childrenCounter += 1;
+                        callHoverInfoMap[call_event].childrenTotalRuntime += total_time;
                     }
                 } else {
                     threads_[searchThreadIndex(involvedThreadId)].threadEcalls_.push_back(eCall);
@@ -319,17 +310,13 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                                          symbol_address_normalized,symbol_file_name, isFail);
                 calls[id] = oCall;
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
-                if (!callStatsMap.count(id) && conditionQuery.isEmpty())
+                if (!callHoverInfoMap.count(id) && conditionQuery.isEmpty())
                 {
-                   /* CallStats callStat;
-                    //callStat.callTotalTime = total_time;
-                    //callStat.callName = symbol_name;
-                    callStatsMap[id] = callStat;*/
-                    callStatsMap[id].callTotalTime = total_time;
-                    callStatsMap[id].callName = symbol_name;
-                    oCall->callInfo = callStatsMap[id];
+                    callHoverInfoMap[id].callTotalTime = total_time;
+                    callHoverInfoMap[id].callName = symbol_name;
+                    oCall->callInfo = callHoverInfoMap[id];
                 } else {
-                    calls[id]->callInfo = callStatsMap[id];
+                    calls[id]->callInfo = callHoverInfoMap[id];
                 }
 
                 if(call_event != 0)
@@ -345,8 +332,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                         calls[call_event]->callInfo.childrenCounter += 1;
                         calls[call_event]->callInfo.childrenTotalRuntime += total_time;
 
-                        callStatsMap[call_event].childrenCounter += 1;
-                        callStatsMap[call_event].childrenTotalRuntime += total_time;
+                        callHoverInfoMap[call_event].childrenCounter += 1;
+                        callHoverInfoMap[call_event].childrenTotalRuntime += total_time;
                     }
 
                 } else { //this should never be reachable unless the database is corrupted
@@ -523,7 +510,8 @@ int moe::SgxDatabaseStructure::searchThreadIndex(int threadId)
     return -1;
 }
 
-void moe::SgxDatabaseStructure::loadExistingEnclaves() {
+void moe::SgxDatabaseStructure::loadExistingEnclaves()
+{
     QSqlQuery query;
     query.prepare("SELECT eid, file_name as enclave_name FROM events WHERE type = 8 ORDER BY eid");
     if(!query.exec())
@@ -540,6 +528,31 @@ void moe::SgxDatabaseStructure::loadExistingEnclaves() {
     }
 }
 
-const QMap<int, QString> &moe::SgxDatabaseStructure::getEnclavesMap() const {
+const QMap<int, QString> &moe::SgxDatabaseStructure::getEnclavesMap() const
+{
     return enclavesList;
+}
+
+void moe::SgxDatabaseStructure::loadEcallsStats()
+{
+    QSqlQuery query;
+    query.prepare("SELECT ec.id, ec.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average "
+                          "FROM ecalls AS ec JOIN events AS e1 ON ec.id = e1.call_id JOIN events AS e2 ON e1.id = e2.call_event "
+                          "WHERE e1.type = 14 AND e2.type = 15 GROUP BY ec.id");
+
+    if(!query.exec())
+    {
+        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+        while(query.next())
+        {
+            CallStatistics ecallStats;
+            ecallStats.callId_ = query.value(0).toInt();
+            ecallStats.callSymbolName_ = query.value(1).toString();
+            ecallStats.callAvg_ = query.value(2).toDouble();
+            ecallStatistics.push_back(ecallStats);
+        }
+    }
+
 }

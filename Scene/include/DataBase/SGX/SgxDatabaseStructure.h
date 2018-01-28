@@ -61,6 +61,7 @@ namespace moe {
 
         const QVector<CallStatistics> &getEcallStatistics() const;
 
+        const QVector<CallStatistics> &getOcallStatistics() const;
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -70,8 +71,8 @@ namespace moe {
         void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
         void loadOCallTypeList();
-        void loadExistingEnclaves();
 
+        void loadExistingEnclaves();
         QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
         QVector<CallStatistics> ecallStatistics;

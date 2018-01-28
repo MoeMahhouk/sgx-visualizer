@@ -29,6 +29,12 @@ namespace moe {
         return signum(x, std::is_signed<T>());
     }
 
+    template <typename T> inline constexpr
+    bool isInteger(T x)
+    {
+        return floorf(x) == x;
+    }
+
     inline double median(QVector<uint64_t > sortedTotalTimeList)
     {
         int listSize = sortedTotalTimeList.size();
@@ -51,10 +57,11 @@ namespace moe {
         return sqrt(varianz(sortedTotaltimeList,average));
     }
 
-    template <typename T> inline constexpr
-    bool isInteger(T x)
+    inline double percentile(QVector<uint64_t> sortedTotaltimeList, qreal percent)
     {
-        return floorf(x) == x;
+        int listSize = sortedTotaltimeList.size();
+        double result = listSize * percent;
+        return isInteger(result) ? (sortedTotaltimeList[result - 1] + sortedTotaltimeList[result]) / 2 : sortedTotaltimeList[ceilf(result) - 1];
     }
 
     inline QString checkTimeUnit(qreal time)

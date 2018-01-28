@@ -881,6 +881,11 @@ void MainWindow::updateTraces() {
     sceneRootNode_->initialize(data, sceneTransformation);
     //zoomAndScrollTofirstEvent();
     render();
+    /*for (moe::CallStatistics callstats : db->getOcallStatistics()) {
+        std::cerr << "call id is "  << callstats.callId_ << " call name is " << callstats.callSymbolName_.toStdString()
+                  << " call avg is " << callstats.callAvg_ << " call median " << callstats.median_ << " call standard deviation " << callstats.standardDeviation_
+                  << " call 99perc is " << callstats._99thPercentile_ << " call 95perc is " << callstats._95thPercentile_ << " call 90perc is " << callstats._90thPercentile_ << std::endl;
+    }*/
 }
 
 

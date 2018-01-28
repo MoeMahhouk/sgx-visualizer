@@ -19,7 +19,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     loadECallTypeList();
     loadOCallTypeList();
     //loadEcallsStats(); //ToDo delete this later, this is only for test
-
+    //loadOcallsStats();
     initializeThreads();
     initializeECallsAndOCalls();
 
@@ -575,19 +575,15 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
             id = medianQuery.value(0).toInt();
             totalTime = (uint64_t) medianQuery.value(1).toDouble();
             medianTotalTimeListMap[id].push_back(totalTime);
-            /*if(!medianTotalTimeListMap.count(id)){
-                QVector<uint64_t > totalTimeList;
-                totalTimeList.push_back(totalTime);
-                medianTotalTimeListMap.insert(id,totalTimeList);
-            } else {
-                medianTotalTimeListMap.value(id).push_back(totalTime);
-            }*/
         }
 
         for (CallStatistics ecallStats : ecallStatistics)
         {
             ecallStatistics[ecallStats.callId_].median_ = median(medianTotalTimeListMap[ecallStats.callId_]);
             ecallStatistics[ecallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ecallStats.callId_],ecallStats.callAvg_);
+            ecallStatistics[ecallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.99);
+            ecallStatistics[ecallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.95);
+            ecallStatistics[ecallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.90);
         }
     }
 }
@@ -643,6 +639,13 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
         {
             ocallStatistics[ocallStats.callId_].median_ = median(medianTotalTimeListMap[ocallStats.callId_]);
             ocallStatistics[ocallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ocallStats.callId_],ocallStats.callAvg_);
+            ocallStatistics[ocallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.99);
+            ocallStatistics[ocallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.95);
+            ocallStatistics[ocallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.90);
         }
     }
+}
+
+const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getOcallStatistics() const {
+    return ocallStatistics;
 }

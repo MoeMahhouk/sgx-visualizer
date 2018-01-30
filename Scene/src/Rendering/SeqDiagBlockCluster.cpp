@@ -80,7 +80,8 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
 
         if(this->isClustered)
         {
-            if(isInScene) {
+            if(isInScene)
+            {
                 hideInScene();
                 data.scene->removeItem(rect);
                 data.scene->removeItem(this);

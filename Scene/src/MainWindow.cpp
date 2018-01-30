@@ -111,6 +111,8 @@ void MainWindow::createActions()
     openAction_->setShortcuts(QKeySequence::Open);
     openAction_->setStatusTip(tr("Open an existing executable"));
     connect(openAction_,SIGNAL(triggered()), this, SLOT(open()));
+
+
 }
 
 void MainWindow::createToolbar()
@@ -157,6 +159,7 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     toolbar->addWidget(reset);
     toolbar->addSeparator();
 
+
     auto scrollLabel = new QLabel("Scroll Options: ");
     toolbar->addWidget(scrollLabel);
 
@@ -172,6 +175,15 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
     toolbar->addWidget(scrollToNextEventButton);
     toolbar->setStyleSheet("QToolBar{spacing:5px;}");
+    scrollToNextEventButton->setStatusTip("Scroll to next ECall");
+
+    QAction *scrollAction = new QAction(tr("scrollnext"),this);
+    scrollAction->setShortcut(QKeySequence::FindNext);
+    scrollAction->setStatusTip(tr("Scroll to next Ecall"));
+    connect(scrollAction, SIGNAL(triggered()), this, SLOT(scrollToNextEvent()));
+    scrollToNextEventButton->addAction(scrollAction);
+
+
 }
 
 void MainWindow::render()

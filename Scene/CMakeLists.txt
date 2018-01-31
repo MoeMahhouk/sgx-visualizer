@@ -46,7 +46,7 @@ add_compile_options(
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} include/DataBase/SGX/CallStatistics.h)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
 #use the widgets/Sql module from Qt 5
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql)

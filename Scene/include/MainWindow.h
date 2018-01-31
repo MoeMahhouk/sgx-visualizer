@@ -43,17 +43,19 @@ private slots:
     void scrollLeftPressed();
     void scrollToNextEvent();
 
+    void loadOCallStats();
+    void loadECallStats();
 protected:
     void wheelEvent ( QWheelEvent * event ) override;
-private:
 
+private:
     moe::Renderable *sceneRootNode_;
     moe::Renderable *sequenceListNode_;
+
+
     moe::MeasureLine *measureLine_ = 0;
 
-
     moe::Transform2D sceneTransformation = moe::Transform2D(1,0,0,1,0,0);
-
     void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1);
     void createMenus();
     void createStatusBar();
@@ -74,27 +76,28 @@ private:
     void loadFile(const QString &fileName);
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
-    void clearSequenceListNode();
 
+    void clearSequenceListNode();
     QListView *filterListView;
     moe::SgxDatabaseStructure* db = 0;
-   // Ui::MainWindow *ui;
+    // Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming
-    qreal yOffset_ = 0;
 
+    qreal yOffset_ = 0;
     QWidget *viewArea_;
     QToolBar *viewToolbar_;
     QGraphicsView *view_;
     QGraphicsScene *scene_;
     QMenu *fileMenu_;
     QMenu *viewMenu_;
+    QMenu *loadStatistics_;
     QMenu *helpMenu_;
     QMenuBar *menuBar_;
     QToolBar *toolBar_;
+
+
     QStatusBar *statusBar_;
-
-
     /*
      * test stuff
      */
@@ -135,6 +138,8 @@ private:
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;
     QAction *enclaveFilterAction_;
+    QAction *loadECallStats_;
+    QAction *loadOCallStats_;
     QAction *timeFilterAction_;
     QAction *applyDockAction_;
     QWidget *filterControls_;

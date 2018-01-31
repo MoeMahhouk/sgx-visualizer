@@ -86,6 +86,11 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
+    loadStatistics_ = new QMenu("Load");
+    fileMenu_->addMenu(loadStatistics_);
+    loadStatistics_->addAction(loadECallStats_);
+    loadStatistics_->addAction(loadOCallStats_);
+
 
     viewMenu_ = menuBar()->addMenu(tr("View"));
     viewMenu_->addAction(timeFilterAction_);
@@ -112,6 +117,17 @@ void MainWindow::createActions()
     openAction_->setStatusTip(tr("Open an existing executable"));
     connect(openAction_,SIGNAL(triggered()), this, SLOT(open()));
 
+    loadECallStats_ = new QAction(tr("ECall Statistics"), this);
+    loadECallStats_->setStatusTip(tr("Generate the Statistics Of ECalls"));
+    connect(loadECallStats_, SIGNAL(triggered()), this, SLOT(loadECallStats()));
+    loadECallStats_->setDisabled(true);
+    //connect(this, SIGNAL(dataBaseLoaded(db)), loadECallStats_, SLOT(setEnabled(bool)));
+
+    loadOCallStats_ = new QAction(tr("OCall Statistics"), this);
+    loadOCallStats_->setStatusTip(tr("Generate the Statistics Of OCalls"));
+    connect(loadOCallStats_, SIGNAL(triggered()), this, SLOT(loadOCallStats()));
+    loadOCallStats_->setDisabled(true);
+    //connect(this, SIGNAL(dataBaseLoaded(db)), loadOCallStats_, SLOT(setEnabled(bool)));
 
 }
 
@@ -165,23 +181,20 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
 
     QPushButton* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
+    scrollLeft->setShortcut(QKeySequence::MoveToPreviousChar);
     toolbar->addWidget(scrollLeft);
 
     QPushButton* scrollRight = new QPushButton(tr("Scroll Right ->"), toolbar);
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
+    scrollRight->setShortcut(QKeySequence::MoveToNextChar);
     toolbar->addWidget(scrollRight);
 
     QPushButton* scrollToNextEventButton = new QPushButton(tr("Next ECall"), toolbar);
     scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
+    scrollToNextEventButton->setShortcut(QKeySequence::FindNext);
+    scrollToNextEventButton->setStatusTip("Scroll to next ECall");
     toolbar->addWidget(scrollToNextEventButton);
     toolbar->setStyleSheet("QToolBar{spacing:5px;}");
-    scrollToNextEventButton->setStatusTip("Scroll to next ECall");
-
-    QAction *scrollAction = new QAction(tr("scrollnext"),this);
-    scrollAction->setShortcut(QKeySequence::FindNext);
-    scrollAction->setStatusTip(tr("Scroll to next Ecall"));
-    connect(scrollAction, SIGNAL(triggered()), this, SLOT(scrollToNextEvent()));
-    scrollToNextEventButton->addAction(scrollAction);
 
 
 }
@@ -263,6 +276,8 @@ void MainWindow::loadFile(const QString& fileName)
             delete db;
         }
         db = new moe::SgxDatabaseStructure(fileName);
+        loadECallStats_->setEnabled(true);
+        loadOCallStats_->setEnabled(true);
         updateTraces();
     }
 }
@@ -899,5 +914,14 @@ void MainWindow::updateTraces() {
                   << " call 99perc is " << callstats._99thPercentile_ << " call 95perc is " << callstats._95thPercentile_ << " call 90perc is " << callstats._90thPercentile_ << std::endl;
     }*/
 }
+
+void MainWindow::loadOCallStats() {
+
+}
+
+void MainWindow::loadECallStats() {
+
+}
+
 
 

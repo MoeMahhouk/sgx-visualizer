@@ -95,6 +95,8 @@ private:
     QMenu *helpMenu_;
     QMenuBar *menuBar_;
     QToolBar *toolBar_;
+    QDialog *eCallStatsDialog_;
+    QDialog *oCallStatsDialog_;
 
 
     QStatusBar *statusBar_;

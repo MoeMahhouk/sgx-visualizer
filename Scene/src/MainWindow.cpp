@@ -86,7 +86,7 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
-    loadStatistics_ = new QMenu("Load");
+    loadStatistics_ = new QMenu("Load Statistics",fileMenu_);
     fileMenu_->addMenu(loadStatistics_);
     loadStatistics_->addAction(loadECallStats_);
     loadStatistics_->addAction(loadOCallStats_);
@@ -117,13 +117,13 @@ void MainWindow::createActions()
     openAction_->setStatusTip(tr("Open an existing executable"));
     connect(openAction_,SIGNAL(triggered()), this, SLOT(open()));
 
-    loadECallStats_ = new QAction(tr("ECall Statistics"), this);
+    loadECallStats_ = new QAction(tr("ECall"), this);
     loadECallStats_->setStatusTip(tr("Generate the Statistics Of ECalls"));
     connect(loadECallStats_, SIGNAL(triggered()), this, SLOT(loadECallStats()));
     loadECallStats_->setDisabled(true);
     //connect(this, SIGNAL(dataBaseLoaded(db)), loadECallStats_, SLOT(setEnabled(bool)));
 
-    loadOCallStats_ = new QAction(tr("OCall Statistics"), this);
+    loadOCallStats_ = new QAction(tr("OCall"), this);
     loadOCallStats_->setStatusTip(tr("Generate the Statistics Of OCalls"));
     connect(loadOCallStats_, SIGNAL(triggered()), this, SLOT(loadOCallStats()));
     loadOCallStats_->setDisabled(true);
@@ -195,8 +195,12 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     scrollToNextEventButton->setStatusTip("Scroll to next ECall");
     toolbar->addWidget(scrollToNextEventButton);
     toolbar->setStyleSheet("QToolBar{spacing:5px;}");
+    toolbar->addSeparator();
 
-
+    auto statisticsLabel = new QLabel("Statistics: ");
+    toolbar->addWidget(statisticsLabel);
+    toolbar->addAction(loadECallStats_);
+    toolbar->addAction(loadOCallStats_);
 }
 
 void MainWindow::render()
@@ -906,13 +910,8 @@ void MainWindow::updateTraces() {
     visualizeThreads(db->getThreads_(), factor_);
     moe::SceneData data{scene_};
     sceneRootNode_->initialize(data, sceneTransformation);
-    //zoomAndScrollTofirstEvent();
+    zoomAndScrollTofirstEvent();
     render();
-    /*for (moe::CallStatistics callstats : db->getOcallStatistics()) {
-        std::cerr << "call id is "  << callstats.callId_ << " call name is " << callstats.callSymbolName_.toStdString()
-                  << " call avg is " << callstats.callAvg_ << " call median " << callstats.median_ << " call standard deviation " << callstats.standardDeviation_
-                  << " call 99perc is " << callstats._99thPercentile_ << " call 95perc is " << callstats._95thPercentile_ << " call 90perc is " << callstats._90thPercentile_ << std::endl;
-    }*/
 }
 
 void MainWindow::loadOCallStats() {
@@ -920,78 +919,107 @@ void MainWindow::loadOCallStats() {
     if(db->getOcallStatistics().isEmpty())
     {
         db->loadOcallsStats();
-        QDialog *dialog = new QDialog();
-        dialog->setWindowTitle(tr("OCall Statistics"));
+        oCallStatsDialog_ = new QDialog();
+        oCallStatsDialog_->setWindowTitle(tr("OCall Statistics"));
         QVBoxLayout *statsLayout = new QVBoxLayout();
 
         QTableWidget *table = new QTableWidget();
         table->setRowCount(db->getOcallStatistics().size());
         table->setColumnCount(8);
 
-        table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
         table->setHorizontalHeaderLabels(QString("ID;Call Name;Average;Mean Value;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
         for (int i = 0; i < table->rowCount(); ++i)
         {
-            table->setItem(i,0, new QTableWidgetItem(db->getOcallStatistics()[i].callId_));
+            table->setItem(i,0, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i].callId_)));
             table->setItem(i,1, new QTableWidgetItem(db->getOcallStatistics()[i].callSymbolName_));
-            table->setItem(i,2, new QTableWidgetItem(db->getOcallStatistics()[i].callAvg_));
-            table->setItem(i,3, new QTableWidgetItem(db->getOcallStatistics()[i].median_));
-            table->setItem(i,4, new QTableWidgetItem(db->getOcallStatistics()[i].standardDeviation_));
-            table->setItem(i,5, new QTableWidgetItem(db->getOcallStatistics()[i]._99thPercentile_));
-            table->setItem(i,6, new QTableWidgetItem(db->getOcallStatistics()[i]._95thPercentile_));
-            table->setItem(i,7, new QTableWidgetItem(db->getOcallStatistics()[i]._90thPercentile_));
+            table->setItem(i,2, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i].callAvg_,'f',2)));
+            table->setItem(i,3, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i].median_,'f',2)));
+            table->setItem(i,4, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i].standardDeviation_,'f',2)));
+            table->setItem(i,5, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i]._99thPercentile_,'f',2)));
+            table->setItem(i,6, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i]._95thPercentile_,'f',2)));
+            table->setItem(i,7, new QTableWidgetItem(QString::number(db->getOcallStatistics()[i]._90thPercentile_,'f',2)));
         }
-
-        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        table->show();
-        /*statsLayout->addWidget(table);
-        dialog->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-        dialog->setLayout(statsLayout);
-        dialog->show();*/
-        /*QAbstractItemModel* model = new QStandardItemModel();
-        model->insertColumns(0,8);
-        model->insertRows(0,db->getOcallStatistics().size()+1);
-        model->setData(model->index(0,0), tr("ID"));
-        model->setData(model->index(0,1), tr("Call Name"));
-        model->setData(model->index(0,2), tr("Average"));
-        model->setData(model->index(0,3), tr("Mean Value"));
-        model->setData(model->index(0,4), tr("Standard Deviation"));
-        model->setData(model->index(0,5), tr("99th Percentile"));
-        model->setData(model->index(0,6), tr("95th Percentile"));
-        model->setData(model->index(0,7), tr("90th Percentile"));
-        for (int i = 1; i < model->rowCount() ; ++i)
+        table->resizeColumnsToContents();
+        table->resizeRowsToContents();
+        int height = 0,width = 0;
+        for (int j = 0; j < table->columnCount() ; ++j)
         {
-            model->setData(model->index(i,0),db->getOcallStatistics()[i-1].callId_);
-            model->setData(model->index(i,1),db->getOcallStatistics()[i-1].callSymbolName_);
-            model->setData(model->index(i,2),db->getOcallStatistics()[i-1].callAvg_);
-            model->setData(model->index(i,3),db->getOcallStatistics()[i-1].median_);
-            model->setData(model->index(i,4),db->getOcallStatistics()[i-1].standardDeviation_);
-            model->setData(model->index(i,5),db->getOcallStatistics()[i-1]._99thPercentile_);
-            model->setData(model->index(i,6),db->getOcallStatistics()[i-1]._95thPercentile_);
-            model->setData(model->index(i,7),db->getOcallStatistics()[i-1]._90thPercentile_);
-
+            width += table->columnWidth(j)+6;
+            //width += table->horizontalHeader()->sectionSize(j);
         }
-        QTableView* tableView = new QTableView();
-        tableView->setModel(model);
-        tableView->horizontalHeader()->hide();
-        tableView->verticalHeader()->hide();
-        statsLayout->addWidget(tableView);
-        dialog->setLayout(statsLayout);
-        dialog->setBaseSize(tableView->width(),tableView->height());
-        dialog->adjustSize();
-        dialog->show();*/
-
-
-
+        //width += table->verticalHeader()->width()/2;
+        for (int k = 0; k < table->rowCount() ; ++k)
+        {
+            height += table->rowHeight(k)+6;
+            //height += table->verticalHeader()->sectionSize(k);
+        }
+        table->horizontalHeader()->setStretchLastSection(true);
+        table->verticalHeader()->setStretchLastSection(true);
+        //table->verticalHeader()->resizeContentsPrecision();
+        //table->horizontalHeader()->adjustSize();
+        //height += table->verticalHeader()->height();
+        //height += table->verticalHeader()->height();
+        //width += table->horizontalHeader()->width();
+        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        statsLayout->addWidget(table);
+        oCallStatsDialog_->setLayout(statsLayout);
+        //oCallStatsDialog_->adjustSize();
+        oCallStatsDialog_->setMinimumSize(width, height);
+        oCallStatsDialog_->show();
+    } else {
+        oCallStatsDialog_->show();
     }
-
-
-
 }
 
 void MainWindow::loadECallStats() {
+    if(db->getEcallStatistics().isEmpty())
+    {
+        db->loadEcallsStats();
+        eCallStatsDialog_ = new QDialog();
+        eCallStatsDialog_->setWindowTitle(tr("ECall Statistics"));
+        QVBoxLayout *statsLayout = new QVBoxLayout();
 
+        QTableWidget *table = new QTableWidget();
+        table->setRowCount(db->getEcallStatistics().size());
+        table->setColumnCount(8);
+
+
+        table->setHorizontalHeaderLabels(QString("ID;Call Name;Average;Mean Value;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
+        for (int i = 0; i < table->rowCount(); ++i)
+        {
+            table->setItem(i,0, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i].callId_)));
+            table->setItem(i,1, new QTableWidgetItem(db->getEcallStatistics()[i].callSymbolName_));
+            table->setItem(i,2, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i].callAvg_,'f',2)));
+            table->setItem(i,3, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i].median_,'f',2)));
+            table->setItem(i,4, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i].standardDeviation_,'f',2)));
+            table->setItem(i,5, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i]._99thPercentile_,'f',2)));
+            table->setItem(i,6, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i]._95thPercentile_,'f',2)));
+            table->setItem(i,7, new QTableWidgetItem(QString::number(db->getEcallStatistics()[i]._90thPercentile_,'f',2)));
+        }
+        table->resizeColumnsToContents();
+        table->resizeRowsToContents();
+        int height = 0,width = 0;
+        for (int j = 0; j < table->columnCount() ; ++j)
+        {
+            width += table->columnWidth(j)+6;
+        }
+        for (int k = 0; k < table->rowCount() ; ++k)
+        {
+            height += table->rowHeight(k)+3;
+        }
+        table->horizontalHeader()->setStretchLastSection(true);
+        table->verticalHeader()->setStretchLastSection(true);
+        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        statsLayout->addWidget(table);
+        eCallStatsDialog_->setLayout(statsLayout);
+        eCallStatsDialog_->setMinimumSize(width, height);
+        eCallStatsDialog_->show();
+    } else {
+        eCallStatsDialog_->show();
+    }
 }
 
 

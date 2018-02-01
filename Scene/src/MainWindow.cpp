@@ -627,7 +627,7 @@ uint64_t MainWindow::getTime(const QLineEdit &inputTime) const
     }
 }
 
-bool MainWindow::updateTime()
+bool MainWindow::updateTimeFilter()
 {
     bool isChanged = false;
     if(db)
@@ -803,7 +803,7 @@ void MainWindow::applyFilter()
     bool updateScene = false;
     if(!db)
         return;
-    if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves() | updateTime())
+    if(updateThreads() | updateECalls() | updateOCalls() | updateEnclaves() | updateTimeFilter())
     {
         updateScene = true;
         filter = new moe::ThreadFilter(db,chosenThreads.toList().toVector());
@@ -1021,6 +1021,3 @@ void MainWindow::loadECallStats() {
         eCallStatsDialog_->show();
     }
 }
-
-
-

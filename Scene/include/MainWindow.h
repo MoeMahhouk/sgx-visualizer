@@ -119,7 +119,7 @@ private:
     bool updateECalls();
     bool updateOCalls();
     bool updateEnclaves();
-    bool updateTime();
+    bool updateTimeFilter();
     uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsOcallsEnclavesAndTimeline();
     void clearQList();

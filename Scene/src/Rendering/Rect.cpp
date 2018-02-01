@@ -86,7 +86,7 @@ void moe::Rect::updateRectTranform() {
 }
 
 void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
-    if(rect->rect().bottomRight().y() > 0 && rect->rect().topRight().y() < sceneData.scene->height() /*&& rect->rect().height() > 5*/) {
+    if(rect->rect().bottomRight().y() > - 50 && rect->rect().topRight().y() < sceneData.scene->height() + 50 /*&& rect->rect().height() > 5*/) {
        // std::cerr << " is this rect visible ? " << rect->isVisible() << std::endl;
         if(!isInScene) {
             sceneData.scene->addItem(rect);

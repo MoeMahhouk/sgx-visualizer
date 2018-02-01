@@ -41,8 +41,8 @@ namespace moe {
 
         void updateRectTranform();
         void checkInSceneBorders(SceneData &sceneData);
-        void hideInScene();
-        void showInScene();
+        void hideInScene(SceneData &sceneData);
+        void showInScene(SceneData &sceneData);
 
         qreal width_, height_;
         // Renderable* offsetForLine_;

@@ -53,7 +53,7 @@ bool moe::SeqDiagBlockCluster::checkClusterCriteria(moe::Renderable *innerBlock)
 void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &parentTransform)
 {  //ToDo test it without the if, it might also work because we remove the item later from the scene when it hast height more than 150, so the ifs are redundant here
     updateRectTranform();
-    if ((rect->rect().height() / (lineOffset_->children_.size()+1)) < 10.0)
+    if ((rect->rect().height() / (lineOffset_->children_.size()+1)) < 15.0)
     {
         if(!isClustered)
         {
@@ -61,37 +61,49 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
             if(!isInScene)
             {
                // std::cerr << "must reshown because it got reclustered now" << std::endl;
-                data.scene->addItem(rect);
-                data.scene->addItem(this);
-                isInScene = true;
-                showInScene();
+                //data.scene->addItem(rect);
+                //data.scene->addItem(this);
+                //isInScene = true;
+                showInScene(data);
             }
-            for (Renderable* child : lineOffset_->children_)
+            /*for (Renderable* child : lineOffset_->children_)
             {
                 child->removeFromScene(data);
-            }
+            }*/
 
             //std::cerr << "children should now vanish and only the cluster appear" << std::endl;
 
             isClustered = true;
         }
+
+        for (Renderable* child : lineOffset_->children_)
+        {
+            child->removeFromScene(data);
+        }
         checkInSceneBorders(data);
     } else {
 
+        if(isInScene)
+        {
+            hideInScene(data);
+            //data.scene->removeItem(rect);
+            //data.scene->removeItem(this);
+            //isInScene = false;
+        }
         if(this->isClustered)
         {
-            if(isInScene)
+            /*if(isInScene)
             {
                 hideInScene();
                 data.scene->removeItem(rect);
                 data.scene->removeItem(this);
                 isInScene = false;
-            }
+            }*/
+            isClustered = false;
             for (Renderable* child : lineOffset_->children_)
             {
                 child->addToScene(data);
             }
-            isClustered = false;
         }
     }
     drawChildren(data);

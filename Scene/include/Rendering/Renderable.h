@@ -98,29 +98,6 @@ namespace moe {
             }
         }
 
-        /*{
-            class ClustNode : Renderable {
-                QTRect rect;
-                bool isClustered = false;
-
-                void onZoomed() {
-                    if near && isClustered:
-                        qtscene.remove(&rect);
-                        isClustered = true;
-                    else if far away and !isClustered
-                        qtscene.add(&rect);
-                        isClustered = false;
-                }
-
-                virtual void drawChildren() override  {
-                    if (!isClustered)
-                        Renderable::drawChildren();
-                    else
-                        update rect
-                }
-            };
-        }*/
-
         Transform2D relativeTransform_;
         Transform2D absoluteTransform_;
 

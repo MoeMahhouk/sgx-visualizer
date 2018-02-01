@@ -248,6 +248,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     view_->setGeometry(0, 0, this->rect().width()*0.8 - 50, this->rect().height()*0.8);
     view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
+    setCentralWidget(viewArea_);
     /*
      * a little bit buggy and should be refined later when writing the view seperate class :/
      * ToDo sometimes qt resize causes some shit scrolling issues -_-

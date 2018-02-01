@@ -44,29 +44,29 @@ void moe::Rect::setWidth(const qreal& width)
 void moe::Rect::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform)
 {
 
-    rect = sceneData.scene->addRect(
+    /*rect = sceneData.scene->addRect(
             absoluteTransform_.getX(),
             absoluteTransform_.getY(),
             width_ * absoluteTransform_.xScale(),
             height_ * absoluteTransform_.yScale(),
             *pen_, *brush_);
-
-    /*rect = new QGraphicsRectItem(absoluteTransform_.getX(),
+*/
+    rect = new QGraphicsRectItem(absoluteTransform_.getX(),
                                  absoluteTransform_.getY(),
                                  width_ * absoluteTransform_.xScale(),
                                  height_ * absoluteTransform_.yScale());
     rect->setBrush(*brush_);
-    rect->setPen(*pen_);*/
+    rect->setPen(*pen_);
     /*
      * todo test remove the rect at the start and add it later if its inside the scene
      */
     //rect->hide();
     //sceneData.scene->removeItem(rect);
     //sceneData.scene->addItem(rect);
-    sceneData.scene->addItem(this);
-    showInScene();
+    //sceneData.scene->addItem(this);
+    showInScene(sceneData);
     //this->hide();
-    isInScene = true;
+    //isInScene = true;
 }
 
 QRectF moe::Rect::boundingRect() const
@@ -89,20 +89,20 @@ void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
     if(rect->rect().bottomRight().y() > - 50 && rect->rect().topRight().y() < sceneData.scene->height() + 50 /*&& rect->rect().height() > 5*/) {
        // std::cerr << " is this rect visible ? " << rect->isVisible() << std::endl;
         if(!isInScene) {
-            sceneData.scene->addItem(rect);
-            sceneData.scene->addItem(this);
-            showInScene();
-            isInScene = true;
+            //sceneData.scene->addItem(rect);
+            //sceneData.scene->addItem(this);
+            showInScene(sceneData);
+            //isInScene = true;
             //this->show();
             //rect->show();
             //std::cerr << "rect should now be visible " << rect->isVisible() << std::endl;
         }
     } else {
         if (isInScene) {
-            hideInScene();
-            sceneData.scene->removeItem(rect);
-            sceneData.scene->removeItem(this);
-            isInScene = false;
+            hideInScene(sceneData);
+            //sceneData.scene->removeItem(rect);
+            //sceneData.scene->removeItem(this);
+            //isInScene = false;
             //this->hide();
             //rect->hide();
            // std::cerr << "rect should now be not visible visible " << rect->isVisible() << std::endl;
@@ -111,14 +111,20 @@ void moe::Rect::checkInSceneBorders(SceneData &sceneData) {
 
 }
 
-void moe::Rect::hideInScene() {
+void moe::Rect::hideInScene(SceneData &sceneData) {
     rect->hide();
     this->hide();
+    sceneData.scene->removeItem(rect);
+    sceneData.scene->removeItem(this);
+    isInScene = false;
 }
 
-void moe::Rect::showInScene() {
+void moe::Rect::showInScene(SceneData &sceneData) {
+    sceneData.scene->addItem(rect);
+    sceneData.scene->addItem(this);
     rect->show();
     this->show();
+    isInScene = true;
 }
 
 

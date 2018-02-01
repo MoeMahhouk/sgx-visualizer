@@ -111,8 +111,8 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
         }*/
      //   return;
     //}
+    mouseOver_->hide();
     scene()->removeItem(mouseOver_);
-    //mouseOver_->hide();
     setZValue(0.0);
     topLevelItem()->setZValue(0.0);
     delete mouseOver_;
@@ -127,11 +127,13 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
     //std::cerr << "ahhhhhhh we are getting removed from scene" << std::endl;
     if(isInScene)
     {
-        hideInScene();
-        sceneData.scene->removeItem(rect);
-        sceneData.scene->removeItem(this);
-        isInScene = false;
+        hideInScene(sceneData);
+        //sceneData.scene->removeItem(rect);
+        //sceneData.scene->removeItem(this);
+        //isInScene = false;
     }
+    /*if (mouseOver_)
+        mouseOver_->hide();*/
     //rect->hide();
     //hide();
     for (Renderable *child : lineOffset_->children_) {
@@ -141,13 +143,15 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
 }
 
 void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
-    //std::cerr << "year we are getting readded to the scene" << std::endl;
+    //std::cerr << "yeah we are getting readded to the scene" << std::endl;
     if(!isInScene) {
-        sceneData.scene->addItem(rect);
-        sceneData.scene->addItem(this);
-        showInScene();
-        isInScene = true;
+        //sceneData.scene->addItem(rect);
+        //sceneData.scene->addItem(this);
+        showInScene(sceneData);
+        //isInScene = true;
     }
+    if (mouseOver_)
+        mouseOver_->hide();
     //rect->show();
     //show();
     for (Renderable *child : lineOffset_->children_) {

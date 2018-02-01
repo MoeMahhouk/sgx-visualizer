@@ -44,7 +44,7 @@ namespace moe {
 
         Renderable *lineOffset_;
 
-        QGraphicsRectItem *mouseOver_;
+        QGraphicsRectItem *mouseOver_ = 0;
 
     };
 }

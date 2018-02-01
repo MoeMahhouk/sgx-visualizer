@@ -538,7 +538,7 @@ const QMap<int, QString> &moe::SgxDatabaseStructure::getEnclavesMap() const
 void moe::SgxDatabaseStructure::loadEcallsStats()
 {
     QSqlQuery query;
-    query.prepare("SELECT ec.id, ec.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average "
+    query.prepare("SELECT ec.id, ec.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average, COUNT(e1.call_id) AS count "
                           "FROM ecalls AS ec JOIN events AS e1 ON ec.id = e1.call_id JOIN events AS e2 ON e1.id = e2.call_event "
                           "WHERE e1.type = 14 AND e2.type = 15 GROUP BY ec.id");
 
@@ -553,6 +553,7 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
             ecallStats.callId_ = query.value(0).toInt();
             ecallStats.callSymbolName_ = query.value(1).toString();
             ecallStats.callAvg_ = query.value(2).toReal();
+            ecallStats.count_ = query.value(3).toReal();
             ecallStatistics.push_back(ecallStats);
         }
     }
@@ -596,7 +597,7 @@ const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getEcallStatistic
 void moe::SgxDatabaseStructure::loadOcallsStats()
 {
     QSqlQuery query;
-    query.prepare("SELECT oc.id, oc.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average "
+    query.prepare("SELECT oc.id, oc.symbol_name, (total(e2.time)-total(e1.time))/count(e1.call_id) AS average , COUNT(e1.call_id) AS count "
                           "FROM ocalls AS oc JOIN events AS e1 ON oc.id = e1.call_id JOIN events AS e2 ON e1.id = e2.call_event "
                           "WHERE e1.type = 16 AND e2.type = 17 GROUP BY oc.id");
 
@@ -611,6 +612,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
             ocallStats.callId_ = query.value(0).toInt();
             ocallStats.callSymbolName_ = query.value(1).toString();
             ocallStats.callAvg_ = query.value(2).toReal();
+            ocallStats.count_ = query.value(3).toReal();
             ocallStatistics.push_back(ocallStats);
         }
     }

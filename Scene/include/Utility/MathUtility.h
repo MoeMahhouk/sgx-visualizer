@@ -64,27 +64,27 @@ namespace moe {
         return isInteger(result) ? (sortedTotaltimeList[result - 1] + sortedTotaltimeList[result]) / 2 : sortedTotaltimeList[ceilf(result) - 1];
     }
 
-    inline QString checkTimeUnit(qreal time)
+    inline QString checkTimeUnit(qreal time,int decimal = 2)
     {
         if (time == 0) {
-            return QString::number(time,'f',2);
+            return QString::number(time,'f',decimal);
         }
         if(time >= pow(10,9)) {
-            return QString::number(time / pow(10,9),'f',2) + "s";
+            return QString::number(time / pow(10,9),'f',decimal) + " s";
         } else if (time >= pow(10,6)) {
-            return QString::number(time / pow(10, 6), 'f', 2) + "ms";
+            return QString::number(time / pow(10, 6), 'f', decimal) + " ms";
         } else if (time >= pow(10,3)) {
-            return QString::number(time / pow(10,3),'f',2) + "µs";
+            return QString::number(time / pow(10,3),'f',decimal) + " µs";
         } else if (time >1) {
-            return QString::number(time,'f',2) + "ns";
+            return QString::number(time,'f',decimal) + " ns";
         } else if (time * pow(10,3) > 1) {
-            return QString::number(time * pow(10,3),'f',2) + "ps";
+            return QString::number(time * pow(10,3),'f',decimal) + " ps";
         } else if(time * pow(10,6) > 1) {
-            return QString::number(time * pow(10,6),'f',2) + "fs";
+            return QString::number(time * pow(10,6),'f',decimal) + " fs";
         } else if(time * pow(10,9) > 1) {
-            return QString::number(time * pow(10,9),'f',2) + "as";
+            return QString::number(time * pow(10,9),'f',decimal) + " as";
         } else {
-            return QString::number(0,'f',2);
+            return QString::number(0,'f',decimal);
         }
     }
 }

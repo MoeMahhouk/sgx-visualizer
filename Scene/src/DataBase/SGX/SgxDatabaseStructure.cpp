@@ -273,6 +273,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     callHoverInfoMap[id].callName += symbol_name;
                     callHoverInfoMap[id].enclaveId += eid;
                     callHoverInfoMap[id].enclaveBinaryName += enclavesList[eid];
+                    callHoverInfoMap[id].status = isFail;
                     eCall->callInfo = callHoverInfoMap[id];
 
                 } else {

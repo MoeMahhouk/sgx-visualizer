@@ -2,9 +2,7 @@
 // Created by moe on 07.01.18.
 //
 
-#include <QGraphicsSceneHoverEvent>
 #include "Rendering/SeqDiagBlock.h"
-#include "Utility/MathUtility.h"
 
 moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal height, QPen *pen, QBrush *brush) :
         Rect(transform, width, height, pen, brush)
@@ -37,17 +35,19 @@ moe::SeqDiagBlock::~SeqDiagBlock()
     delete lineOffset_;
 }
 
-void moe::SeqDiagBlock::initializeStats(const CallHoverInfo &callsInfos) {
+void moe::SeqDiagBlock::initializeStats(const CallHoverInfo &callsInfos)
+{
     callsInfos_.childrenCounter = callsInfos.childrenCounter;
     callsInfos_.childrenTotalRuntime = callsInfos.childrenTotalRuntime;
     callsInfos_.callName = callsInfos.callName;
     callsInfos_.callTotalTime = callsInfos.callTotalTime;
     callsInfos_.enclaveId = callsInfos.enclaveId;
     callsInfos_.enclaveBinaryName = callsInfos.enclaveBinaryName;
-
+    callsInfos_.status = callsInfos.status;
 }
 
-void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
 
     /*if(!rect->isVisible()) { //so that it wont print anything if the item
         return;
@@ -74,29 +74,37 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     }
     enclaveInfo->setY(callName->boundingRect().bottomLeft().y());
 
+    auto status = new QGraphicsTextItem(mouseOver_);
+    status->setDefaultTextColor(Qt::black);
+    QString statusText = callsInfos_.status ? "<font color = \"red\"> Failed" : "<font color = \"green\"> success";
+    status->setHtml("Status : <b> " + statusText + "</b>");
+    status->setY(enclaveInfo->boundingRect().bottomLeft().y() + 15);
+
+
     auto callTotalTime = new QGraphicsTextItem(mouseOver_);
     callTotalTime->setDefaultTextColor(Qt::black);
     callTotalTime->setHtml("Total runtime : <b>" + checkTimeUnit(callsInfos_.callTotalTime) + " (" +QString::number(callsInfos_.callTotalTime,'f', 0) + "ns)" + "</b>");
-    callTotalTime->setY(enclaveInfo->boundingRect().bottomLeft().y() + 15);
+    callTotalTime->setY(status->boundingRect().bottomLeft().y() + 30);
 
     auto callChildsCounter = new QGraphicsTextItem(mouseOver_);
     callChildsCounter->setDefaultTextColor(Qt::black);
     callChildsCounter->setHtml("Number Of inner Calls : <b>" + QString::number(callsInfos_.childrenCounter,'f', 0) + "</b>");
-    callChildsCounter->setY(callTotalTime->boundingRect().bottomLeft().y() + 30);
+    callChildsCounter->setY(callTotalTime->boundingRect().bottomLeft().y() + 45);
 
     auto childrenTotalTime = new QGraphicsTextItem(mouseOver_);
     childrenTotalTime->setDefaultTextColor(Qt::black);
     childrenTotalTime->setHtml("Total inner Calls runtime : <b>" + checkTimeUnit(callsInfos_.childrenTotalRuntime) + " (" + QString::number(callsInfos_.childrenTotalRuntime,'f', 0) + "ns)" + "</b>");
-    childrenTotalTime->setY(callChildsCounter->boundingRect().bottomLeft().y() + 45);
+    childrenTotalTime->setY(callChildsCounter->boundingRect().bottomLeft().y() + 60);
 
     QList<qreal> elementWidths;
     elementWidths.push_back(callName->boundingRect().right());
     elementWidths.push_back(enclaveInfo->boundingRect().right());
+    elementWidths.push_back(status->boundingRect().right());
     elementWidths.push_back(callTotalTime->boundingRect().right());
     elementWidths.push_back(callChildsCounter->boundingRect().right());
     elementWidths.push_back(childrenTotalTime->boundingRect().right());
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());
-    mouseOver_->setRect(-5,-5, maxWidth + 15, childrenTotalTime->boundingRect().bottomLeft().y() + 75);
+    mouseOver_->setRect(-5,-5, maxWidth + 15, childrenTotalTime->boundingRect().bottomLeft().y() + 90);
     //scene()->update();
     /*std::cerr << "we are here boooooooooyz mouse Pos : " << event->pos().y() << " mouse Over coordination is y : " << mouseOver_->pos().y() << "  x:" << mouseOver_->pos().x()<< std::endl;
 
@@ -104,7 +112,8 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     std::cerr << "this object coordinations y" << this->boundingRect().y() << std::endl;*/
 }
 
-void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
    // if(!rect->isVisible()) {
         /*if(mouseOver_) {
             scene()->removeItem(mouseOver_);
@@ -121,11 +130,13 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
 }
 
-QRectF moe::SeqDiagBlock::boundingRect() const {
+QRectF moe::SeqDiagBlock::boundingRect() const
+{
     return Rect::boundingRect();
 }
 
-void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
+void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData)
+{
     //std::cerr << "ahhhhhhh we are getting removed from scene" << std::endl;
     /*if(mouseOver_)
     {
@@ -144,16 +155,22 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
         //isInScene = false;
     }
     if (mouseOver_)
+    {
         mouseOver_->hide();
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }
     //rect->hide();
     //hide();
-    for (Renderable *child : lineOffset_->children_) {
+    for (Renderable *child : lineOffset_->children_)
+    {
         child->removeFromScene(sceneData);
     }
 
 }
 
-void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
+void moe::SeqDiagBlock::addToScene(SceneData& sceneData)
+{
     //std::cerr << "yeah we are getting readded to the scene" << std::endl;
     /*if (mouseOver_)
     {
@@ -163,7 +180,8 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
         delete mouseOver_;
         mouseOver_ = nullptr;
     }*/
-    if(!isInScene) {
+    if(!isInScene)
+    {
         //sceneData.scene->addItem(rect);
         //sceneData.scene->addItem(this);
         showInScene(sceneData);
@@ -173,14 +191,18 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
     {
         std::cerr << "we are here now and mouseover should be hidden "<< std::endl;
         mouseOver_->hide();
+        delete mouseOver_;
+        mouseOver_ = nullptr;
     }
     //rect->show();
     //show();
-    for (Renderable *child : lineOffset_->children_) {
+    for (Renderable *child : lineOffset_->children_)
+    {
         child->addToScene(sceneData);
     }
 }
 
-const moe::CallHoverInfo &moe::SeqDiagBlock::getCallsInfos_() const {
+const moe::CallHoverInfo &moe::SeqDiagBlock::getCallsInfos_() const
+{
     return callsInfos_;
 }

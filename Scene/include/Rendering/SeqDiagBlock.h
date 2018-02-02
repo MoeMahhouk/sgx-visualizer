@@ -5,9 +5,12 @@
 #ifndef SCENE_SEQDIAGBLOCK_H
 #define SCENE_SEQDIAGBLOCK_H
 
+#include <QGraphicsSceneHoverEvent>
 
 #include "DataBase/SGX/CallHoverInfo.h"
 #include "Rect.h"
+#include "Utility/MathUtility.h"
+
 
 namespace moe {
 

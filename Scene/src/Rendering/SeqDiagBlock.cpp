@@ -52,6 +52,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     /*if(!rect->isVisible()) { //so that it wont print anything if the item
         return;
     }*/
+
     mouseOver_ = new QGraphicsRectItem(this);
     topLevelItem()->setZValue(10.0);
     setZValue(11);
@@ -96,7 +97,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     elementWidths.push_back(childrenTotalTime->boundingRect().right());
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());
     mouseOver_->setRect(-5,-5, maxWidth + 15, childrenTotalTime->boundingRect().bottomLeft().y() + 75);
-    scene()->update();
+    //scene()->update();
     /*std::cerr << "we are here boooooooooyz mouse Pos : " << event->pos().y() << " mouse Over coordination is y : " << mouseOver_->pos().y() << "  x:" << mouseOver_->pos().x()<< std::endl;
 
     std::cerr << "this object coordinations x" << this->boundingRect().x() << std::endl;
@@ -111,11 +112,12 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
         }*/
      //   return;
     //}
-    mouseOver_->hide();
-    scene()->removeItem(mouseOver_);
-    setZValue(0.0);
     topLevelItem()->setZValue(0.0);
+    setZValue(0.0);
+    //mouseOver_->hide();
+    scene()->removeItem(mouseOver_);
     delete mouseOver_;
+    mouseOver_  = nullptr; //write after free segv error
 
 }
 
@@ -125,6 +127,15 @@ QRectF moe::SeqDiagBlock::boundingRect() const {
 
 void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
     //std::cerr << "ahhhhhhh we are getting removed from scene" << std::endl;
+    /*if(mouseOver_)
+    {
+        std::cerr << "hey we are here at removeFromScene and we are removing mouseOver" << std::endl;
+
+        mouseOver_->hide();
+        sceneData.scene->removeItem(mouseOver_);
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }*/
     if(isInScene)
     {
         hideInScene(sceneData);
@@ -132,8 +143,8 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
         //sceneData.scene->removeItem(this);
         //isInScene = false;
     }
-    /*if (mouseOver_)
-        mouseOver_->hide();*/
+    if (mouseOver_)
+        mouseOver_->hide();
     //rect->hide();
     //hide();
     for (Renderable *child : lineOffset_->children_) {
@@ -144,6 +155,14 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData) {
 
 void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
     //std::cerr << "yeah we are getting readded to the scene" << std::endl;
+    /*if (mouseOver_)
+    {
+        std::cerr << "hey we are here at addtoscene and we are removing mouseOver" << std::endl;
+        mouseOver_->hide();
+        sceneData.scene->removeItem(mouseOver_);
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }*/
     if(!isInScene) {
         //sceneData.scene->addItem(rect);
         //sceneData.scene->addItem(this);
@@ -151,10 +170,17 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData) {
         //isInScene = true;
     }
     if (mouseOver_)
+    {
+        std::cerr << "we are here now and mouseover should be hidden "<< std::endl;
         mouseOver_->hide();
+    }
     //rect->show();
     //show();
     for (Renderable *child : lineOffset_->children_) {
         child->addToScene(sceneData);
     }
+}
+
+const moe::CallHoverInfo &moe::SeqDiagBlock::getCallsInfos_() const {
+    return callsInfos_;
 }

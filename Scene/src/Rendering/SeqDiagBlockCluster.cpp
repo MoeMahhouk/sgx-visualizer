@@ -19,12 +19,15 @@ moe::SeqDiagBlockCluster::~SeqDiagBlockCluster() {
 }
 
 void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
+    auto innerBlockInfo = innerBlock->getCallsInfos_();
     if(height_ == 0) {
         Renderable::setTransform(innerBlock->getTransform());
         setHeight(innerBlock->getHeight());
         setWidth(innerBlock->getWidth());
         innerBlock->Renderable::setTransform(Transform2D());
-
+        callsInfos_.enclaveId = innerBlockInfo.enclaveId;
+        callsInfos_.enclaveBinaryName = innerBlockInfo.enclaveBinaryName;
+        callsInfos_.callName = "Cluster of E\\OCalls";
     } else {
         qreal yOffsetBetweenEndAndStart = innerBlock->getTransform().getY() - (getTransform().getY() + getHeight()); //start of the added block - the end of the existing cluster block
         qreal relativeStartTime = innerBlock->getTransform().getY() - getTransform().getY();
@@ -34,6 +37,9 @@ void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
         setHeight(getHeight() + new_height_diff);
     }
     lineOffset_->children_.push_back(innerBlock);
+    callsInfos_.childrenCounter += 1;
+    callsInfos_.callTotalTime += innerBlockInfo.callTotalTime;
+    callsInfos_.childrenTotalRuntime += innerBlockInfo.childrenTotalRuntime;
 
 }
 
@@ -118,13 +124,13 @@ void moe::SeqDiagBlockCluster::drawChildren(moe::SceneData &sceneData) {
 }
 
 void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    //SeqDiagBlock::hoverEnterEvent(event);
-    return;
+    SeqDiagBlock::hoverEnterEvent(event); //must be reworked for the cluster 
+    //return;
 }
 
 void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    //SeqDiagBlock::hoverLeaveEvent(event);
-    return;
+    SeqDiagBlock::hoverLeaveEvent(event);
+    //return;
 }
 
 /*void moe::SeqDiagBlockCluster::hideRenderable() {

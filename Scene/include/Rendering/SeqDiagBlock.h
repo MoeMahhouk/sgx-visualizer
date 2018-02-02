@@ -32,6 +32,8 @@ namespace moe {
         virtual void addToScene(SceneData& sceneData) override;
 
 
+        const CallHoverInfo &getCallsInfos_() const;
+
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
@@ -45,6 +47,8 @@ namespace moe {
         Renderable *lineOffset_;
 
         QGraphicsRectItem *mouseOver_ = 0;
+
+
 
     };
 }

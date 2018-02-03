@@ -35,15 +35,26 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
-    const QGraphicsScene &sceneblabla = scene_;
-    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,0) - QPointF(0,20);//mapFrom(viewArea_,event->pos());
-    std::cerr << "mouse y pos is  " << mouseScenePos.y() << std::endl;
+    const qreal MEASURELINE_OFFSET = 70;
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,0) - QPointF(0,MEASURELINE_OFFSET);
+    /*std::cerr << "mouse y pos is  " << mouseScenePos.y() << std::endl;
+
+    std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
+    std::cerr << "yoffset is " << yOffset_ << std::endl;
+    std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
+
     if(!viewArea_->rect().contains(event->pos()))
     {
         if (event->modifiers() & Qt::ControlModifier)
         {
             qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
+            qreal mouseSceneYBeforeZoom = mouseScenePos.y();
+            qreal mouseSceneYAfterZoom = mouseScenePos.y() * yScaleFactor;
+            qreal oldYOffset = yOffset_;
+
             verticalZoom(yScaleFactor);
+            scrollTo(oldYOffset * yScaleFactor, factor_);
+            verticalScroll(mouseSceneYBeforeZoom - mouseSceneYAfterZoom, factor_);
         } else {
             verticalScroll(moe::signum(event->delta())*40,factor_);
         }
@@ -373,28 +384,15 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
     qreal pixelScroll=0;
     if (yOffset_ + (yOffset/factor) >= 0)
     {
-        qreal oldXCordinate = sequenceListNode_->getTransform().getX();
-        sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCordinate,0));
+        qreal oldXCoordinate = sequenceListNode_->getTransform().getX();
+        sequenceListNode_->setTransform(moe::Transform2D(1,0,0,1,oldXCoordinate,0));
         yOffset_ = 0;
     } else if (moe::signum(yOffset_)*(yOffset_ + (yOffset/factor)) <= (db->getProgramTotalTime() * yScale_)) {
         pixelScroll = yOffset;
-        /*qreal print = (yOffset_ + (yOffset/factor));
-        std::cerr << " yoffset_ + (yOffset/factor) " << print << " db->getProgramTotalTime() * yScale_" << db->getProgramTotalTime() * yScale_ << std::endl;
-        std::cerr << " yoffset_ is now at " << yOffset_ << " and the program total length is" << db->getProgramTotalTime() * yScale_ << std::endl;
-        pixelScroll = (((db->getProgramTotalTime() * yScale_) + yOffset_) * factor_) * -1;
-        std::cerr << "pixel Scroll is now " << pixelScroll << std::endl;
-        yOffset_ -= (db->getProgramTotalTime() * yScale_) + yOffset_;*/
-        //std::cerr << "it should be back to zero now, before setTransform , and yOffset is " << yOffset_ << "and pixelScroll is " << pixelScroll << std::endl;
         sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1, 0, 0, 1, 0, pixelScroll));
-        //std::cerr << "transform after is " << sequenceListNode_->getTransform().getY() << std::endl;
         yOffset_ += (yOffset/factor);
     } else {
-        /*if(yOffset_ == db->getProgramTotalTime()*yScale_ *-1)
-            return;
-        scrollTo(-1*(db->getProgramTotalTime())*yScale_,factor_);*/
-       // std::cerr << "we are heeeeeeeere boys " << std::endl;
-
-        return;
+       return;
     }
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
@@ -408,7 +406,7 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
  */
 void MainWindow::verticalZoom(qreal yScale, qreal factor)
 {
-    qreal oldYOffset = yOffset_;
+    //qreal oldYOffset = yOffset_;
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
@@ -417,8 +415,8 @@ void MainWindow::verticalZoom(qreal yScale, qreal factor)
     yScale_ *= yScale;
     moe::ZoomEvent e = {yScale_, yOffset_};
     notify(&e);
-    scrollTo(oldYOffset * yScale, factor_);
-    render();
+    //scrollTo(oldYOffset * yScale, factor_);
+    //render();
 }
 
 void MainWindow::scrollTo(qreal yOffset, qreal factor)

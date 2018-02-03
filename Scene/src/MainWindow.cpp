@@ -35,12 +35,18 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
-    if (event->modifiers() & Qt::ControlModifier)
+    const QGraphicsScene &sceneblabla = scene_;
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,0) - QPointF(0,20);//mapFrom(viewArea_,event->pos());
+    std::cerr << "mouse y pos is  " << mouseScenePos.y() << std::endl;
+    if(!viewArea_->rect().contains(event->pos()))
     {
-        qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
-        verticalZoom(yScaleFactor);
-    } else {
-        verticalScroll(moe::signum(event->delta())*40,factor_);
+        if (event->modifiers() & Qt::ControlModifier)
+        {
+            qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
+            verticalZoom(yScaleFactor);
+        } else {
+            verticalScroll(moe::signum(event->delta())*40,factor_);
+        }
     }
 }
 

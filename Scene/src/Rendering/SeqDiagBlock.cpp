@@ -123,7 +123,7 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     //}
     topLevelItem()->setZValue(0.0);
     setZValue(0.0);
-    //mouseOver_->hide();
+    mouseOver_->hide();
     scene()->removeItem(mouseOver_);
     delete mouseOver_;
     mouseOver_  = nullptr; //write after free segv error
@@ -147,18 +147,18 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData)
         delete mouseOver_;
         mouseOver_ = nullptr;
     }*/
+    if (mouseOver_)
+    {
+        mouseOver_->hide();
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }
     if(isInScene)
     {
         hideInScene(sceneData);
         //sceneData.scene->removeItem(rect);
         //sceneData.scene->removeItem(this);
         //isInScene = false;
-    }
-    if (mouseOver_)
-    {
-        mouseOver_->hide();
-        delete mouseOver_;
-        mouseOver_ = nullptr;
     }
     //rect->hide();
     //hide();
@@ -180,19 +180,19 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData)
         delete mouseOver_;
         mouseOver_ = nullptr;
     }*/
-    if(!isInScene)
-    {
-        //sceneData.scene->addItem(rect);
-        //sceneData.scene->addItem(this);
-        showInScene(sceneData);
-        //isInScene = true;
-    }
     if (mouseOver_)
     {
         std::cerr << "we are here now and mouseover should be hidden "<< std::endl;
         mouseOver_->hide();
         delete mouseOver_;
         mouseOver_ = nullptr;
+    }
+    if(!isInScene)
+    {
+        //sceneData.scene->addItem(rect);
+        //sceneData.scene->addItem(this);
+        showInScene(sceneData);
+        //isInScene = true;
     }
     //rect->show();
     //show();

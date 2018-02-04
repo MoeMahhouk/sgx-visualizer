@@ -14,10 +14,8 @@ moe::Rect::Rect(Transform2D transform, qreal width, qreal height, QPen* pen, QBr
 
 void moe::Rect::draw(SceneData &sceneData, Transform2D &parentTransform)
 {
-
     updateRectTranform();
     checkInSceneBorders(sceneData);
-
 }
 
 

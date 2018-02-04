@@ -4,6 +4,9 @@
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
 
+//#define QCUSTOMPLOT_USE_LIBRARY
+//#include "lib/qcustomplot.h"
+
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -1021,4 +1024,24 @@ void MainWindow::loadECallStats() {
     } else {
         eCallStatsDialog_->show();
     }
+
+
+    /*
+     * test customPlot
+     */
+
+   /* QCustomPlot *customPlot = new QCustomPlot();
+    const QVector<moe::CallStatistics> &eCallStatsList = db->getEcallStatistics();
+
+    QSharedPointer<QCPAxisTickerText> plottedEcallNames(new QCPAxisTickerText);
+    for (int l = 0; l < eCallStatsList.size() ; ++l) {
+        plottedEcallNames->addTick(5*(l+1), eCallStatsList[l].callSymbolName_);
+    }
+    customPlot->xAxis->setTicker(plottedEcallNames);
+    QVector<qreal> plottedMedian(eCallStatsList.size());
+    for (int m = 0; m < eCallStatsList.size() ; ++m) {
+        plottedMedian[m] = eCallStatsList[m].median_;
+    }
+    QCPGraph *graph1 = customPlot->addGraph();
+    graph1->setData(plottedEcallNames,plottedMedian);*/
 }

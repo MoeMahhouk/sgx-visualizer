@@ -429,7 +429,7 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor)
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
-    render();
+    //render();
 }
 
 /**

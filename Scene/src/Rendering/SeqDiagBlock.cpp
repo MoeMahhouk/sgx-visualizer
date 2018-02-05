@@ -14,6 +14,13 @@ moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal h
 
 void moe::SeqDiagBlock::draw(SceneData &data, moe::Transform2D &parentTransform)
 {
+    /*if(mouseOver_){
+        mouseOver_->hide();
+        data.scene->removeItem(mouseOver_);
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }*/
+    hideMouseOverAfterRenderUpdate();
     Rect::draw(data, parentTransform);
 }
 
@@ -123,11 +130,11 @@ void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     //}
     topLevelItem()->setZValue(0.0);
     setZValue(0.0);
-    mouseOver_->hide();
-    scene()->removeItem(mouseOver_);
-    delete mouseOver_;
-    mouseOver_  = nullptr; //write after free segv error
-
+//    mouseOver_->hide();
+    //scene()->removeItem(mouseOver_);
+    //delete mouseOver_;
+    //mouseOver_  = nullptr; //write after free segv error
+    hideMouseOverAfterRenderUpdate();
 }
 
 QRectF moe::SeqDiagBlock::boundingRect() const
@@ -205,4 +212,13 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData)
 const moe::CallHoverInfo &moe::SeqDiagBlock::getCallsInfos_() const
 {
     return callsInfos_;
+}
+
+void moe::SeqDiagBlock::hideMouseOverAfterRenderUpdate() {
+    if(mouseOver_){
+        mouseOver_->hide();
+        scene()->removeItem(mouseOver_);
+        delete mouseOver_;
+        mouseOver_ = nullptr;
+    }
 }

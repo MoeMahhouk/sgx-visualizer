@@ -58,6 +58,7 @@ bool moe::SeqDiagBlockCluster::checkClusterCriteria(moe::Renderable *innerBlock)
 
 void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &parentTransform)
 {  //ToDo test it without the if, it might also work because we remove the item later from the scene when it hast height more than 150, so the ifs are redundant here
+    hideMouseOverAfterRenderUpdate();
     updateRectTranform();
     if ((rect->rect().height() / (lineOffset_->children_.size()+1)) < 15.0)
     {

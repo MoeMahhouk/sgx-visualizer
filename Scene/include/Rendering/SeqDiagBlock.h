@@ -45,6 +45,8 @@ namespace moe {
 
         virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 
+        void hideMouseOverAfterRenderUpdate();
+
         CallHoverInfo callsInfos_;
 
         Renderable *lineOffset_;

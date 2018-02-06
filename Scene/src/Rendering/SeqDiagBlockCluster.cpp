@@ -6,13 +6,7 @@
 
 moe::SeqDiagBlockCluster::SeqDiagBlockCluster(moe::Transform2D transform, qreal width, qreal height, QPen *pen,
                                               QBrush *brush) : SeqDiagBlock(transform, width, height, pen, brush)
-{
-    //isClustered = false;
-}
-
-/*void moe::SeqDiagBlockCluster::initializeStats(const moe::CallHoverInfo &callsInfos) {
-    SeqDiagBlock::initializeStats(callsInfos);
-}*/
+{}
 
 moe::SeqDiagBlockCluster::~SeqDiagBlockCluster() {
 
@@ -45,7 +39,7 @@ void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
 
 bool moe::SeqDiagBlockCluster::checkClusterCriteria(moe::Renderable *innerBlock) {
 
-    if (height_ == 0) {
+    if (height_ == 0 /*|| lineOffset_->children_.size() < 2*/) {
         return true;
     }
     //start of the added block - the end of the existing cluster block
@@ -67,19 +61,8 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
 
             if(!isInScene)
             {
-               // std::cerr << "must reshown because it got reclustered now" << std::endl;
-                //data.scene->addItem(rect);
-                //data.scene->addItem(this);
-                //isInScene = true;
                 showInScene(data);
             }
-            /*for (Renderable* child : lineOffset_->children_)
-            {
-                child->removeFromScene(data);
-            }*/
-
-            //std::cerr << "children should now vanish and only the cluster appear" << std::endl;
-
             isClustered = true;
         }
 
@@ -93,19 +76,9 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
         if(isInScene)
         {
             hideInScene(data);
-            //data.scene->removeItem(rect);
-            //data.scene->removeItem(this);
-            //isInScene = false;
         }
         if(this->isClustered)
         {
-            /*if(isInScene)
-            {
-                hideInScene();
-                data.scene->removeItem(rect);
-                data.scene->removeItem(this);
-                isInScene = false;
-            }*/
             isClustered = false;
             for (Renderable* child : lineOffset_->children_)
             {
@@ -125,7 +98,9 @@ void moe::SeqDiagBlockCluster::drawChildren(moe::SceneData &sceneData) {
 }
 
 void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    //SeqDiagBlock::hoverEnterEvent(event); //must be reworked for the cluster
+    int rowCount = 0;
+    qreal yOffset = 0;
+    QList<qreal> elementWidths;
     mouseOver_ = new QGraphicsRectItem(this);
     topLevelItem()->setZValue(10.0);
     setZValue(11);
@@ -135,55 +110,79 @@ void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) 
     auto callName = new QGraphicsTextItem(mouseOver_);
     callName->setDefaultTextColor(Qt::black);
     callName->setHtml("Name : <b>" + callsInfos_.callName + "</b>");
+    elementWidths.push_back(callName->boundingRect().right());
 
-    auto enclaveInfo = new QGraphicsTextItem(mouseOver_);
     if(callsInfos_.enclaveId != 0)
     {
+        auto enclaveInfo = new QGraphicsTextItem(mouseOver_);
         enclaveInfo->setDefaultTextColor(Qt::black);
         enclaveInfo->setHtml("EnclaveID/Name : <b>" + QString::number(callsInfos_.enclaveId,'f', 0) + " / " + callsInfos_.enclaveBinaryName + "</b>");
-    } else {
+        enclaveInfo->setY(callName->boundingRect().bottomLeft().y());
+        rowCount++;
+        elementWidths.push_back(enclaveInfo->boundingRect().right());
+    } /*else {
         enclaveInfo->setDefaultTextColor(Qt::black);
         enclaveInfo->setHtml("EnclaveID/Name : <b> NaN / OCall Cluster </b>");
-    }
-    enclaveInfo->setY(callName->boundingRect().bottomLeft().y());
+    }*/
 
     auto clusterTotalTime = new QGraphicsTextItem(mouseOver_);
     clusterTotalTime->setDefaultTextColor(Qt::black);
     clusterTotalTime->setHtml("Cluster's Total runtime : <b>" + checkTimeUnit(callsInfos_.callTotalTime) + " (" +QString::number(callsInfos_.callTotalTime,'f', 0) + "ns)" + "</b>");
-    clusterTotalTime->setY(enclaveInfo->boundingRect().bottomLeft().y() + 15);
+    clusterTotalTime->setY(callName->boundingRect().bottomLeft().y() + (15*rowCount));
+    rowCount++;
+    elementWidths.push_back(clusterTotalTime->boundingRect().right());
+
 
     auto directChildrenNumber = new QGraphicsTextItem(mouseOver_);
     directChildrenNumber->setDefaultTextColor(Qt::black);
     directChildrenNumber->setHtml("Number direct clustered Calls : <b>" + QString::number(lineOffset_->children_.size(),'f', 0) + "</b>");
-    directChildrenNumber->setY(clusterTotalTime->boundingRect().bottomLeft().y() + 30);
-
-
-    auto childrenTotalTime = new QGraphicsTextItem(mouseOver_);
-    childrenTotalTime->setDefaultTextColor(Qt::black);
-    childrenTotalTime->setHtml("Total inner Calls runtime : <b>" + checkTimeUnit(callsInfos_.childrenTotalRuntime) + " (" + QString::number(callsInfos_.childrenTotalRuntime,'f', 0) + "ns)" + "</b>");
-    childrenTotalTime->setY(directChildrenNumber->boundingRect().bottomLeft().y() + 45);
-
-    auto innerChildrenNumber = new QGraphicsTextItem(mouseOver_);
-    innerChildrenNumber->setDefaultTextColor(Qt::black);
-    innerChildrenNumber->setHtml("Number inner clustered Calls : <b>" + QString::number(callsInfos_.childrenCounter,'f', 0) + "</b>");
-    innerChildrenNumber->setY(childrenTotalTime->boundingRect().bottomLeft().y() + 60);
-
-    QList<qreal> elementWidths;
-    elementWidths.push_back(callName->boundingRect().right());
-    elementWidths.push_back(enclaveInfo->boundingRect().right());
-    elementWidths.push_back(clusterTotalTime->boundingRect().right());
+    directChildrenNumber->setY(clusterTotalTime->boundingRect().bottomLeft().y() + (15*rowCount));
+    rowCount++;
+    yOffset = clusterTotalTime->boundingRect().bottomLeft().y();
     elementWidths.push_back(directChildrenNumber->boundingRect().right());
-    elementWidths.push_back(childrenTotalTime->boundingRect().right());
-    elementWidths.push_back(innerChildrenNumber->boundingRect().right());
+
+
+    if(callsInfos_.childrenTotalRuntime != 0)
+    {
+        auto childrenTotalTime = new QGraphicsTextItem(mouseOver_);
+        childrenTotalTime->setDefaultTextColor(Qt::black);
+        childrenTotalTime->setHtml("Total inner Calls runtime : <b>" + checkTimeUnit(callsInfos_.childrenTotalRuntime) + " (" + QString::number(callsInfos_.childrenTotalRuntime,'f', 0) + "ns)" + "</b>");
+        childrenTotalTime->setY(directChildrenNumber->boundingRect().bottomLeft().y() + (15*rowCount));
+        rowCount++;
+        elementWidths.push_back(childrenTotalTime->boundingRect().right());
+
+        auto innerChildrenNumber = new QGraphicsTextItem(mouseOver_);
+        innerChildrenNumber->setDefaultTextColor(Qt::black);
+        innerChildrenNumber->setHtml("Number inner clustered Calls : <b>" + QString::number(callsInfos_.childrenCounter,'f', 0) + "</b>");
+        innerChildrenNumber->setY(childrenTotalTime->boundingRect().bottomLeft().y() + (15*rowCount));
+        rowCount++;
+        yOffset = innerChildrenNumber->boundingRect().bottomLeft().y();
+        elementWidths.push_back(innerChildrenNumber->boundingRect().right());
+    }
 
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());
-    mouseOver_->setRect(-5,-5, maxWidth + 15, childrenTotalTime->boundingRect().bottomLeft().y() + 90);
+    mouseOver_->setRect(-5,-5, maxWidth + 15, yOffset + (15 * ++rowCount));
     //return;
 }
 
 void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     SeqDiagBlock::hoverLeaveEvent(event);
     //return;
+}
+
+moe::Renderable * moe::SeqDiagBlockCluster::decomposeCluster() {
+    if(lineOffset_->children_.size() == 1) {
+        lineOffset_->children_[0]->setTransform(this->getTransform());
+        static_cast<SeqDiagBlock*>(lineOffset_->children_[0])->setHeight(this->getHeight());
+        static_cast<SeqDiagBlock*>(lineOffset_->children_[0])->setWidth(this->getWidth());
+        return lineOffset_->children_[0];
+    } else {
+        return nullptr;
+    }
+}
+
+const int moe::SeqDiagBlockCluster::size() const {
+    return lineOffset_->children_.size();
 }
 
 

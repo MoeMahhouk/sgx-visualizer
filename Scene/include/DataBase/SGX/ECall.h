@@ -35,6 +35,7 @@ namespace moe  {
             callBlock->initializeStats(callInfo);
             if (!children_.isEmpty())
             {
+                //Call *tmpCall;
                 SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::yellow));
                 callBlock->addBlock(clusterTest);
                 QVector<SeqDiagBlockCluster *> subClusterList;
@@ -54,6 +55,10 @@ namespace moe  {
                     //callBlock->addBlock(childRenderable);
                 }
                 for (SeqDiagBlockCluster *subCluster: subClusterList) {
+                    if (subCluster->size())
+                    {
+
+                    }
                     clusterTest->addBlock(subCluster);
                 }
             }

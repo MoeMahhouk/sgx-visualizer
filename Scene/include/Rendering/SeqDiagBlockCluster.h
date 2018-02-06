@@ -22,7 +22,12 @@ namespace moe {
 
         void addBlock(SeqDiagBlock *innerBlock);
 
-        bool checkClusterCriteria(Renderable * innerBlock);
+        Renderable * decomposeCluster();
+
+        const int size() const;
+
+        bool checkClusterCriteria(Renderable *innerBlock);
+
 
        /* virtual void removeFromScene() override ;
 

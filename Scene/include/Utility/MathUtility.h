@@ -11,6 +11,14 @@
 #include <QVector>
 
 namespace moe {
+
+
+    struct AbstractTimeUnit {
+        qreal absTime_ = 0;
+        QString absTimeWithUnit_ = "";
+        QString timeWithUnit_ = "";
+    };
+
     template <typename T> inline constexpr
     int signum(T x, std::false_type is_signed)
     {
@@ -87,6 +95,43 @@ namespace moe {
             return QString::number(0,'f',decimal);
         }
     }
+
+    inline AbstractTimeUnit checkAbsTimeUnit(qreal time, int decimal = 2)
+    {
+        AbstractTimeUnit result;
+        result.absTime_ = QString::number(time,'f',decimal).toDouble();
+        result.absTimeWithUnit_ = QString::number(time,'f',decimal) + " ns";
+        if (time == 0) {
+            result.timeWithUnit_ = QString::number(time,'f',decimal);
+            return result;
+        }
+        if(time >= pow(10,9)) {
+            result.timeWithUnit_ = QString::number(time / pow(10,9),'f',decimal) + " s";
+            return result;
+        } else if (time >= pow(10,6)) {
+            result.timeWithUnit_ = QString::number(time / pow(10, 6), 'f', decimal) + " ms";
+            return result;
+        } else if (time >= pow(10,3)) {
+            result.timeWithUnit_ = QString::number(time / pow(10,3),'f',decimal) + " µs";
+            return result;
+        } else if (time >1) {
+            result.timeWithUnit_ = QString::number(time,'f',decimal) + " ns";
+            return result;
+        } else if (time * pow(10,3) > 1) {
+            result.timeWithUnit_ = QString::number(time * pow(10,3),'f',decimal) + " ps";
+            return result;
+        } else if(time * pow(10,6) > 1) {
+            result.timeWithUnit_ = QString::number(time * pow(10,6),'f',decimal) + " fs";
+            return result;
+        } else if(time * pow(10,9) > 1) {
+            result.timeWithUnit_ = QString::number(time * pow(10,9),'f',decimal) + " as";
+            return result;
+        } else {
+            result.timeWithUnit_ = QString::number(0,'f',decimal);
+            return result;
+        }
+    }
+
 }
 
 #endif //SCENE_MATHUTILITY_H

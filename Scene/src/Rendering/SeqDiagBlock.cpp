@@ -2,6 +2,7 @@
 // Created by moe on 07.01.18.
 //
 
+#include <DataBase/SGX/SGXErrorCodes.h>
 #include "Rendering/SeqDiagBlock.h"
 
 moe::SeqDiagBlock::SeqDiagBlock(moe::Transform2D transform, qreal width, qreal height, QPen *pen, QBrush *brush) :
@@ -84,7 +85,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
     auto status = new QGraphicsTextItem(mouseOver_);
     status->setDefaultTextColor(Qt::black);
-    QString statusText = callsInfos_.status ? "<font color = \"red\"> Error Call" : "<font color = \"green\"> success";
+    QString statusText = callsInfos_.status ? "<font color = \"red\">" + sgxErrorToString(callsInfos_.status) : "<font color = \"green\"> success";
     status->setHtml("Status : <b> " + statusText + "</b>");
     status->setY(callName->boundingRect().bottomLeft().y() + (15*rowCount));
     rowCount++;

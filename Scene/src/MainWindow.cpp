@@ -83,6 +83,10 @@ void MainWindow::resetPressed()
 
 void MainWindow::scrollRightPressed()
 {
+    db->loadEcallAnalysis();
+    for (moe::CallStaticAnalysis call: db->getEcallStaticAnalysis()) {
+        std::cerr << call.callName_.toStdString() << call.totalCount_ << std::endl;
+    }
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }

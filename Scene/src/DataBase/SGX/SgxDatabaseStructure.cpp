@@ -9,6 +9,7 @@
 moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QString &type) : DataBaseManager(path) {
     m_db = QSqlDatabase::addDatabase(type);
     m_db.setDatabaseName(path);
+
     if (!m_db.open()) {
         std::cerr << "Error: connection with database fail" << std::endl;
     } else {
@@ -569,7 +570,7 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
                                 "order BY call_id, total_time ");
     if(!medianQuery.exec())
     {
-        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        std::cerr << "Error: "<< medianQuery.lastError().text().toStdString() << std::endl;
         return;
     } else {
         while (medianQuery.next())
@@ -628,7 +629,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
                                 "order BY call_id, total_time ");
     if(!medianQuery.exec())
     {
-        std::cerr << "Error: "<< query.lastError().text().toStdString() << std::endl;
+        std::cerr << "Error: "<< medianQuery.lastError().text().toStdString() << std::endl;
         return;
     } else {
         while (medianQuery.next())
@@ -651,4 +652,117 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
 
 const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getOcallStatistics() const {
     return ocallStatistics;
+}
+
+void moe::SgxDatabaseStructure::loadEcallAnalysis() {
+    if(!m_db.tables().contains("ECallAnalysisView",Qt::CaseInsensitive))
+    {
+        QSqlQuery createViewQuery;
+        createViewQuery.prepare("create TEMPORARY Table ecallAnalysisTable AS \n"
+                                        "SELECT e1.call_id as call_id, (e2.time - e1.time) AS total_time, oc.symbol_name AS name\n"
+                                        "FROM events as e1 JOIN events as e2 ON e1.id = e2.call_event JOIN ocalls as oc ON e1.call_id = oc.id\n"
+                                        "WHERE e1.type = 16 AND e2.type = 17\n"
+                                        "ORDER BY call_id, total_time;\n"
+                                        "\n"
+                                        "create Table ECallAnalysisView AS \n"
+                                        "SELECT ot1.call_id as ocall_id , ot1.name  as ocall_name , COUNT(ot1.call_id) as ocall_total_count , \n"
+                                        "(SELECT COUNT(ot2.call_id) FROM ocallAnalysisTable as ot2 WHERE ot2.total_time <= 1000 AND ot2.call_id = ot1.call_id) AS ocall_count_under_micro,\n"
+                                        "(SELECT COUNT(ot3.call_id) FROM ocallAnalysisTable as ot3 WHERE ot3.total_time <= 10000 AND ot3.call_id = ot1.call_id) AS ocall_count_under_10micro \n"
+                                        "FROM ocallAnalysisTable as ot1\n"
+                                        "GROUP BY ot1.call_id;");
+    if (!createViewQuery.exec())
+    {
+        std::cerr << "Error: "<< createViewQuery.lastError().text().toStdString() << std::endl;
+        return;
+    }
+
+        QSqlQuery loadECallAnalysisQuery;
+        loadECallAnalysisQuery.prepare("SELECT * FROM OCallAnalysisView");
+        if(!loadECallAnalysisQuery.exec())
+        {
+            std::cerr << "Error: "<< loadECallAnalysisQuery.lastError().text().toStdString() << std::endl;
+            return;
+        } else {
+
+            while(loadECallAnalysisQuery.next())
+            {
+                CallStaticAnalysis eCallStaticAnalysis;
+                eCallStaticAnalysis.callId_ = loadECallAnalysisQuery.value(0).toInt();
+                eCallStaticAnalysis.callName_ = loadECallAnalysisQuery.value(1).toString();
+                eCallStaticAnalysis.totalCount_ = loadECallAnalysisQuery.value(2).toInt();
+                eCallStaticAnalysis.totalOfLowerThanMicroSeconds_ = loadECallAnalysisQuery.value(3).toInt();
+                eCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadECallAnalysisQuery.value(4).toInt();
+                ecallStaticAnalysis.push_back(eCallStaticAnalysis);
+            }
+        }
+
+    }
+
+}
+
+void moe::SgxDatabaseStructure::loadOcallAnalysis() {
+
+    if(!m_db.tables().contains("OCallAnalysisView",Qt::CaseInsensitive))
+    {
+        //ToDo ask nico why views delete their content if they depend on other temporary views
+        //ToDo ask nico why cant one use with insde a view :/
+        QSqlQuery createViewQuery;
+        /*createViewQuery.prepare("create Table ocallAnalysisTable AS \n"
+                                        "SELECT e1.call_id as call_id, (e2.time - e1.time) AS total_time, oc.symbol_name AS name\n"
+                                        "FROM events as e1 JOIN events as e2 ON e1.id = e2.call_event JOIN ocalls as oc ON e1.call_id = oc.id\n"
+                                        "WHERE e1.type = 16 AND e2.type = 17\n"
+                                        "ORDER BY call_id, total_time;\n"
+                                        "\n"
+                                        "create TABLE OCallAnalysisView AS \n"
+                                        "SELECT ot1.call_id as ocall_id , ot1.name  as ocall_name , COUNT(ot1.call_id) as ocall_total_count , \n"
+                                        "(SELECT COUNT(ot2.call_id) FROM ocallAnalysisTable as ot2 WHERE ot2.total_time <= 1000 AND ot2.call_id = ot1.call_id) AS ocall_count_under_micro,\n"
+                                        "(SELECT COUNT(ot3.call_id) FROM ocallAnalysisTable as ot3 WHERE ot3.total_time <= 10000 AND ot3.call_id = ot1.call_id) AS ocall_count_under_10micro \n"
+                                        "FROM ocallAnalysisTable as ot1\n"
+                                        "GROUP BY ot1.call_id;");*/
+
+        bool check = createViewQuery.exec("create TEMPORARY Table ocallAnalysisTable AS  "
+                                                  "SELECT e1.call_id as call_id, (e2.time - e1.time) AS total_time, oc.symbol_name AS name "
+                                                  "FROM events as e1 JOIN events as e2 ON e1.id = e2.call_event JOIN ocalls as oc ON e1.call_id = oc.id "
+                                                  "WHERE e1.type = 16 AND e2.type = 17 "
+                                                  "ORDER BY call_id, total_time; "
+                                                  "create Table OCallAnalysisView AS "
+                                                  "SELECT ot1.call_id as ocall_id , ot1.name  as ocall_name , COUNT(ot1.call_id) as ocall_total_count , "
+                                                  "(SELECT COUNT(ot2.call_id) FROM ocallAnalysisTable as ot2 WHERE ot2.total_time <= 1000 AND ot2.call_id = ot1.call_id) AS ocall_count_under_micro, "
+                                                  "(SELECT COUNT(ot3.call_id) FROM ocallAnalysisTable as ot3 WHERE ot3.total_time <= 10000 AND ot3.call_id = ot1.call_id) AS ocall_count_under_10micro "
+                                                  "FROM ocallAnalysisTable as ot1 "
+                                                  "GROUP BY ot1.call_id;");
+        if(!check) {
+            std::cerr << "Error: "<< createViewQuery.lastError().text().toStdString() << std::endl;
+            return;
+        }
+    }
+
+    QSqlQuery loadOCallAnalysisQuery;
+    loadOCallAnalysisQuery.prepare("SELECT * FROM OCallAnalysisView");
+    if(!loadOCallAnalysisQuery.exec())
+    {
+        std::cerr << "Error: "<< loadOCallAnalysisQuery.lastError().text().toStdString() << std::endl;
+        return;
+    } else {
+
+        while(loadOCallAnalysisQuery.next())
+        {
+            CallStaticAnalysis oCallStaticAnalysis;
+            oCallStaticAnalysis.callId_ = loadOCallAnalysisQuery.value(0).toInt();
+            oCallStaticAnalysis.callName_ = loadOCallAnalysisQuery.value(1).toString();
+            oCallStaticAnalysis.totalCount_ = loadOCallAnalysisQuery.value(2).toInt();
+            oCallStaticAnalysis.totalOfLowerThanMicroSeconds_ = loadOCallAnalysisQuery.value(3).toInt();
+            oCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadOCallAnalysisQuery.value(4).toInt();
+            ocallStaticAnalysis.push_back(oCallStaticAnalysis);
+        }
+    }
+
+}
+
+const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStaticAnalysis() const {
+    return ecallStaticAnalysis;
+}
+
+const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getOcallStaticAnalysis() const {
+    return ocallStaticAnalysis;
 }

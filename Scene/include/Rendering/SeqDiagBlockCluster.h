@@ -18,28 +18,18 @@ namespace moe {
 
         virtual ~SeqDiagBlockCluster();
 
-        //virtual void initializeStats(const CallHoverInfo &callsInfos) override ;
-
         void addBlock(SeqDiagBlock *innerBlock);
-
-        Renderable * decomposeCluster();
 
         const int size() const;
 
         bool checkClusterCriteria(Renderable *innerBlock);
 
 
-       /* virtual void removeFromScene() override ;
-
-        virtual void addToScene() override;*/
-
     protected:
 
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
 
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
-
-        //virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
         virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 

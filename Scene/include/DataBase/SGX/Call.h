@@ -40,6 +40,16 @@ namespace moe {
 
         virtual SeqDiagBlock* toRenderable(qreal factor) const = 0; //ToDo added factor for test purposes
     };
+
+    /*struct CallCluster : public Call {
+        CallCluster(int id = 0, int eid = 0, uint64_t symbol_address = 0, uint64_t start_time = 0, uint64_t relative_start_time = 0,
+              uint64_t total_time = 0, bool is_private = false, QString symbol_name = "", int isFail = 0) :
+                Call(id, eid, symbol_address,start_time,relative_start_time, total_time, symbol_name, isFail)
+        {
+        }
+
+
+    };*/
 }
 
 #endif //SCENE_CALL_H

@@ -54,7 +54,7 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
 {  //ToDo test it without the if, it might also work because we remove the item later from the scene when it hast height more than 150, so the ifs are redundant here
     hideMouseOverAfterRenderUpdate();
     updateRectTranform();
-    if ((rect->rect().height() / (lineOffset_->children_.size()+1)) < 15.0)
+    if ((rect->rect().height() / (this->size()+1)) < 15.0)
     {
         if(!isClustered)
         {
@@ -165,23 +165,15 @@ void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) 
     //return;
 }
 
-void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
     SeqDiagBlock::hoverLeaveEvent(event);
     //return;
 }
 
-moe::Renderable * moe::SeqDiagBlockCluster::decomposeCluster() {
-    if(lineOffset_->children_.size() == 1) {
-        lineOffset_->children_[0]->setTransform(this->getTransform());
-        static_cast<SeqDiagBlock*>(lineOffset_->children_[0])->setHeight(this->getHeight());
-        static_cast<SeqDiagBlock*>(lineOffset_->children_[0])->setWidth(this->getWidth());
-        return lineOffset_->children_[0];
-    } else {
-        return nullptr;
-    }
-}
 
-const int moe::SeqDiagBlockCluster::size() const {
+const int moe::SeqDiagBlockCluster::size() const
+{
     return lineOffset_->children_.size();
 }
 

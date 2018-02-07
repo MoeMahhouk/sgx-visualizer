@@ -60,10 +60,9 @@ namespace moe {
                         subClusterList.push_back(new SeqDiagBlockCluster());
                         subClusterList.back()->addBlock(eCallRenderable);
                     }
-                    //clusterTest->addBlock(eCallRenderable);
-                    //threadSeqDiag->addBlock(eCallRenderable);
                 }
-                for (SeqDiagBlockCluster *subCluster: subClusterList) {
+                for (SeqDiagBlockCluster *subCluster: subClusterList)
+                {
                     clusterTest->addBlock(subCluster);
                 }
             }

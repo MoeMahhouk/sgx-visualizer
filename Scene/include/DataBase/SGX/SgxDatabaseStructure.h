@@ -21,6 +21,7 @@
 #include "OCallTypes.h"
 #include "ECallTypes.h"
 #include "CallStatistics.h"
+#include "CallStaticAnalysis.h"
 
 namespace moe {
 
@@ -59,9 +60,17 @@ namespace moe {
 
         void loadOcallsStats();
 
+        void loadEcallAnalysis();
+
+        void loadOcallAnalysis();
+
         const QVector<CallStatistics> &getEcallStatistics() const;
 
         const QVector<CallStatistics> &getOcallStatistics() const;
+
+        const QVector<CallStaticAnalysis> &getEcallStaticAnalysis() const;
+
+        const QVector<CallStaticAnalysis> &getOcallStaticAnalysis() const;
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -70,13 +79,15 @@ namespace moe {
         void initializeECallsAndOCalls(QString conditionQuery = nullptr);
         void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
-        void loadOCallTypeList();
 
+        void loadOCallTypeList();
         void loadExistingEnclaves();
         QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
         QVector<CallStatistics> ecallStatistics;
         QVector<CallStatistics> ocallStatistics;
+        QVector<CallStaticAnalysis> ecallStaticAnalysis;
+        QVector<CallStaticAnalysis> ocallStaticAnalysis;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;
         QMap<int, QString> enclavesList; //stores the pair eid and enclave name

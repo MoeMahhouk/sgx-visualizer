@@ -1,0 +1,153 @@
+//
+// Created by moe on 07.02.18.
+//
+
+#ifndef SCENE_SGXERRORCODES_H
+#define SCENE_SGXERRORCODES_H
+
+#include <QtCore/QString>
+
+namespace moe {
+    //ToDo is not currently used because these are in hexadecimal and the ones in the data bank are already converted to decimal numbers
+    enum SGXErrorCodes {
+        SGX_SUCCESS                                              = 0x0000,
+        SGX_ERROR_UNEXPECTED                                     = 0x0001,
+        SGX_ERROR_INVALID_PARAMETER                              = 0x0002,
+        SGX_ERROR_OUT_OF_MEMORY                                  = 0x0003,
+        SGX_ERROR_ENCLAVE_LOST                                   = 0x0004,
+        SGX_ERROR_INVALID_STATE                                  = 0x0005,
+        SGX_ERROR_HYPERV_ENABLED                                 = 0x0007,
+        SGX_ERROR_FEATURE_NOT_SUPPORTED                          = 0x0008,
+        SGX_ERROR_INVALID_FUNCTION                               = 0x1001,
+        SGX_ERROR_OUT_OF_TCS                                     = 0x1003,
+        SGX_ERROR_ENCLAVE_CRASHED                                = 0x1006,
+        SGX_ERROR_ECALL_NOT_ALLOWED                              = 0x1007,
+        SGX_ERROR_OCALL_NOT_ALLOWED                              = 0x1008,
+        SGX_ERROR_UNDEFINED_SYMBOL                               = 0x2000,
+        SGX_ERROR_INVALID_ENCLAVE                                = 0x2001,
+        SGX_ERROR_INVALID_ENCLAVE_ID                             = 0x2002,
+        SGX_ERROR_INVALID_SIGNATURE                              = 0x2003,
+        SGX_ERROR_NDEBUG_ENCLAVE                                 = 0x2004,
+        SGX_ERROR_OUT_OF_EPC                                     = 0x2005,
+        SGX_ERROR_NO_DEVICE                                      = 0x2006,
+        SGX_ERROR_MEMORY_MAP_CONFLICT                            = 0x2007,
+        SGX_EEROR_INVALID_METADATA                               = 0x2009,
+        SGX_ERROR_DEVICE_BUSY                                    = 0x200C,
+        SGX_ERROR_INVALID_VERSION                                = 0x200D,
+        SGX_ERROR_MODE_INCOMPATIBLE                              = 0x200E,
+        SGX_ERROR_ENCLAVE_FILE_ACCESS                            = 0x200F,
+        SGX_ERROR_INVALID_MISC                                   = 0x2010,
+        SGX_ERROR_MAC_MISMATCH                                   = 0x3001,
+        SGX_ERROR_INVALID_ATTRIBUTE                              = 0x3002,
+        SGX_ERROR_INVALID_CPUSVN                                 = 0x3003,
+        SGX_ERROR_INVALID_ISVSVN                                 = 0x3004,
+        SGX_ERROR_INVALID_KEYNAME                                = 0x3005,
+        SGX_ERROR_SERVICE_UNAVAILABLE                            = 0x4001,
+        SGX_ERROR_SERVICE_TIMEOUT                                = 0x4002,
+        SGX_ERROR_AE_INVALID_EPIDBLOB                            = 0x4003,
+        SGX_ERROR_SERVICE_INVALID_PRIVILEDGE                     = 0x4004,
+        SGX_ERROR_EPID_MEMBER_REVOKED                            = 0x4005,
+        SGX_ERROR_UPDATE_NEEDED                                  = 0x4006,
+        SGX_ERROR_NETWORK_FAILURE                                = 0x4007,
+        SGX_ERROR_AE_SESSION_INVALID                             = 0x4008,
+        SGX_ERROR_BUSY                                           = 0x400a,
+        SGX_ERROR_MC_NOT_FOUND                                   = 0x400c,
+        SGX_ERROR_MC_NO_ACCESS_RIGHT                             = 0x400d,
+        SGX_ERROR_MC_USED_UP                                     = 0x400e,
+        SGX_ERROR_MC_OVER_QUOTA                                  = 0x400f,
+        SGX_ERROR_KDF_MISMATCH                                   = 0x4011,
+        SGX_ERROR_UNRECOGNIZED_PLATFORM                          = 0x4012,
+        SGX_ERROR_SM_SERVICE_CLOSED                              = 0x4013,
+        SGX_ERROR_SM_SERVICE_UNAVAILABLE                         = 0x4014,
+        SGX_ERROR_SM_SERVICE_UNCAUGHT_EXCEPTION                  = 0x4015,
+        SGX_ERROR_SM_SERVICE_RESPONSE_OVERFLOW                   = 0x4016,
+        SGX_ERROR_SM_SERVICE_INTERNAL_ERROR                      = 0x4017,
+        SGX_ERROR_NO_PRIVILEGE                                   = 0x5002,
+        SGX_ERROR_FILE_BAD_STATUS                                = 0x7001,
+        SGX_ERROR_FILE_NO_KEY_ID                                 = 0x7002,
+        SGX_ERROR_FILE_NAME_MISMATCH                             = 0x7003,
+        SGX_ERROR_FILE_NOT_SGX_FILE                              = 0x7004,
+        SGX_ERROR_FILE_CANT_OPEN_RECOVERY_FILE                   = 0x7005,
+        SGX_ERROR_FILE_CANT_WRITE_RECOVERY_FILE                  = 0x7006,
+        SGX_ERROR_FILE_RECOVERY_NEEDED                           = 0x7007,
+        SGX_ERROR_FILE_FLUSH_FAILED                              = 0x7008,
+        SGX_ERROR_FILE_CLOSE_FAILED                              = 0x7009,
+        SGX_ERROR_IPLDR_NOTENCRYPTED                             = 0x8001,
+        SGX_ERROR_IPLDR_MAC_MISMATCH                             = 0x8002,
+        SGX_ERROR_IPLDR_ENCRYPTED                                = 0x8003
+
+    };
+
+    inline const QString sgxErrorToString(SGXErrorCodes errorCode)
+    {
+        switch (errorCode)
+        {
+            case SGX_SUCCESS:                                    return "SGX_SUCCESS";
+            case SGX_ERROR_UNEXPECTED:                           return "SGX_ERROR_UNEXPECTED";
+            case SGX_ERROR_INVALID_PARAMETER:                    return "SGX_ERROR_INVALID_PARAMETER";
+            case SGX_ERROR_OUT_OF_MEMORY:                        return "SGX_ERROR_OUT_OF_MEMORY";
+            case SGX_ERROR_ENCLAVE_LOST:                         return "SGX_ERROR_ENCLAVE_LOST";
+            case SGX_ERROR_INVALID_STATE:                        return "SGX_ERROR_INVALID_STATE";
+            case SGX_ERROR_HYPERV_ENABLED:                       return "SGX_ERROR_HYPERV_ENABLED";
+            case SGX_ERROR_FEATURE_NOT_SUPPORTED:                return "SGX_ERROR_FEATURE_NOT_SUPPORTED";
+            case SGX_ERROR_INVALID_FUNCTION:                     return "SGX_ERROR_INVALID_FUNCTION";
+            case SGX_ERROR_OUT_OF_TCS:                           return "SGX_ERROR_OUT_OF_TCS";
+            case SGX_ERROR_ENCLAVE_CRASHED:                      return "SGX_ERROR_ENCLAVE_CRASHED";
+            case SGX_ERROR_ECALL_NOT_ALLOWED:                    return "SGX_ERROR_ECALL_NOT_ALLOWED";
+            case SGX_ERROR_OCALL_NOT_ALLOWED:                    return "SGX_ERROR_OCALL_NOT_ALLOWED";
+            case SGX_ERROR_UNDEFINED_SYMBOL:                     return "SGX_ERROR_UNDEFINED_SYMBOL";
+            case SGX_ERROR_INVALID_ENCLAVE:                      return "SGX_ERROR_INVALID_ENCLAVE";
+            case SGX_ERROR_INVALID_ENCLAVE_ID:                   return "SGX_ERROR_INVALID_ENCLAVE_ID";
+            case SGX_ERROR_INVALID_SIGNATURE:                    return "SGX_ERROR_INVALID_SIGNATURE";
+            case SGX_ERROR_NDEBUG_ENCLAVE:                       return "SGX_ERROR_NDEBUG_ENCLAVE";
+            case SGX_ERROR_OUT_OF_EPC:                           return "SGX_ERROR_OUT_OF_EPC";
+            case SGX_ERROR_NO_DEVICE:                            return "SGX_ERROR_NO_DEVICE";
+            case SGX_ERROR_MEMORY_MAP_CONFLICT:                  return "SGX_ERROR_MEMORY_MAP_CONFLICT";
+            case SGX_EEROR_INVALID_METADATA:                     return "SGX_EEROR_INVALID_METADATA";
+            case SGX_ERROR_DEVICE_BUSY:                          return "SGX_ERROR_DEVICE_BUSY";
+            case SGX_ERROR_INVALID_VERSION:                      return "SGX_ERROR_INVALID_VERSION";
+            case SGX_ERROR_MODE_INCOMPATIBLE:                    return "SGX_ERROR_MODE_INCOMPATIBLE";
+            case SGX_ERROR_ENCLAVE_FILE_ACCESS:                  return "SGX_ERROR_ENCLAVE_FILE_ACCESS";
+            case SGX_ERROR_INVALID_MISC:                         return "SGX_ERROR_INVALID_MISC";
+            case SGX_ERROR_MAC_MISMATCH:                         return "SGX_ERROR_MAC_MISMATCH";
+            case SGX_ERROR_INVALID_ATTRIBUTE:                    return "SGX_ERROR_INVALID_ATTRIBUTE";
+            case SGX_ERROR_INVALID_CPUSVN:                       return "SGX_ERROR_INVALID_CPUSVN";
+            case SGX_ERROR_INVALID_ISVSVN:                       return "SGX_ERROR_INVALID_ISVSVN";
+            case SGX_ERROR_INVALID_KEYNAME:                      return "SGX_ERROR_INVALID_KEYNAME";
+            case SGX_ERROR_SERVICE_UNAVAILABLE:                  return "SGX_ERROR_SERVICE_UNAVAILABLE";
+            case SGX_ERROR_SERVICE_TIMEOUT:                      return "SGX_ERROR_SERVICE_TIMEOUT";
+            case SGX_ERROR_AE_INVALID_EPIDBLOB:                  return "SGX_ERROR_AE_INVALID_EPIDBLOB";
+            case SGX_ERROR_SERVICE_INVALID_PRIVILEDGE:           return "SGX_ERROR_SERVICE_INVALID_PRIVILEDGE";
+            case SGX_ERROR_EPID_MEMBER_REVOKED:                  return "SGX_ERROR_EPID_MEMBER_REVOKED";
+            case SGX_ERROR_UPDATE_NEEDED:                        return "SGX_ERROR_UPDATE_NEEDED";
+            case SGX_ERROR_NETWORK_FAILURE:                      return "SGX_ERROR_NETWORK_FAILURE";
+            case SGX_ERROR_AE_SESSION_INVALID:                   return "SGX_ERROR_AE_SESSION_INVALID";
+            case SGX_ERROR_BUSY:                                 return "SGX_ERROR_BUSY";
+            case SGX_ERROR_MC_NOT_FOUND:                         return "SGX_ERROR_MC_NOT_FOUND";
+            case SGX_ERROR_MC_NO_ACCESS_RIGHT:                   return "SGX_ERROR_MC_NO_ACCESS_RIGHT";
+            case SGX_ERROR_MC_USED_UP:                           return "SGX_ERROR_MC_USED_UP";
+            case SGX_ERROR_MC_OVER_QUOTA:                        return "SGX_ERROR_MC_OVER_QUOTA";
+            case SGX_ERROR_KDF_MISMATCH:                         return "SGX_ERROR_KDF_MISMATCH";
+            case SGX_ERROR_UNRECOGNIZED_PLATFORM:                return "SGX_ERROR_UNRECOGNIZED_PLATFORM";
+            case SGX_ERROR_SM_SERVICE_CLOSED:                    return "SGX_ERROR_SM_SERVICE_CLOSED";
+            case SGX_ERROR_SM_SERVICE_UNAVAILABLE:               return "SGX_ERROR_SM_SERVICE_UNAVAILABLE";
+            case SGX_ERROR_SM_SERVICE_UNCAUGHT_EXCEPTION:        return "SGX_ERROR_SM_SERVICE_UNCAUGHT_EXCEPTION";
+            case SGX_ERROR_SM_SERVICE_RESPONSE_OVERFLOW:         return "SGX_ERROR_SM_SERVICE_RESPONSE_OVERFLOW";
+            case SGX_ERROR_SM_SERVICE_INTERNAL_ERROR:            return "SGX_ERROR_SM_SERVICE_INTERNAL_ERROR";
+            case SGX_ERROR_NO_PRIVILEGE:                         return "SGX_ERROR_NO_PRIVILEGE";
+            case SGX_ERROR_FILE_BAD_STATUS:                      return "SGX_ERROR_FILE_BAD_STATUS";
+            case SGX_ERROR_FILE_NO_KEY_ID:                       return "SGX_ERROR_FILE_NO_KEY_ID";
+            case SGX_ERROR_FILE_NAME_MISMATCH:                   return "SGX_ERROR_FILE_NAME_MISMATCH";
+            case SGX_ERROR_FILE_NOT_SGX_FILE:                    return "SGX_ERROR_FILE_NOT_SGX_FILE";
+            case SGX_ERROR_FILE_CANT_OPEN_RECOVERY_FILE:         return "SGX_ERROR_FILE_CANT_OPEN_RECOVERY_FILE";
+            case SGX_ERROR_FILE_CANT_WRITE_RECOVERY_FILE:        return "SGX_ERROR_FILE_CANT_WRITE_RECOVERY_FILE";
+            case SGX_ERROR_FILE_RECOVERY_NEEDED:                 return "SGX_ERROR_FILE_RECOVERY_NEEDED";
+            case SGX_ERROR_FILE_FLUSH_FAILED:                    return "SGX_ERROR_FILE_FLUSH_FAILED";
+            case SGX_ERROR_FILE_CLOSE_FAILED:                    return "SGX_ERROR_FILE_CLOSE_FAILED";
+            case SGX_ERROR_IPLDR_NOTENCRYPTED:                   return "SGX_ERROR_IPLDR_NOTENCRYPTED";
+            case SGX_ERROR_IPLDR_MAC_MISMATCH:                   return "SGX_ERROR_IPLDR_MAC_MISMATCH";
+            case SGX_ERROR_IPLDR_ENCRYPTED:                      return "SGX_ERROR_IPLDR_ENCRYPTED";
+        }
+    }
+}
+#endif //SCENE_SGXERRORCODES_H

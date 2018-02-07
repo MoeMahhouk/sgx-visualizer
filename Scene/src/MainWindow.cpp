@@ -1,6 +1,7 @@
 
 
 
+#include <DataBase/SGX/SGXErrorCodes.h>
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
 
@@ -32,7 +33,9 @@ void MainWindow::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this);
     if (!fileName.isEmpty())
+    {
         loadFile(fileName);
+    }
 }
 
 
@@ -83,10 +86,6 @@ void MainWindow::resetPressed()
 
 void MainWindow::scrollRightPressed()
 {
-    db->loadEcallAnalysis();
-    for (moe::CallStaticAnalysis call: db->getEcallStaticAnalysis()) {
-        std::cerr << call.callName_.toStdString() << call.totalCount_ << std::endl;
-    }
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }
@@ -307,6 +306,10 @@ void MainWindow::loadFile(const QString& fileName)
         db = new moe::SgxDatabaseStructure(fileName);
         loadECallStats_->setEnabled(true);
         loadOCallStats_->setEnabled(true);
+        //QThread thread1(this) ;
+        //thread1.
+        //std::thread t1(&MainWindow::updateTraces,this);
+        //t1.join();
         updateTraces();
     }
 }
@@ -924,6 +927,7 @@ void MainWindow::updateTraces() {
     sceneRootNode_->initialize(data, sceneTransformation);
     zoomAndScrollTofirstEvent();
     render();
+
 }
 
 void MainWindow::loadOCallStats() {

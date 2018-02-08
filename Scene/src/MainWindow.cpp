@@ -117,6 +117,7 @@ void MainWindow::createMenus()
     statistics->addAction(loadOCallStats_);
     auto analysis = new QMenu("Analysis", load);
     load->addMenu(analysis);
+    analysis->addAction(loadCallStaticAnalysis_);
 
 
 
@@ -157,6 +158,10 @@ void MainWindow::createActions()
     loadOCallStats_->setDisabled(true);
     //connect(this, SIGNAL(dataBaseLoaded(db)), loadOCallStats_, SLOT(setEnabled(bool)));
 
+    loadCallStaticAnalysis_ = new QAction(tr("Static"), this);
+    loadCallStaticAnalysis_->setStatusTip(tr("Generate the Static Analysis For E/OCalls"));
+    connect(loadCallStaticAnalysis_, SIGNAL(triggered()), this, SLOT(generateCallStaticAnalysis()));
+    loadCallStaticAnalysis_->setDisabled(true);
 }
 
 void MainWindow::createToolbar()
@@ -229,6 +234,11 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     toolbar->addWidget(statisticsLabel);
     toolbar->addAction(loadECallStats_);
     toolbar->addAction(loadOCallStats_);
+    toolbar->addSeparator();
+
+    auto analysisLabel = new QLabel("Analysis: ");
+    toolbar->addWidget(analysisLabel);
+    toolbar->addAction(loadCallStaticAnalysis_);
 }
 
 void MainWindow::render()
@@ -311,6 +321,7 @@ void MainWindow::loadFile(const QString& fileName)
         db = new moe::SgxDatabaseStructure(fileName);
         loadECallStats_->setEnabled(true);
         loadOCallStats_->setEnabled(true);
+        loadCallStaticAnalysis_->setEnabled(true);
         //QThread thread1(this) ;
         //thread1.
         //std::thread t1(&MainWindow::updateTraces,this);
@@ -1012,12 +1023,12 @@ void MainWindow::loadECallStats()
         table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
         for (int i = 0; i < table->rowCount(); ++i)
         {
-            moe::AbstractTimeUnit itemInfo;
+            //moe::AbstractTimeUnit itemInfo;
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setData(Qt::EditRole,eCallStatsList[i].callId_);
             table->setItem(i,0, item);
             //table->setItem(i,0, new QTableWidgetItem(QString::number(eCallStatsList[i].callId_)));
-            table->setItem(i,1, new QTableWidgetItem(db->getEcallStatistics()[i].callSymbolName_));
+            table->setItem(i,1, new QTableWidgetItem(eCallStatsList[i].callSymbolName_));
             table->setItem(i,2, new QTableWidgetItem(QString::number(eCallStatsList[i].count_,'f',0)));
             table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].callAvg_,0) + " (" + QString::number(eCallStatsList[i].callAvg_,'f',0)+ " ns)"));
             table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].median_,0) + " (" + QString::number(eCallStatsList[i].median_,'f',0)+ " ns)"));
@@ -1090,14 +1101,67 @@ void MainWindow::loadECallStats()
     QCPGraph *graph1 = customPlot->addGraph();
     graph1->setData(plottedEcallNames,plottedMedian);*/
 }
-
-void MainWindow::generateCallAnalysis()
+//ToDo can be later done with separate class for refinement and better abstraction
+void MainWindow::generateCallStaticAnalysis()
 {
     if(db->getEcallStaticAnalysis().isEmpty() || db->getOcallStaticAnalysis().isEmpty()) {
-        analysisDialig_ = new QDialog();
-        analysisDialig_->setWindowTitle(tr("Call Analysis"));
-        QTabWidget *tab = new QTabWidget();
-        //tab->addTab()
+        db->loadEcallAnalysis();
+        db->loadOcallAnalysis();
+        const QVector<moe::CallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
+        const QVector<moe::CallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
 
+        analysisDialig_ = new QDialog();
+        analysisDialig_->setWindowTitle(tr("Call Static Analysis"));
+        auto  dialogLayout = new QVBoxLayout();
+
+        QTabWidget *analysisDialogTab = new QTabWidget();
+        QTabWidget *staticAnalysisDialogTab = new QTabWidget();
+        QTabWidget *dynamicAnalysisDialogTab = new QTabWidget();
+
+        QTableWidget *eCallStaticAnalysisTable = new QTableWidget();
+        eCallStaticAnalysisTable->setRowCount(ecallStaticAnalysisList.size());
+        eCallStaticAnalysisTable->setColumnCount(2);
+        eCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));
+        for (int i = 0; i < ecallStaticAnalysisList.size() ; ++i)
+        {
+            eCallStaticAnalysisTable->setItem(i,0,new QTableWidgetItem(ecallStaticAnalysisList[i].callName_));
+            eCallStaticAnalysisTable->setItem(i,1,new QTableWidgetItem(ecallStaticAnalysisList[i].analysisText_));
+        }
+        eCallStaticAnalysisTable->resizeRowsToContents();
+        eCallStaticAnalysisTable->resizeColumnsToContents();
+        eCallStaticAnalysisTable->horizontalHeader()->setStretchLastSection(true);
+        eCallStaticAnalysisTable->verticalHeader()->setStretchLastSection(true);
+        eCallStaticAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        eCallStaticAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+
+        QTableWidget *oCallStaticAnalysisTable = new QTableWidget();
+        oCallStaticAnalysisTable->setRowCount(ocallStaticAnalysisList.size());
+        oCallStaticAnalysisTable->setColumnCount(2);
+        oCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));
+        for (int i = 0; i < ocallStaticAnalysisList.size() ; ++i)
+        {
+            oCallStaticAnalysisTable->setItem(i,0,new QTableWidgetItem(ocallStaticAnalysisList[i].callName_));
+            oCallStaticAnalysisTable->setItem(i,1,new QTableWidgetItem(ocallStaticAnalysisList[i].analysisText_));
+        }
+        oCallStaticAnalysisTable->resizeRowsToContents();
+        oCallStaticAnalysisTable->resizeColumnsToContents();
+        oCallStaticAnalysisTable->horizontalHeader()->setStretchLastSection(true);
+        oCallStaticAnalysisTable->verticalHeader()->setStretchLastSection(true);
+        oCallStaticAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        oCallStaticAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+        analysisDialogTab->addTab(staticAnalysisDialogTab,"Static");
+        analysisDialogTab->addTab(dynamicAnalysisDialogTab,"Dynamic");
+        staticAnalysisDialogTab->addTab(eCallStaticAnalysisTable,"ECall");
+        staticAnalysisDialogTab->addTab(oCallStaticAnalysisTable,"OCall");
+
+        dialogLayout->addWidget(analysisDialogTab);
+        analysisDialig_->setLayout(dialogLayout);
+        analysisDialig_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
+        analysisDialig_->show();
+        //tab->addTab()
+    } else {
+        analysisDialig_->show();
     }
 }

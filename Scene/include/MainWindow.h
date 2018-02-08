@@ -45,7 +45,7 @@ private slots:
 
     void loadOCallStats();
     void loadECallStats();
-    void generateCallAnalysis();
+    void generateCallStaticAnalysis();
 protected:
     void wheelEvent ( QWheelEvent * event ) override;
 
@@ -144,6 +144,7 @@ private:
     QAction *enclaveFilterAction_;
     QAction *loadECallStats_;
     QAction *loadOCallStats_;
+    QAction *loadCallStaticAnalysis_;
     QAction *timeFilterAction_;
     QAction *applyDockAction_;
     QWidget *filterControls_;

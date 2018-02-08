@@ -674,7 +674,7 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis() {
 
 void moe::SgxDatabaseStructure::loadOcallAnalysis() {
 
-    if(!m_db.tables().contains("OCallAnalysisView",Qt::CaseInsensitive))
+    if(!m_db.tables(QSql::Views).contains("OCallAnalysisView",Qt::CaseInsensitive))
     {
         QSqlQuery createViewQuery;
         QSqlQuery createViewQuery2;
@@ -700,8 +700,9 @@ void moe::SgxDatabaseStructure::loadOcallAnalysis() {
     QSqlQuery loadOCallAnalysisQuery;
     loadOCallAnalysisQuery.prepare("SELECT * FROM OCallAnalysisView");
 
-    if(!execAndCheckQuery(loadOCallAnalysisQuery))
+    if(!execAndCheckQuery(loadOCallAnalysisQuery)) {
         return;
+    }
 
     while(loadOCallAnalysisQuery.next())
     {

@@ -48,7 +48,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
     std::cerr << "yoffset is " << yOffset_ << std::endl;
     std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
-    //std::cerr << "the scaling factor is now " << yScale_ * factor_ << std::endl;
     if(!viewArea_->rect().contains(event->pos()))
     {
         if (event->modifiers() & Qt::ControlModifier)
@@ -65,16 +64,13 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             verticalScroll(moe::signum(event->delta())*40,factor_);
         }
     }
+    //std::cerr << "the scaling factor is now " << yScale_ * factor_ << std::endl;
+    std::cerr << "the scaling factor is now " << yScale_ /factor_ << std::endl;
 }
 
 
 void MainWindow::resetPressed()
 {
-    for (moe::Renderable* r: sequenceListNode_->children_)
-    {
-        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
-        s->resetLineScales();
-    }
     sequenceListNode_->setTransform(moe::Transform2D());
     yOffset_ = 0;
     yScale_ = 1;
@@ -86,6 +82,10 @@ void MainWindow::resetPressed()
 
 void MainWindow::scrollRightPressed()
 {
+    db->loadEcallAnalysis();
+    for (int i = 0; i < db->getEcallStaticAnalysis().size() ; ++i) {
+        std::cerr << db->getEcallStaticAnalysis()[i].callName_.toStdString() << db->getEcallStaticAnalysis()[i].totalCount_ << std::endl;
+    }
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }

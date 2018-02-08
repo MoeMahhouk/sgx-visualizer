@@ -64,6 +64,8 @@ namespace moe {
 
         void loadOcallAnalysis();
 
+        bool execAndCheckQuery(QSqlQuery query);
+
         const QVector<CallStatistics> &getEcallStatistics() const;
 
         const QVector<CallStatistics> &getOcallStatistics() const;

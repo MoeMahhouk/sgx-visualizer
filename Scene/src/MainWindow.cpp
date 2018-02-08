@@ -109,10 +109,15 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
-    loadStatistics_ = new QMenu("Load Statistics",fileMenu_);
-    fileMenu_->addMenu(loadStatistics_);
-    loadStatistics_->addAction(loadECallStats_);
-    loadStatistics_->addAction(loadOCallStats_);
+    auto load = new QMenu("Load",fileMenu_);
+    fileMenu_->addMenu(load);
+    auto statistics = new QMenu("Statistics",load);
+    load->addMenu(statistics);
+    statistics->addAction(loadECallStats_);
+    statistics->addAction(loadOCallStats_);
+    auto analysis = new QMenu("Analysis", load);
+    load->addMenu(analysis);
+
 
 
     viewMenu_ = menuBar()->addMenu(tr("View"));
@@ -930,7 +935,8 @@ void MainWindow::updateTraces() {
 
 }
 
-void MainWindow::loadOCallStats() {
+void MainWindow::loadOCallStats()
+{
 
     if(db->getOcallStatistics().isEmpty())
     {
@@ -988,7 +994,8 @@ void MainWindow::loadOCallStats() {
     }
 }
 
-void MainWindow::loadECallStats() {
+void MainWindow::loadECallStats()
+{
     if(db->getEcallStatistics().isEmpty())
     {
         db->loadEcallsStats();
@@ -1082,4 +1089,15 @@ void MainWindow::loadECallStats() {
     }
     QCPGraph *graph1 = customPlot->addGraph();
     graph1->setData(plottedEcallNames,plottedMedian);*/
+}
+
+void MainWindow::generateCallAnalysis()
+{
+    if(db->getEcallStaticAnalysis().isEmpty() || db->getOcallStaticAnalysis().isEmpty()) {
+        analysisDialig_ = new QDialog();
+        analysisDialig_->setWindowTitle(tr("Call Analysis"));
+        QTabWidget *tab = new QTabWidget();
+        //tab->addTab()
+
+    }
 }

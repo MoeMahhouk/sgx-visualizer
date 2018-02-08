@@ -45,6 +45,7 @@ private slots:
 
     void loadOCallStats();
     void loadECallStats();
+    void generateCallAnalysis();
 protected:
     void wheelEvent ( QWheelEvent * event ) override;
 
@@ -91,12 +92,13 @@ private:
     QGraphicsScene *scene_;
     QMenu *fileMenu_;
     QMenu *viewMenu_;
-    QMenu *loadStatistics_;
+    //QMenu *loadStatistics_;
     QMenu *helpMenu_;
     QMenuBar *menuBar_;
     QToolBar *toolBar_;
     QDialog *eCallStatsDialog_;
     QDialog *oCallStatsDialog_;
+    QDialog *analysisDialig_;
 
 
     QStatusBar *statusBar_;

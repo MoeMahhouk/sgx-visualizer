@@ -666,6 +666,10 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis() {
         eCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadECallAnalysisQuery.value(4).toInt();
         ecallStaticAnalysis.push_back(eCallStaticAnalysis);
     }
+    for (int i = 0; i < ecallStaticAnalysis.size() ; ++i)
+    {
+        ecallStaticAnalysis[i].generateAnalysisText();
+    }
 }
 
 void moe::SgxDatabaseStructure::loadOcallAnalysis() {
@@ -708,6 +712,11 @@ void moe::SgxDatabaseStructure::loadOcallAnalysis() {
         oCallStaticAnalysis.totalOfLowerThanMicroSeconds_ = loadOCallAnalysisQuery.value(3).toInt();
         oCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadOCallAnalysisQuery.value(4).toInt();
         ocallStaticAnalysis.push_back(oCallStaticAnalysis);
+    }
+
+    for (int i = 0; i < ocallStaticAnalysis.size() ; ++i)
+    {
+        ocallStaticAnalysis[i].generateAnalysisText();
     }
 }
 

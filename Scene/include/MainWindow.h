@@ -84,6 +84,7 @@ private:
     // Ui::MainWindow *ui;
     qreal factor_ = 1;
     qreal yScale_ = 1; //toDo better solution for zooming
+    qreal scaleLineStep;
 
     qreal yOffset_ = 0;
     QWidget *viewArea_;

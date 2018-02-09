@@ -47,12 +47,14 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,7) - QPointF(0,MEASURELINE_OFFSET);
     std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
     //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
-    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
+    //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
 
+    std::cerr << "difference " << (this->height() * 0.75) + (yOffset_ * factor_) << std::endl;
+    std::cerr << "difference multiplied with the scale" << ((this->height() * 0.75) + ((yOffset_ * factor_)/ yScale_)) << std::endl;
     /*std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
     std::cerr << "yoffset is " << yOffset_ << std::endl;
     std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
-    if(!scene_->sceneRect().contains(event->pos()))
+    if(!scene_->sceneRect().contains(event->pos()) && db)
     {
         if (event->modifiers() & Qt::ControlModifier)
         {
@@ -60,8 +62,11 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             qreal mouseSceneYBeforeZoom = mouseScenePos.y();
             qreal mouseSceneYAfterZoom = mouseScenePos.y() * yScaleFactor;
             qreal oldYOffset = yOffset_;
-            if(((yScale_*yScaleFactor)/factor_) > 5000000000 || ((yScale_*yScaleFactor) / factor_) < 50000 /*|| mouseScenePos.y() > (yOffset_ * factor_)/yScale_ + this->height()*0.75*/ )
+            const qreal limit = (qreal)scaleLineStep/(qreal)(yScale_*yScaleFactor);
+            if(limit/pow(10,8) > 1 || limit < 300 ){
                 return;
+            }
+
             verticalZoom(yScaleFactor);
             scrollTo(oldYOffset * yScaleFactor, factor_);
             verticalScroll(mouseSceneYBeforeZoom - mouseSceneYAfterZoom, factor_);
@@ -69,8 +74,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             verticalScroll(moe::signum(event->delta())*40,factor_);
         }
     }
-    //std::cerr << "the scaling factor is now " << yScale_ * factor_ << std::endl;
-    //std::cerr << "the scaling factor is now " << yScale_ /factor_ << std::endl;
 }
 
 
@@ -209,7 +212,7 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
 {
     auto zoomLabel = new QLabel("Zoom Options: ");
     toolbar->addWidget(zoomLabel);
-    QPushButton* reset = new QPushButton(tr("Reset"), toolbar);
+    auto* reset = new QPushButton(tr("Reset"), toolbar);
     reset->connect(reset,SIGNAL(clicked()),this, SLOT(resetPressed()));
     toolbar->addWidget(reset);
     toolbar->addSeparator();
@@ -218,17 +221,17 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     auto scrollLabel = new QLabel("Scroll Options: ");
     toolbar->addWidget(scrollLabel);
 
-    QPushButton* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
+    auto* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
     scrollLeft->setShortcut(QKeySequence::MoveToPreviousChar);
     toolbar->addWidget(scrollLeft);
 
-    QPushButton* scrollRight = new QPushButton(tr("Scroll Right ->"), toolbar);
+    auto* scrollRight = new QPushButton(tr("Scroll Right ->"), toolbar);
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));
     scrollRight->setShortcut(QKeySequence::MoveToNextChar);
     toolbar->addWidget(scrollRight);
 
-    QPushButton* scrollToNextEventButton = new QPushButton(tr("Next ECall"), toolbar);
+    auto* scrollToNextEventButton = new QPushButton(tr("Next ECall"), toolbar);
     scrollToNextEventButton->connect(scrollToNextEventButton, SIGNAL(clicked()), this, SLOT(scrollToNextEvent()));
     scrollToNextEventButton->setShortcut(QKeySequence::FindNext);
     scrollToNextEventButton->setStatusTip("Scroll to next ECall");
@@ -518,7 +521,7 @@ void MainWindow::generateOCallList()
         for (int i = 0; i < db->getOCallTypeList().size() ; ++i)
         {
             QString oCallItemName = db->getOCallTypeList()[i].symbol_name_;
-            QListWidgetItem *eCallItem = new QListWidgetItem(oCallItemName, oCallList_);
+            auto *eCallItem = new QListWidgetItem(oCallItemName, oCallList_);
             eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
             eCallItem->setCheckState(Qt::Checked);
             chosenOcalls.insert(i);
@@ -553,7 +556,7 @@ void MainWindow::generateECallList()
         for (int i = 0; i < db->getECallTypeList().size() ; ++i)
         {
             QString eCallItemName = db->getECallTypeList()[i].symbol_name_;
-            QListWidgetItem *eCallItem = new QListWidgetItem(eCallItemName, eCallList_);
+            auto *eCallItem = new QListWidgetItem(eCallItemName, eCallList_);
             eCallItem->setFlags(eCallItem->flags() | Qt::ItemIsUserCheckable);
             eCallItem->setCheckState(Qt::Checked);
             chosenEcalls.insert(i);
@@ -588,7 +591,7 @@ void MainWindow::generateThreadList()
         {
             QString threadItemName = "Thread ";
             threadItemName.append(QString::number(i));
-            QListWidgetItem *threadItem = new QListWidgetItem(threadItemName, threadList_);
+            auto *threadItem = new QListWidgetItem(threadItemName, threadList_);
             threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
             threadItem->setCheckState(db->getThreads_()[i].threadEcalls_.isEmpty() ? Qt::Unchecked :Qt::Checked); //ToDo here we checked out the empty threads
             chosenThreads.insert(i);
@@ -626,7 +629,7 @@ void MainWindow::generateEncalveList()
     {
         for (auto e : db->getEnclavesMap().keys()) {
             QString enclaveName = db->getEnclavesMap().value(e);
-            QListWidgetItem *enclaveItem = new QListWidgetItem(enclaveName, enclavesList_);
+            auto *enclaveItem = new QListWidgetItem(enclaveName, enclavesList_);
             enclaveItem->setFlags(enclaveItem->flags() | Qt::ItemIsUserCheckable);
             enclaveItem->setCheckState(Qt::Checked);
             chosenEnclaves.insert(e);
@@ -690,7 +693,7 @@ bool MainWindow::updateTimeFilter()
 void MainWindow::createFilterDocks()
 {
     timeDock_ = new QDockWidget(tr("Time Filter"),this);
-    QWidget *timeDockWidget = new QWidget();
+    auto *timeDockWidget = new QWidget();
     timeDock_->setMinimumWidth(380);
     timeDock_->setMaximumHeight(100);
     timeDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -715,12 +718,12 @@ void MainWindow::createFilterDocks()
     threadDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     threadList_ = new QListWidget();
     //multiThreadDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
-    QWidget *multiThreadDockWidget = new QWidget();
+    auto *multiThreadDockWidget = new QWidget();
     auto multiThreadWidgetLayout = new QVBoxLayout();
     multiThreadWidgetLayout->addWidget(threadList_);
     //multiThreadButtonWidget has the horizontal layout and the 2 push buttons
-    QWidget *multiThreadButtonWidget = new QWidget();
-    QHBoxLayout *multiThreadButtonLayout = new QHBoxLayout();
+    auto *multiThreadButtonWidget = new QWidget();
+    auto *multiThreadButtonLayout = new QHBoxLayout();
     auto selectAllThread = new QPushButton(tr("Select All"), this);
     connect(selectAllThread, &QPushButton::pressed, [this]() { selectAll(threadList_);});
     auto unSelectAllThread = new QPushButton(tr("Unselect All"), this);
@@ -740,12 +743,12 @@ void MainWindow::createFilterDocks()
     enclaveDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     enclavesList_ = new QListWidget();
     //multiECallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
-    QWidget *multiEnclaveDockWidget = new QWidget();
+    auto *multiEnclaveDockWidget = new QWidget();
     auto multiEnclaveWidgetLayout = new QVBoxLayout();
     multiEnclaveWidgetLayout->addWidget(enclavesList_);
     //multiECallButtonWidget has the horizontal layout and the 2 push buttons
-    QWidget *multiEnclaveButtonWidget = new QWidget();
-    QHBoxLayout *multiEnclaveButtonLayout = new QHBoxLayout();
+    auto *multiEnclaveButtonWidget = new QWidget();
+    auto *multiEnclaveButtonLayout = new QHBoxLayout();
     auto selectAllEnclaves = new QPushButton(tr("Select All"), this);
     connect(selectAllEnclaves, &QPushButton::pressed, [this]() { selectAll(enclavesList_);});
     auto unSelectAllEnclaves = new QPushButton(tr("Unselect All"), this);
@@ -766,12 +769,12 @@ void MainWindow::createFilterDocks()
     eCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     eCallList_ = new QListWidget();
     //multiECallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
-    QWidget *multiECallDockWidget = new QWidget();
+    auto *multiECallDockWidget = new QWidget();
     auto multiECallWidgetLayout = new QVBoxLayout();
     multiECallWidgetLayout->addWidget(eCallList_);
     //multiECallButtonWidget has the horizontal layout and the 2 push buttons
-    QWidget *multiECallButtonWidget = new QWidget();
-    QHBoxLayout *multiECallButtonLayout = new QHBoxLayout();
+    auto *multiECallButtonWidget = new QWidget();
+    auto *multiECallButtonLayout = new QHBoxLayout();
     auto selectAllECalls = new QPushButton(tr("Select All"), this);
     connect(selectAllECalls, &QPushButton::pressed, [this]() { selectAll(eCallList_);});
     auto unSelectAllECalls = new QPushButton(tr("Unselect All"), this);
@@ -791,12 +794,12 @@ void MainWindow::createFilterDocks()
     oCallDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     oCallList_ = new QListWidget();
     //multiOCallDockWidget has 2 layouts, the first one is the main one vertical layout and has another widget which has the horizontal layout for the buttons
-    QWidget *multiOCallDockWidget = new QWidget();
+    auto *multiOCallDockWidget = new QWidget();
     auto multiOCallWidgetLayout = new QVBoxLayout();
     multiOCallWidgetLayout->addWidget(oCallList_);
     //multiOCallButtonWidget has the horizontal layout and the 2 push buttons
-    QWidget *multiOCallButtonWidget = new QWidget();
-    QHBoxLayout *multiOCallButtonLayout = new QHBoxLayout();
+    auto *multiOCallButtonWidget = new QWidget();
+    auto *multiOCallButtonLayout = new QHBoxLayout();
     auto selectAllOCalls = new QPushButton(tr("Select All"), this);
     connect(selectAllOCalls, &QPushButton::pressed, [this]() { selectAll(oCallList_);});
     auto unSelectAllOCalls = new QPushButton(tr("Unselect All"), this);
@@ -811,7 +814,7 @@ void MainWindow::createFilterDocks()
     oCallFilterAction_ = oCallDock_->toggleViewAction();
     connect(oCallFilterAction_, SIGNAL(toggled(bool)), oCallDock_, SLOT(setVisible(bool)));
 
-    QDockWidget *applyDock = new QDockWidget(tr("Apply Filter"), this);
+    auto *applyDock = new QDockWidget(tr("Apply Filter"), this);
     generateFilterControls();
     applyDock->setWidget(filterControls_);
     applyDock->setMaximumHeight(70);
@@ -938,6 +941,7 @@ void MainWindow::updateTraces() {
      */
     factor_ = (this->height() * 0.75) / db->getProgramTotalTime();
     measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() * 0.75, 40);
+    scaleLineStep = db->getProgramTotalTime()/measureLine_->getNumOfScaleLines();
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
     generateThreadList();
@@ -1119,11 +1123,11 @@ void MainWindow::generateCallStaticAnalysis()
         analysisDialig_->setWindowTitle(tr("Call Static Analysis"));
         auto  dialogLayout = new QVBoxLayout();
 
-        QTabWidget *analysisDialogTab = new QTabWidget();
-        QTabWidget *staticAnalysisDialogTab = new QTabWidget();
-        QTabWidget *dynamicAnalysisDialogTab = new QTabWidget();
+        auto *analysisDialogTab = new QTabWidget();
+        auto *staticAnalysisDialogTab = new QTabWidget();
+        auto *dynamicAnalysisDialogTab = new QTabWidget();
 
-        QTableWidget *eCallStaticAnalysisTable = new QTableWidget();
+        auto *eCallStaticAnalysisTable = new QTableWidget();
         eCallStaticAnalysisTable->setRowCount(ecallStaticAnalysisList.size());
         eCallStaticAnalysisTable->setColumnCount(2);
         eCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));
@@ -1142,7 +1146,7 @@ void MainWindow::generateCallStaticAnalysis()
         eCallStaticAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
 
-        QTableWidget *oCallStaticAnalysisTable = new QTableWidget();
+        auto *oCallStaticAnalysisTable = new QTableWidget();
         oCallStaticAnalysisTable->setRowCount(ocallStaticAnalysisList.size());
         oCallStaticAnalysisTable->setColumnCount(2);
         oCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));

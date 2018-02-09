@@ -41,15 +41,18 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
-    const qreal MEASURELINE_OFFSET = 80;
 
-    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,5) - QPointF(0,MEASURELINE_OFFSET);
+    const qreal MEASURELINE_OFFSET = 80;
+    //ToDo find out why 7 in mapfromscene (this changes from monitor to monitor)
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,7) - QPointF(0,MEASURELINE_OFFSET);
     std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
+    //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
+    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
 
     /*std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
     std::cerr << "yoffset is " << yOffset_ << std::endl;
     std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
-    if(!viewArea_->rect().contains(event->pos()))
+    if(!scene_->sceneRect().contains(event->pos()))
     {
         if (event->modifiers() & Qt::ControlModifier)
         {
@@ -57,7 +60,8 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             qreal mouseSceneYBeforeZoom = mouseScenePos.y();
             qreal mouseSceneYAfterZoom = mouseScenePos.y() * yScaleFactor;
             qreal oldYOffset = yOffset_;
-
+            if(((yScale_*yScaleFactor)/factor_) > 5000000000 || ((yScale_*yScaleFactor) / factor_) < 50000 /*|| mouseScenePos.y() > (yOffset_ * factor_)/yScale_ + this->height()*0.75*/ )
+                return;
             verticalZoom(yScaleFactor);
             scrollTo(oldYOffset * yScaleFactor, factor_);
             verticalScroll(mouseSceneYBeforeZoom - mouseSceneYAfterZoom, factor_);
@@ -72,6 +76,11 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 
 void MainWindow::resetPressed()
 {
+    for (moe::Renderable* r: sequenceListNode_->children_)
+    {
+        moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
+        s->resetLineScales();
+    }
     sequenceListNode_->setTransform(moe::Transform2D());
     yOffset_ = 0;
     yScale_ = 1;
@@ -928,7 +937,7 @@ void MainWindow::updateTraces() {
      * testing window height
      */
     factor_ = (this->height() * 0.75) / db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.75, 40);
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() * 0.75, 40);
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
     generateThreadList();
@@ -945,7 +954,6 @@ void MainWindow::updateTraces() {
 
 void MainWindow::loadOCallStats()
 {
-
     if(db->getOcallStatistics().isEmpty())
     {
         db->loadOcallsStats();

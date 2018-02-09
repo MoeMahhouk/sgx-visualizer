@@ -28,6 +28,8 @@ namespace moe {
 
 		void setPixel_line_depth_(int pixel_line_depth_);
 
+		const int getNumOfScaleLines()const;
+
 	protected:
 
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;

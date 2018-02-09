@@ -89,3 +89,7 @@ void moe::MeasureLine::setPixel_line_depth_(int pixel_line_depth_) {
 void moe::MeasureLine::initializeRenderable(moe::SceneData &sceneData, moe::Transform2D &parentTransform) {
     return;
 }
+
+const int moe::MeasureLine::getNumOfScaleLines() const {
+    return measureLines_.size();
+}

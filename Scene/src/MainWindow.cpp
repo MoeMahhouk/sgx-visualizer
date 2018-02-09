@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     createActions();
     createFilterDocks();
     createMenus();
-    createToolbar();
+    //createToolbar();
     createStatusBar();
     applySettings();
     generateGraphicsView();
@@ -40,12 +40,13 @@ void MainWindow::open()
 
 
 void MainWindow::wheelEvent(QWheelEvent *event)
-{
-    const qreal MEASURELINE_OFFSET = 70;
-    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,0) - QPointF(0,MEASURELINE_OFFSET);
-    /*std::cerr << "mouse y pos is  " << mouseScenePos.y() << std::endl;
+{//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
+    const qreal MEASURELINE_OFFSET = 80;
 
-    std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,5) - QPointF(0,MEASURELINE_OFFSET);
+    std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
+
+    /*std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
     std::cerr << "yoffset is " << yOffset_ << std::endl;
     std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
     if(!viewArea_->rect().contains(event->pos()))
@@ -65,7 +66,7 @@ void MainWindow::wheelEvent(QWheelEvent *event)
         }
     }
     //std::cerr << "the scaling factor is now " << yScale_ * factor_ << std::endl;
-    std::cerr << "the scaling factor is now " << yScale_ /factor_ << std::endl;
+    //std::cerr << "the scaling factor is now " << yScale_ /factor_ << std::endl;
 }
 
 
@@ -82,10 +83,6 @@ void MainWindow::resetPressed()
 
 void MainWindow::scrollRightPressed()
 {
-    db->loadEcallAnalysis();
-    for (int i = 0; i < db->getEcallStaticAnalysis().size() ; ++i) {
-        std::cerr << db->getEcallStaticAnalysis()[i].callName_.toStdString() << db->getEcallStaticAnalysis()[i].totalCount_ << std::endl;
-    }
     sequenceListNode_->setTransform(sequenceListNode_->getTransform() * moe::Transform2D(1,0,0,1,20,0));
     render();
 }
@@ -298,7 +295,7 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         qreal oldXoffset = sequenceListNode_->getTransform().getX();
         resetPressed();
         measureLine_->setPixel_line_depth_(this->height()*0.75);
-        factor_ = (double)(this->height()*0.75)/db->getProgramTotalTime();
+        factor_ = (this->height()*0.75)/db->getProgramTotalTime();
         clearSequenceListNode();
         scene_->clear();
         visualizeThreads(db->getThreads_(),factor_);
@@ -930,8 +927,8 @@ void MainWindow::updateTraces() {
     /*
      * testing window height
      */
-    factor_ = (double)(this->height() * 0.7) / db->getProgramTotalTime();
-    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.7, 40);
+    factor_ = (this->height() * 0.75) / db->getProgramTotalTime();
+    measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height()*0.75, 40);
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
     generateThreadList();

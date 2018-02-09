@@ -1112,7 +1112,7 @@ void MainWindow::generateCallStaticAnalysis()
     if(db->getEcallStaticAnalysis().isEmpty() || db->getOcallStaticAnalysis().isEmpty()) {
         db->loadEcallAnalysis();
         db->loadOcallAnalysis();
-        const QVector<moe::CallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
+        const QVector<moe::ECallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
         const QVector<moe::CallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
 
         analysisDialig_ = new QDialog();
@@ -1130,7 +1130,9 @@ void MainWindow::generateCallStaticAnalysis()
         for (int i = 0; i < ecallStaticAnalysisList.size() ; ++i)
         {
             eCallStaticAnalysisTable->setItem(i,0,new QTableWidgetItem(ecallStaticAnalysisList[i].callName_));
-            eCallStaticAnalysisTable->setItem(i,1,new QTableWidgetItem(ecallStaticAnalysisList[i].analysisText_));
+            auto textItem = new QTableWidgetItem(ecallStaticAnalysisList[i].analysisText_);
+            ecallStaticAnalysisList[i].hint ? textItem->setForeground(QBrush(Qt::green)) : textItem->setForeground(textItem->foreground());
+            eCallStaticAnalysisTable->setItem(i,1,textItem);
         }
         eCallStaticAnalysisTable->resizeRowsToContents();
         eCallStaticAnalysisTable->resizeColumnsToContents();

@@ -45,10 +45,10 @@ namespace moe {
 
             if (!threadEcalls_.isEmpty())
             {
-                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster();
+                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta));
                 threadSeqDiag->addBlock(clusterTest);
                 QVector<SeqDiagBlockCluster *> subClusterList;
-                subClusterList.push_back(new SeqDiagBlockCluster());
+                subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta)));
                 for (ECall *eCall : threadEcalls_)
                 {
 

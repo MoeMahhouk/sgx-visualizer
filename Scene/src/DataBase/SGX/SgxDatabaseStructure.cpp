@@ -255,6 +255,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
             case (int)EventMap::EnclaveECallEvent: {
                 ECall *eCall = new ECall(call_id,eid,symbol_address,start_time,relative_start_time,total_time,0,symbol_name,isFail);
                 calls[id] = eCall;
+
                 //ToDo idea to save the stats without changing them after filtering and such (saving the stats at the start and never touch them)
                 if (!callHoverInfoMap.count(id) && conditionQuery.isEmpty())
                 {
@@ -272,6 +273,9 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
 
                 if(call_event != 0)
                 {
+                    if(!directPublicEcalls.count(call_id))
+                        directPublicEcalls[call_id] = false;
+
                     //here i calculate the relative start time of the child according to his parent start time
                     eCall->relative_start_time_ -= calls[call_event]->start_time_;
                     calls[call_event]->children_.push_back(eCall);
@@ -290,6 +294,11 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     }
                 } else {
                     threads_[searchThreadIndex(involvedThreadId)].threadEcalls_.push_back(eCall);
+                    //If the ECall not in the list or was uptill now only found privately inside ocalls, change it to true because he should stay public
+                    if(!directPublicEcalls.count(call_id) || !directPublicEcalls[call_id])
+                    {
+                        directPublicEcalls[call_id] = true;
+                    }
                 }
                 break;
             }
@@ -375,7 +384,8 @@ const QVector<moe::MyThread> &moe::SgxDatabaseStructure::getThreads_() const
     return threads_;
 }
 
-void moe::SgxDatabaseStructure::loadECallTypeList() {
+void moe::SgxDatabaseStructure::loadECallTypeList()
+{
     int numOfECallTypes = getNumberOfRows("ecalls");
     eCallTypeList = QVector<ECallTypes>(numOfECallTypes);
     QSqlQuery query;
@@ -658,7 +668,7 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis() {
 
     while(loadECallAnalysisQuery.next())
     {
-        CallStaticAnalysis eCallStaticAnalysis;
+        ECallStaticAnalysis eCallStaticAnalysis;
         eCallStaticAnalysis.callId_ = loadECallAnalysisQuery.value(0).toInt();
         eCallStaticAnalysis.callName_ = loadECallAnalysisQuery.value(1).toString();
         eCallStaticAnalysis.totalCount_ = loadECallAnalysisQuery.value(2).toInt();
@@ -668,6 +678,7 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis() {
     }
     for (int i = 0; i < ecallStaticAnalysis.size() ; ++i)
     {
+        ecallStaticAnalysis[i].shouldBePrivate_ = !directPublicEcalls[ecallStaticAnalysis[i].callId_];
         ecallStaticAnalysis[i].generateAnalysisText();
     }
 }
@@ -721,7 +732,7 @@ void moe::SgxDatabaseStructure::loadOcallAnalysis() {
     }
 }
 
-const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStaticAnalysis() const
+const QVector<moe::ECallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStaticAnalysis() const
 {
     return ecallStaticAnalysis;
 }

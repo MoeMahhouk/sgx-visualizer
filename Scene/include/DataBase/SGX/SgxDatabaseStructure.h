@@ -70,9 +70,10 @@ namespace moe {
 
         const QVector<CallStatistics> &getOcallStatistics() const;
 
-        const QVector<CallStaticAnalysis> &getEcallStaticAnalysis() const;
+        const QVector<ECallStaticAnalysis> &getEcallStaticAnalysis() const;
 
         const QVector<CallStaticAnalysis> &getOcallStaticAnalysis() const;
+
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -81,14 +82,15 @@ namespace moe {
         void initializeECallsAndOCalls(QString conditionQuery = nullptr);
         void initializeThreads(QString conditionQuery = nullptr);
         void loadECallTypeList();
-
         void loadOCallTypeList();
         void loadExistingEnclaves();
-        QString getInvolvedThreads();
         int searchThreadIndex(int threadId);
+        QString getInvolvedThreads();
+
+        QMap<int, bool> directPublicEcalls;
         QVector<CallStatistics> ecallStatistics;
         QVector<CallStatistics> ocallStatistics;
-        QVector<CallStaticAnalysis> ecallStaticAnalysis;
+        QVector<ECallStaticAnalysis> ecallStaticAnalysis;
         QVector<CallStaticAnalysis> ocallStaticAnalysis;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;

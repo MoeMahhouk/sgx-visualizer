@@ -11,11 +11,11 @@
 namespace moe {
 
     struct CallStaticAnalysis {
-        int callId_, totalCount_, totalOfLowerThanMicroSeconds_, totalOflowerThan10MicroSeconds_;
+        int callId_, eid_ , totalCount_, totalOfLowerThanMicroSeconds_, totalOflowerThan10MicroSeconds_;
         QString callName_;
         QString analysisText_;
 
-        void generateAnalysisText()
+        virtual void generateAnalysisText()
         {
 
             qreal underOneMicroPercent = 0;
@@ -42,9 +42,28 @@ namespace moe {
             {
                 analysisText_ = text;
             } else {
-                analysisText_ = " This Call has from Total of ( " + QString::number(totalCount_) + " ) neither under 1µs nor 10µs instance-s \n";
+                analysisText_ = "This Call has from Total of ( " + QString::number(totalCount_) + " ) neither under 1µs nor 10µs instance-s \n";
             }
         }
+    };
+
+    struct ECallStaticAnalysis : public CallStaticAnalysis {
+        bool shouldBePrivate_, hint = false;
+
+        virtual void generateAnalysisText()
+        {
+            CallStaticAnalysis::generateAnalysisText();
+            if(shouldBePrivate_) {
+                hint = true;
+                analysisText_.append("\n (Hint this ECall is only called inside OCalls, Why not make it private :) )");
+            }
+        }
+    };
+
+    //ToDo later for warning massages in red (but first we should change the CallStaticAnalysis to abstract class and reimplement the generate method)
+    //ToDo ask nico if ecalls needs to be tested for under 1µs and10 µs
+    struct OCallStaticAnalysis : public CallStaticAnalysis {
+        bool warning;
     };
 }
 #endif //SCENE_CALLSTATICANALYSIS_H

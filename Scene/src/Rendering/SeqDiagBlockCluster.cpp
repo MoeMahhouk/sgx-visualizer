@@ -38,8 +38,8 @@ void moe::SeqDiagBlockCluster::addBlock(SeqDiagBlock *innerBlock) {
 }
 
 bool moe::SeqDiagBlockCluster::checkClusterCriteria(moe::Renderable *innerBlock) {
-
-    if (height_ == 0 /*|| lineOffset_->children_.size() < 2*/) {
+    //ToDo change the clustering system later for better clustering purposes
+    if (/*height_ == 0 ||*/ lineOffset_->children_.size() < 2) {
         return true;
     }
     //start of the added block - the end of the existing cluster block

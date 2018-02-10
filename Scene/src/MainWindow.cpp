@@ -42,15 +42,18 @@ void MainWindow::open()
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
 
-    const qreal MEASURELINE_OFFSET = 80;
-    //ToDo find out why 7 in mapfromscene (this changes from monitor to monitor)
-    QPointF mouseScenePos = view_->mapToScene(event->pos()) - view_->mapFromScene(0,7) - QPointF(0,MEASURELINE_OFFSET);
-    std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
+    const qreal MEASURELINE_OFFSET = 50;
+    //ToDo find out why 7 in mapfromscene (this changes linux appearence settings)
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;// - view_->mapFromScene(0,0) - view_->mapToScene(QPoint(0,50));
+    /*std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
+    std::cerr << "scene y  is  " << view_->mapFromScene(0,0).y()  << std::endl;
+    std::cerr << "mapToSceneis  " << view_->mapToScene(QPoint(0,50)).y()   << std::endl;
+    std::cerr << "mapFromScene is  " << view_->mapFromScene(QPointF(0,50)).y() * 0.8   << std::endl;
     //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
     //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
 
-    std::cerr << "difference " << (this->height() * 0.75) + (yOffset_ * factor_) << std::endl;
-    std::cerr << "difference multiplied with the scale" << ((this->height() * 0.75) + ((yOffset_ * factor_)/ yScale_)) << std::endl;
+    //std::cerr << "difference " << (this->height() * 0.75) + (yOffset_ * factor_) << std::endl;
+    //std::cerr << "difference multiplied with the scale" << ((this->height() * 0.75) + ((yOffset_ * factor_)/ yScale_)) << std::endl;
     /*std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
     std::cerr << "yoffset is " << yOffset_ << std::endl;
     std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
@@ -66,7 +69,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             if(limit/pow(10,8) > 1 || limit < 300 ){
                 return;
             }
-
             verticalZoom(yScaleFactor);
             scrollTo(oldYOffset * yScaleFactor, factor_);
             verticalScroll(mouseSceneYBeforeZoom - mouseSceneYAfterZoom, factor_);

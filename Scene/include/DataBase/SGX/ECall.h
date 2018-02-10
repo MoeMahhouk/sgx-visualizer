@@ -33,7 +33,7 @@ namespace moe  {
             //std::cerr << " ECALL totaltime mulitplicated with factor (height) : " << (total_time_ * factor)  << std::endl;
             //SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow));
             callBlock->initializeStats(callInfo);
-            if (!children_.isEmpty())
+            if (children_.size() > 1)
             {
                 SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow));
                 callBlock->addBlock(clusterTest);
@@ -55,6 +55,12 @@ namespace moe  {
                 for (SeqDiagBlockCluster *subCluster: subClusterList)
                 {
                     clusterTest->addBlock(subCluster);
+                }
+            } else {
+                for (Call *call : children_)
+                {
+                    SeqDiagBlock *childRenderable = call->toRenderable(factor);
+                    callBlock->addBlock(childRenderable);
                 }
             }
             return callBlock;

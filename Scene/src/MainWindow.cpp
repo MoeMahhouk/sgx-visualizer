@@ -44,13 +44,17 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 
     const qreal MEASURELINE_OFFSET = 50;
     //ToDo find out why 7 in mapfromscene (this changes linux appearence settings)
-    QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;// - view_->mapFromScene(0,0) - view_->mapToScene(QPoint(0,50));
+    QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;
+
+    //std::cerr << "yoffset is  " << yOffset_   << std::endl;
+    //std::cerr << "yoffset multiplied and so on is  " << (yOffset_ * factor_)/yScale_  << std::endl;
+    //std::cerr << "mouse pos divided with yscale is " << mouseScenePos.y()/yScale_ << std::endl;;
     /*std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
     std::cerr << "scene y  is  " << view_->mapFromScene(0,0).y()  << std::endl;
     std::cerr << "mapToSceneis  " << view_->mapToScene(QPoint(0,50)).y()   << std::endl;
     std::cerr << "mapFromScene is  " << view_->mapFromScene(QPointF(0,50)).y() * 0.8   << std::endl;
-    //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
-    //std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
+    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
+    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
 
     //std::cerr << "difference " << (this->height() * 0.75) + (yOffset_ * factor_) << std::endl;
     //std::cerr << "difference multiplied with the scale" << ((this->height() * 0.75) + ((yOffset_ * factor_)/ yScale_)) << std::endl;
@@ -64,9 +68,10 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             qreal yScaleFactor = pow((double) 2, event->delta()/ 240.0);
             qreal mouseSceneYBeforeZoom = mouseScenePos.y();
             qreal mouseSceneYAfterZoom = mouseScenePos.y() * yScaleFactor;
+            qreal yOffsetTailDiff = ((this->height()*0.75) + ((yOffset_ * factor_)/yScale_)); // gives the tail of the objects in pixel coordination
             qreal oldYOffset = yOffset_;
             const qreal limit = (qreal)scaleLineStep/(qreal)(yScale_*yScaleFactor);
-            if(limit/pow(10,8) > 1 || limit < 300 ){
+            if(limit/pow(10,8) > 1 || limit < 300 || mouseScenePos.y()/yScale_ > yOffsetTailDiff){
                 return;
             }
             verticalZoom(yScaleFactor);

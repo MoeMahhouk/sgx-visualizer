@@ -22,6 +22,7 @@
 #include "ECallTypes.h"
 #include "CallStatistics.h"
 #include "CallStaticAnalysis.h"
+#include "CallDynamicAnalysis.h"
 
 namespace moe {
 
@@ -64,6 +65,10 @@ namespace moe {
 
         void loadOcallAnalysis();
 
+        void loadECallDynamicAnalysis();
+
+        void loadOCallDynamicAnalysis();
+
         bool statsGenerated();
 
         bool staticAnalysisGenerated();
@@ -78,6 +83,10 @@ namespace moe {
 
         const QVector<CallStaticAnalysis> &getOcallStaticAnalysis() const;
 
+        const QMap<int, CallDynamicAnalysis> &getEcallDynamicAnalysis() const;
+
+        const QMap<int, CallDynamicAnalysis> &getOcallDynamicAnalysis() const;
+
     private:
         int getNumberOfRows(const QString& tableName);
         uint64_t getThreadStartTime(int index);
@@ -91,6 +100,8 @@ namespace moe {
         int searchThreadIndex(int threadId);
         QString getInvolvedThreads();
 
+        QMap<int, CallDynamicAnalysis> ocallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
+        QMap<int, CallDynamicAnalysis> ecallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
         QMap<int, bool> directPublicEcalls;
         QVector<CallStatistics> ecallStatistics;
         QVector<CallStatistics> ocallStatistics;
@@ -105,6 +116,7 @@ namespace moe {
         QVector<ECallTypes> eCallTypeList; //this list is not for rendering, it is for the filtering stuff
         QVector<MyThread> threads_;
         QSqlDatabase m_db;
+
     };
 }
 

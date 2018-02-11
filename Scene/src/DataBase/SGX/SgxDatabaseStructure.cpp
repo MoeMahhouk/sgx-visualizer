@@ -21,6 +21,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     loadOCallTypeList();
     initializeThreads();
     initializeECallsAndOCalls();
+    loadOCallDynamicAnalysis(); //TODO its only a test
 
 }
 
@@ -752,10 +753,97 @@ bool moe::SgxDatabaseStructure::execAndCheckQuery(QSqlQuery query)
     return true;
 }
 
-bool moe::SgxDatabaseStructure::statsGenerated() {
+bool moe::SgxDatabaseStructure::statsGenerated()
+{
     return !ecallStatistics.isEmpty() && !ocallStatistics.isEmpty();
 }
 
-bool moe::SgxDatabaseStructure::staticAnalysisGenerated() {
+bool moe::SgxDatabaseStructure::staticAnalysisGenerated()
+{
     return !ecallStaticAnalysis.isEmpty() && !ocallStaticAnalysis.isEmpty();
+}
+
+void moe::SgxDatabaseStructure::loadECallDynamicAnalysis()
+{
+    for (int i = 0; i < threads_.size() ; ++i)
+    {
+        for (int j = 0; j < threads_[i].threadEcalls_.size() ; ++j)
+        {
+            int ecallId = threads_[i].threadEcalls_[j]->id_;
+            if (!ecallDynamicAnalysis.count(ecallId))
+            {
+                CallDynamicAnalysis ecall;
+                ecall.callId_ = ecallId;
+                ecall.eid_ = threads_[i].threadEcalls_[j]->eid_;
+                ecall.callName_ = threads_[i].threadEcalls_[j]->symbol_name_;
+                ecallDynamicAnalysis[ecallId] = ecall;
+            }
+            ecallDynamicAnalysis[ecallId].counter_ += 1;
+            //ToDo ask nico if this is also important to address.
+            if(j != 0)
+            {
+                int predecessorEcallId = threads_[i].threadEcalls_[j-1]->id_;
+                ecallDynamicAnalysis[ecallId].incrementPredecessoreIdCounter(predecessorEcallId);
+            }
+            if(j != threads_[i].threadEcalls_.size() - 1)
+            {
+                int successorEcallId = threads_[i].threadEcalls_[j+1]->id_;
+                ecallDynamicAnalysis[ecallId].incrementSuccessorIdCounter(successorEcallId);
+            }
+        }
+    }
+    QMap<int,CallDynamicAnalysis>::iterator k;
+    for (k = ecallDynamicAnalysis.begin(); k != ecallDynamicAnalysis.end() ; ++k)
+    {
+        k.value().generateAnalysisText();
+    }
+}
+
+const QMap<int, moe::CallDynamicAnalysis> &moe::SgxDatabaseStructure::getEcallDynamicAnalysis() const
+{
+    return ecallDynamicAnalysis;
+}
+
+const QMap<int, moe::CallDynamicAnalysis> &moe::SgxDatabaseStructure::getOcallDynamicAnalysis() const
+{
+    return ocallDynamicAnalysis;
+}
+
+void moe::SgxDatabaseStructure::loadOCallDynamicAnalysis()
+{
+    for (int i = 0; i < threads_.size() ; ++i)
+    {
+        for (int j = 0; j < threads_[i].threadEcalls_.size() ; ++j)
+        {
+            for (int k = 0; k < threads_[i].threadEcalls_[j]->children_.size() ; ++k)
+            {
+                int ocallId = threads_[i].threadEcalls_[j]->children_[k]->id_;
+                if (!ocallDynamicAnalysis.count(ocallId))
+                {
+                    CallDynamicAnalysis ocall;
+                    ocall.callId_ = ocallId;
+                    ocall.eid_ = threads_[i].threadEcalls_[j]->children_[k]->eid_;
+                    ocall.callName_ = threads_[i].threadEcalls_[j]->children_[k]->symbol_name_;
+                    ocallDynamicAnalysis[ocallId] = ocall;
+                }
+                ocallDynamicAnalysis[ocallId].counter_ += 1;
+                //ToDo ask nico if this is also important to address.
+                if(k != 0)
+                {
+                    int predecessorOcallId = threads_[i].threadEcalls_[j]->children_[k-1]->id_;
+                    ocallDynamicAnalysis[ocallId].incrementPredecessoreIdCounter(predecessorOcallId);
+                }
+                if(k != threads_[i].threadEcalls_[j]->children_.size() - 1)
+                {
+                    int successorOcallId = threads_[i].threadEcalls_[j]->children_[k+1]->id_;
+                    ocallDynamicAnalysis[ocallId].incrementSuccessorIdCounter(successorOcallId);
+                }
+            }
+        }
+    }
+    QMap<int,CallDynamicAnalysis>::iterator l;
+    for (l = ocallDynamicAnalysis.begin(); l != ocallDynamicAnalysis.end() ; ++l)
+    {
+        l.value().generateAnalysisText();
+    }
 }

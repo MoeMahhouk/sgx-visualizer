@@ -94,7 +94,6 @@ private:
     QGraphicsScene *scene_;
     QMenu *fileMenu_;
     QMenu *viewMenu_;
-    //QMenu *loadStatistics_;
     QMenu *helpMenu_;
     QMenuBar *menuBar_;
     QToolBar *toolBar_;
@@ -148,8 +147,6 @@ private:
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;
     QAction *enclaveFilterAction_;
-    //QAction *loadECallStats_;
-    //QAction *loadOCallStats_;
     QAction *loadCallStatistics;
     QAction *loadCallStaticAnalysis_;
     QAction *timeFilterAction_;

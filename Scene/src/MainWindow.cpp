@@ -41,26 +41,13 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
-
+    QMap<int,moe::CallDynamicAnalysis>::const_iterator i;
+    for (i = db->getOcallDynamicAnalysis().begin(); i != db->getOcallDynamicAnalysis().end() ; ++i) {
+        std::cerr << i.value().analysisText_.toStdString() << std::endl;
+    }
     const qreal MEASURELINE_OFFSET = 50;
-    //ToDo find out why 7 in mapfromscene (this changes linux appearence settings)
     QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;
 
-    //std::cerr << "yoffset is  " << yOffset_   << std::endl;
-    //std::cerr << "yoffset multiplied and so on is  " << (yOffset_ * factor_)/yScale_  << std::endl;
-    //std::cerr << "mouse pos divided with yscale is " << mouseScenePos.y()/yScale_ << std::endl;;
-    /*std::cerr << "mouse y pos is  " << mouseScenePos.y()   << std::endl;
-    std::cerr << "scene y  is  " << view_->mapFromScene(0,0).y()  << std::endl;
-    std::cerr << "mapToSceneis  " << view_->mapToScene(QPoint(0,50)).y()   << std::endl;
-    std::cerr << "mapFromScene is  " << view_->mapFromScene(QPointF(0,50)).y() * 0.8   << std::endl;
-    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
-    std::cerr << "yoffset is  " << (yOffset_ * factor_)/yScale_  << std::endl;
-
-    //std::cerr << "difference " << (this->height() * 0.75) + (yOffset_ * factor_) << std::endl;
-    //std::cerr << "difference multiplied with the scale" << ((this->height() * 0.75) + ((yOffset_ * factor_)/ yScale_)) << std::endl;
-    /*std::cerr << "mouse distance in nanu seconds is " << mouseScenePos.y() * (1.0/factor_) << std::endl;
-    std::cerr << "yoffset is " << yOffset_ << std::endl;
-    std::cerr << "signum is " << moe::signum(event->delta()) << std::endl;*/
     if(!scene_->sceneRect().contains(event->pos()) && db)
     {
         if (event->modifiers() & Qt::ControlModifier)
@@ -317,8 +304,6 @@ void MainWindow::loadFile(const QString& fileName)
             delete db;
         }
         db = new moe::SgxDatabaseStructure(fileName);
-        //loadECallStats_->setEnabled(true);
-        //loadOCallStats_->setEnabled(true);
         loadCallStatistics->setEnabled(true);
         loadCallStaticAnalysis_->setEnabled(true);
         //QThread thread1(this) ;

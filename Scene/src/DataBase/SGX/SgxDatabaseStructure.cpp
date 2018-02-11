@@ -751,3 +751,11 @@ bool moe::SgxDatabaseStructure::execAndCheckQuery(QSqlQuery query)
     }
     return true;
 }
+
+bool moe::SgxDatabaseStructure::statsGenerated() {
+    return !ecallStatistics.isEmpty() && !ocallStatistics.isEmpty();
+}
+
+bool moe::SgxDatabaseStructure::staticAnalysisGenerated() {
+    return !ecallStaticAnalysis.isEmpty() && !ocallStaticAnalysis.isEmpty();
+}

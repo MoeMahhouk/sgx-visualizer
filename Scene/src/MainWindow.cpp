@@ -111,7 +111,6 @@ void MainWindow::scrollToNextEvent()
 {
     if(db)
     {
-       // std::cerr << "data base is not null" << std::endl;
         scrollToNextEvent(db->getThreads_(),factor_);
     }
 }
@@ -122,14 +121,9 @@ void MainWindow::createMenus()
     fileMenu_->addAction(openAction_);
     auto load = new QMenu("Load",fileMenu_);
     fileMenu_->addMenu(load);
-    auto statistics = new QMenu("Statistics",load);
-    load->addMenu(statistics);
-    statistics->addAction(loadECallStats_);
-    statistics->addAction(loadOCallStats_);
-    auto analysis = new QMenu("Analysis", load);
-    load->addMenu(analysis);
-    analysis->addAction(loadCallStaticAnalysis_);
 
+    load->addAction(loadCallStatistics);
+    load->addAction(loadCallStaticAnalysis_);
 
 
     viewMenu_ = menuBar()->addMenu(tr("View"));
@@ -157,20 +151,13 @@ void MainWindow::createActions()
     openAction_->setStatusTip(tr("Open an existing executable"));
     connect(openAction_,SIGNAL(triggered()), this, SLOT(open()));
 
-    loadECallStats_ = new QAction(tr("ECall"), this);
-    loadECallStats_->setStatusTip(tr("Generate the Statistics Of ECalls"));
-    connect(loadECallStats_, SIGNAL(triggered()), this, SLOT(loadECallStats()));
-    loadECallStats_->setDisabled(true);
-    //connect(this, SIGNAL(dataBaseLoaded(db)), loadECallStats_, SLOT(setEnabled(bool)));
+    loadCallStatistics = new QAction(tr("Statistics"),this);
+    loadCallStatistics->setStatusTip(tr("Generate E/OCalls Statistics for the loaded trace"));
+    connect(loadCallStatistics, SIGNAL(triggered()), this, SLOT(generateCallStatistics()));
+    loadCallStatistics->setDisabled(true);
 
-    loadOCallStats_ = new QAction(tr("OCall"), this);
-    loadOCallStats_->setStatusTip(tr("Generate the Statistics Of OCalls"));
-    connect(loadOCallStats_, SIGNAL(triggered()), this, SLOT(loadOCallStats()));
-    loadOCallStats_->setDisabled(true);
-    //connect(this, SIGNAL(dataBaseLoaded(db)), loadOCallStats_, SLOT(setEnabled(bool)));
-
-    loadCallStaticAnalysis_ = new QAction(tr("Static"), this);
-    loadCallStaticAnalysis_->setStatusTip(tr("Generate the Static Analysis For E/OCalls"));
+    loadCallStaticAnalysis_ = new QAction(tr("Analysis"), this);
+    loadCallStaticAnalysis_->setStatusTip(tr("Generate the Static/Dynamic Analysis For E/OCalls"));
     connect(loadCallStaticAnalysis_, SIGNAL(triggered()), this, SLOT(generateCallStaticAnalysis()));
     loadCallStaticAnalysis_->setDisabled(true);
 }
@@ -241,14 +228,9 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     toolbar->setStyleSheet("QToolBar{spacing:5px;}");
     toolbar->addSeparator();
 
-    auto statisticsLabel = new QLabel("Statistics: ");
-    toolbar->addWidget(statisticsLabel);
-    toolbar->addAction(loadECallStats_);
-    toolbar->addAction(loadOCallStats_);
+    toolbar->addAction(loadCallStatistics);
     toolbar->addSeparator();
 
-    auto analysisLabel = new QLabel("Analysis: ");
-    toolbar->addWidget(analysisLabel);
     toolbar->addAction(loadCallStaticAnalysis_);
 }
 
@@ -330,8 +312,9 @@ void MainWindow::loadFile(const QString& fileName)
             delete db;
         }
         db = new moe::SgxDatabaseStructure(fileName);
-        loadECallStats_->setEnabled(true);
-        loadOCallStats_->setEnabled(true);
+        //loadECallStats_->setEnabled(true);
+        //loadOCallStats_->setEnabled(true);
+        loadCallStatistics->setEnabled(true);
         loadCallStaticAnalysis_->setEnabled(true);
         //QThread thread1(this) ;
         //thread1.
@@ -958,140 +941,114 @@ void MainWindow::updateTraces() {
 
 }
 
-void MainWindow::loadOCallStats()
+QTableWidget *MainWindow::loadOCallStats()
 {
-    if(db->getOcallStatistics().isEmpty())
+    const QVector<moe::CallStatistics> &oCallStatsList = db->getOcallStatistics();
+    QTableWidget *table = new QTableWidget();
+    table->setRowCount(oCallStatsList.size());
+    table->setColumnCount(9);
+
+    table->setSortingEnabled(false);
+    table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
+    for (int i = 0; i < table->rowCount(); ++i)
     {
-        db->loadOcallsStats();
-        const QVector<moe::CallStatistics> &oCallStatsList = db->getOcallStatistics();
-        oCallStatsDialog_ = new QDialog();
-        oCallStatsDialog_->setWindowTitle(tr("OCall Statistics"));
-        QVBoxLayout *statsLayout = new QVBoxLayout();
-
-        QTableWidget *table = new QTableWidget(oCallStatsDialog_);
-        table->setRowCount(oCallStatsList.size());
-        table->setColumnCount(9);
-
-        table->setSortingEnabled(false);
-        table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
-        for (int i = 0; i < table->rowCount(); ++i)
-        {
-            QTableWidgetItem *item = new QTableWidgetItem;
-            item->setData(Qt::EditRole,oCallStatsList[i].callId_);
-            table->setItem(i,0, item);
-            //table->setItem(i,0, new QTableWidgetItem(QString::number(oCallStatsList[i].callId_)));
-            table->setItem(i,1, new QTableWidgetItem(oCallStatsList[i].callSymbolName_));
-            table->setItem(i,2, new QTableWidgetItem(QString::number(oCallStatsList[i].count_,'f',0)));
-            table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].callAvg_,0) + " (" + QString::number(oCallStatsList[i].callAvg_,'f',0) + " ns)"));
-            table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].median_,0) + " (" + QString::number(oCallStatsList[i].median_,'f',0) + " ns)"));
-            table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].standardDeviation_,0) + " (" + QString::number(oCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
-            table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
-            table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
-            table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
-        }
-        table->resizeColumnsToContents();
-        table->resizeRowsToContents();
-        int height = 0,width = 0;
-        for (int j = 0; j < table->columnCount() ; ++j)
-        {
-            width += table->columnWidth(j)+6;
-        }
-        for (int k = 0; k < table->rowCount() ; ++k)
-        {
-            height += table->rowHeight(k)+6;
-        }
-        table->horizontalHeader()->setStretchLastSection(true);
-        table->verticalHeader()->setStretchLastSection(true);
-        table->verticalHeader()->hide();
-        table->setSortingEnabled(true);
-        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-        statsLayout->addWidget(table);
-        oCallStatsDialog_->setLayout(statsLayout);
-        oCallStatsDialog_->setMinimumSize(width, height);
-        oCallStatsDialog_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
-        oCallStatsDialog_->show();
-    } else {
-        oCallStatsDialog_->show();
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setData(Qt::EditRole,oCallStatsList[i].callId_);
+        table->setItem(i,0, item);
+        //table->setItem(i,0, new QTableWidgetItem(QString::number(oCallStatsList[i].callId_)));
+        table->setItem(i,1, new QTableWidgetItem(oCallStatsList[i].callSymbolName_));
+        table->setItem(i,2, new QTableWidgetItem(QString::number(oCallStatsList[i].count_,'f',0)));
+        table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].callAvg_,0) + " (" + QString::number(oCallStatsList[i].callAvg_,'f',0) + " ns)"));
+        table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].median_,0) + " (" + QString::number(oCallStatsList[i].median_,'f',0) + " ns)"));
+        table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].standardDeviation_,0) + " (" + QString::number(oCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
+        table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
+        table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
+        table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
     }
+    table->resizeColumnsToContents();
+    table->resizeRowsToContents();
+    int height = 0,width = 0;
+    for (int j = 0; j < table->columnCount() ; ++j)
+    {
+        width += table->columnWidth(j)+6;
+    }
+    for (int k = 0; k < table->rowCount() ; ++k)
+    {
+        height += table->rowHeight(k)+6;
+    }
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->verticalHeader()->setStretchLastSection(true);
+    table->verticalHeader()->hide();
+    table->setSortingEnabled(true);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    return table;
 }
 
-void MainWindow::loadECallStats()
+QTableWidget *MainWindow::loadECallStats()
 {
-    if(db->getEcallStatistics().isEmpty())
+    const QVector<moe::CallStatistics> &eCallStatsList = db->getEcallStatistics();
+
+    auto table = new QTableWidget();
+    table->setRowCount(eCallStatsList.size());
+    table->setColumnCount(9);
+
+    table->setSortingEnabled(false);
+    table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
+    for (int i = 0; i < table->rowCount(); ++i)
     {
-        db->loadEcallsStats();
-        const QVector<moe::CallStatistics> &eCallStatsList = db->getEcallStatistics();
-        eCallStatsDialog_ = new QDialog();
-        eCallStatsDialog_->setWindowTitle(tr("ECall Statistics"));
-        QVBoxLayout *statsLayout = new QVBoxLayout();
+        //moe::AbstractTimeUnit itemInfo;
+        auto item = new QTableWidgetItem;
+        item->setData(Qt::EditRole,eCallStatsList[i].callId_);
+        table->setItem(i,0, item);
+        //table->setItem(i,0, new QTableWidgetItem(QString::number(eCallStatsList[i].callId_)));
+        table->setItem(i,1, new QTableWidgetItem(eCallStatsList[i].callSymbolName_));
+        table->setItem(i,2, new QTableWidgetItem(QString::number(eCallStatsList[i].count_,'f',0)));
+        table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].callAvg_,0) + " (" + QString::number(eCallStatsList[i].callAvg_,'f',0)+ " ns)"));
+        table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].median_,0) + " (" + QString::number(eCallStatsList[i].median_,'f',0)+ " ns)"));
+        table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].standardDeviation_,0) + " (" + QString::number(eCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
+        table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
+        table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
+        table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
+        /*itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].callAvg_, 0);
+        table->setItem(i,3, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
 
-        QTableWidget *table = new QTableWidget(eCallStatsDialog_);
-        table->setRowCount(db->getEcallStatistics().size());
-        table->setColumnCount(9);
+        itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].median_, 0);
+        table->setItem(i,4, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
 
-        table->setSortingEnabled(false);
-        table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
-        for (int i = 0; i < table->rowCount(); ++i)
-        {
-            //moe::AbstractTimeUnit itemInfo;
-            QTableWidgetItem *item = new QTableWidgetItem;
-            item->setData(Qt::EditRole,eCallStatsList[i].callId_);
-            table->setItem(i,0, item);
-            //table->setItem(i,0, new QTableWidgetItem(QString::number(eCallStatsList[i].callId_)));
-            table->setItem(i,1, new QTableWidgetItem(eCallStatsList[i].callSymbolName_));
-            table->setItem(i,2, new QTableWidgetItem(QString::number(eCallStatsList[i].count_,'f',0)));
-            table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].callAvg_,0) + " (" + QString::number(eCallStatsList[i].callAvg_,'f',0)+ " ns)"));
-            table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].median_,0) + " (" + QString::number(eCallStatsList[i].median_,'f',0)+ " ns)"));
-            table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i].standardDeviation_,0) + " (" + QString::number(eCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
-            table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
-            table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
-            table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(eCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(eCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
-            /*itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].callAvg_, 0);
-            table->setItem(i,3, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
+        itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].standardDeviation_, 0);
+        table->setItem(i,5, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
 
-            itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].median_, 0);
-            table->setItem(i,4, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
+        itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._99thPercentile_, 0);
+        table->setItem(i,6, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
 
-            itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i].standardDeviation_, 0);
-            table->setItem(i,5, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
+        itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._95thPercentile_, 0);
+        table->setItem(i,7, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
 
-            itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._99thPercentile_, 0);
-            table->setItem(i,6, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
-
-            itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._95thPercentile_, 0);
-            table->setItem(i,7, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));
-
-            itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._90thPercentile_, 0);
-            table->setItem(i,8, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));*/
-        }
-
-        table->resizeColumnsToContents();
-        table->resizeRowsToContents();
-        int height = 0,width = 0;
-        for (int j = 0; j < table->columnCount() ; ++j)
-        {
-            width += table->columnWidth(j)+6;
-        }
-        for (int k = 0; k < table->rowCount() ; ++k)
-        {
-            height += table->rowHeight(k)+3;
-        }
-        table->horizontalHeader()->setStretchLastSection(true);
-        table->verticalHeader()->setStretchLastSection(true);
-        table->verticalHeader()->hide();
-        table->setSortingEnabled(true);
-        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-        statsLayout->addWidget(table);
-        eCallStatsDialog_->setLayout(statsLayout);
-        eCallStatsDialog_->setMinimumSize(width, height);
-        eCallStatsDialog_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
-        eCallStatsDialog_->show();
-    } else {
-        eCallStatsDialog_->show();
+        itemInfo = moe::checkAbsTimeUnit(eCallStatsList[i]._90thPercentile_, 0);
+        table->setItem(i,8, new QTableWidgetItem(itemInfo.timeWithUnit_ + " (" + itemInfo.absTimeWithUnit_ + " ns)"));*/
     }
 
+    table->resizeColumnsToContents();
+    table->resizeRowsToContents();
+    int height = 0,width = 0;
+    for (int j = 0; j < table->columnCount() ; ++j)
+    {
+        width += table->columnWidth(j)+6;
+    }
+    for (int k = 0; k < table->rowCount() ; ++k)
+    {
+        height += table->rowHeight(k)+3;
+    }
+    table->horizontalHeader()->setStretchLastSection(true);
+    table->verticalHeader()->setStretchLastSection(true);
+    table->verticalHeader()->hide();
+    table->setSortingEnabled(true);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    return table;
 
     /*
      * test customPlot
@@ -1111,11 +1068,13 @@ void MainWindow::loadECallStats()
     }
     QCPGraph *graph1 = customPlot->addGraph();
     graph1->setData(plottedEcallNames,plottedMedian);*/
+
 }
 //ToDo can be later done with separate class for refinement and better abstraction
 void MainWindow::generateCallStaticAnalysis()
 {
-    if(db->getEcallStaticAnalysis().isEmpty() || db->getOcallStaticAnalysis().isEmpty()) {
+    if(!db->staticAnalysisGenerated())
+    {
         db->loadEcallAnalysis();
         db->loadOcallAnalysis();
         const QVector<moe::ECallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
@@ -1125,11 +1084,11 @@ void MainWindow::generateCallStaticAnalysis()
         analysisDialig_->setWindowTitle(tr("Call Static Analysis"));
         auto  dialogLayout = new QVBoxLayout();
 
-        auto *analysisDialogTab = new QTabWidget();
-        auto *staticAnalysisDialogTab = new QTabWidget();
-        auto *dynamicAnalysisDialogTab = new QTabWidget();
+        auto analysisDialogTab = new QTabWidget();
+        auto staticAnalysisDialogTab = new QTabWidget();
+        auto dynamicAnalysisDialogTab = new QTabWidget();
 
-        auto *eCallStaticAnalysisTable = new QTableWidget();
+        auto eCallStaticAnalysisTable = new QTableWidget();
         eCallStaticAnalysisTable->setRowCount(ecallStaticAnalysisList.size());
         eCallStaticAnalysisTable->setColumnCount(2);
         eCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));
@@ -1176,5 +1135,31 @@ void MainWindow::generateCallStaticAnalysis()
         //tab->addTab()
     } else {
         analysisDialig_->show();
+    }
+}
+
+void MainWindow::generateCallStatistics()
+{
+    if(!db->statsGenerated())
+    {
+        db->loadEcallsStats();
+        db->loadOcallsStats();
+        statisticsDialog_ = new QDialog();
+        statisticsDialog_->setWindowTitle(tr("E/OCall Statistics"));
+        auto statsDiagLayout = new QVBoxLayout();
+
+        auto statsDiagTab = new QTabWidget();
+
+        auto ecallStatsTable = loadECallStats();
+        auto ocallStatsTable = loadOCallStats();
+
+        statsDiagTab->addTab(ecallStatsTable, "ECall");
+        statsDiagTab->addTab(ocallStatsTable, "OCall");
+        statsDiagLayout->addWidget(statsDiagTab);
+        statisticsDialog_->setLayout(statsDiagLayout);
+        statisticsDialog_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
+        statisticsDialog_->show();
+    } else {
+        statisticsDialog_->show();
     }
 }

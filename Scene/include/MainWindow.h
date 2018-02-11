@@ -43,8 +43,9 @@ private slots:
     void scrollLeftPressed();
     void scrollToNextEvent();
 
-    void loadOCallStats();
-    void loadECallStats();
+    //void loadOCallStats();
+    //void loadECallStats();
+    void generateCallStatistics();
     void generateCallStaticAnalysis();
 protected:
     void wheelEvent ( QWheelEvent * event ) override;
@@ -100,6 +101,7 @@ private:
     QDialog *eCallStatsDialog_;
     QDialog *oCallStatsDialog_;
     QDialog *analysisDialig_;
+    QDialog *statisticsDialog_;
 
 
     QStatusBar *statusBar_;
@@ -126,6 +128,9 @@ private:
     uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsOcallsEnclavesAndTimeline();
     void clearQList();
+    QTableWidget *loadOCallStats();
+    QTableWidget *loadECallStats();
+
 
     QTabWidget *tabwidget_;
     QLineEdit *startTimeFilter;
@@ -143,8 +148,9 @@ private:
     QAction *eCallFilterAction_;
     QAction *oCallFilterAction_;
     QAction *enclaveFilterAction_;
-    QAction *loadECallStats_;
-    QAction *loadOCallStats_;
+    //QAction *loadECallStats_;
+    //QAction *loadOCallStats_;
+    QAction *loadCallStatistics;
     QAction *loadCallStaticAnalysis_;
     QAction *timeFilterAction_;
     QAction *applyDockAction_;

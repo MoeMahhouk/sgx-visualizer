@@ -45,17 +45,17 @@ namespace moe {
             QString predecessorsPatternIds = checkForPredessorPattern();
             if(!successorPatternIds.isEmpty())
             {
-                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a predecessor with the call id-s ( ");
-                successorPatternIds.remove(successorPatternIds.size()-1,1);
+                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a predecessor with the call id ( ");
+                //successorPatternIds.remove(successorPatternIds.size()-1,1);
                 tempAnlytxt.append(successorPatternIds);
-                tempAnlytxt.append(" )\n");
+               // tempAnlytxt.append(" )\n");
             }
             if(!predecessorsPatternIds.isEmpty())
             {
-                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a successor with the call id-s ( ");
-                predecessorsPatternIds.remove(predecessorsPatternIds.size()-1,1);
+                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a successor with the call id ( ");
+                //predecessorsPatternIds.remove(predecessorsPatternIds.size()-1,1);
                 tempAnlytxt.append(predecessorsPatternIds);
-                tempAnlytxt.append(" )\n");
+                //tempAnlytxt.append(" )\n");
             }
             if(successorPatternIds.isEmpty() && predecessorsPatternIds.isEmpty()) {
                 analysisText_ = "No Suspicious Pattern was found for this Call";
@@ -70,9 +70,15 @@ namespace moe {
         {
             QString successorsIDs = "";
             QMap<int, int>::iterator i;
-            for (i = sucessorId_Counter_Map_.begin(); i != sucessorId_Counter_Map_.end(); ++i) {
-                if (i.value() >= 2) //ToDo add here later a check for the percentage of how often this pattern appears according to the total calls counter
-                    successorsIDs.append(QString::number(i.key()) + " ,");
+            for (i = sucessorId_Counter_Map_.begin(); i != sucessorId_Counter_Map_.end(); ++i)
+            {
+                //ToDo add here later a check for the percentage of how often this pattern appears according to the total calls counter
+                if (i.value() >= 2 && (patternPercentage(i.value()) > 50.0))
+                {
+                    std::cerr << " patternpercentage " << patternPercentage(i.value())  << " is it bigger than 50 ? " << (patternPercentage(i.value()) > 50) << std::endl;
+                    //successorsIDs.append(QString::number(i.key()) + " ,");
+                    successorsIDs.append(QString::number(i.key()) + " ) , the exact occurrence of this Pattern is ( " +  QString::number(patternPercentage(i.value())) + "% ) \n");
+                }
             }
             return successorsIDs;
         }
@@ -83,10 +89,15 @@ namespace moe {
             QMap<int,int>::iterator i;
             for (i = predecessoreId_Counter_Map_.begin(); i != predecessoreId_Counter_Map_.end(); ++i)
             {
-                if(i.value() >= 2)
-                    predecessorsIDs.append(QString::number(i.key()) + " ,");
+                if(i.value() >= 2 && (patternPercentage(i.value()) > 50.0))
+                    predecessorsIDs.append(QString::number(i.key()) + " ) , the exact occurrence of this Pattern is ( " +  QString::number(patternPercentage(i.value())) + "% ) \n");
             }
             return predecessorsIDs;
+        }
+
+        float patternPercentage(int neighbourCount)
+        {
+            return ((float)neighbourCount/(float)counter_) * 100;
         }
     };
 }

@@ -21,6 +21,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     loadOCallTypeList();
     initializeThreads();
     initializeECallsAndOCalls();
+    loadECallDynamicAnalysis();
     loadOCallDynamicAnalysis(); //TODO its only a test
 
 }

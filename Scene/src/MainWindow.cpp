@@ -41,10 +41,7 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
-    QMap<int,moe::CallDynamicAnalysis>::const_iterator i;
-    for (i = db->getOcallDynamicAnalysis().begin(); i != db->getOcallDynamicAnalysis().end() ; ++i) {
-        std::cerr << i.value().analysisText_.toStdString() << std::endl;
-    }
+
     const qreal MEASURELINE_OFFSET = 50;
     QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;
 
@@ -1060,6 +1057,33 @@ QTableWidget *MainWindow::loadECallStats()
     graph1->setData(plottedEcallNames,plottedMedian);*/
 
 }
+
+void MainWindow::generateCallStatistics()
+{
+    if(!db->statsGenerated())
+    {
+        db->loadEcallsStats();
+        db->loadOcallsStats();
+        statisticsDialog_ = new QDialog();
+        statisticsDialog_->setWindowTitle(tr("E/OCall Statistics"));
+        auto statsDiagLayout = new QVBoxLayout();
+
+        auto statsDiagTab = new QTabWidget();
+
+        auto ecallStatsTable = loadECallStats();
+        auto ocallStatsTable = loadOCallStats();
+
+        statsDiagTab->addTab(ecallStatsTable, "ECall");
+        statsDiagTab->addTab(ocallStatsTable, "OCall");
+        statsDiagLayout->addWidget(statsDiagTab);
+        statisticsDialog_->setLayout(statsDiagLayout);
+        statisticsDialog_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
+        statisticsDialog_->show();
+    } else {
+        statisticsDialog_->show();
+    }
+}
+
 //ToDo can be later done with separate class for refinement and better abstraction
 void MainWindow::generateCallStaticAnalysis()
 {
@@ -1069,6 +1093,8 @@ void MainWindow::generateCallStaticAnalysis()
         db->loadOcallAnalysis();
         const QVector<moe::ECallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
         const QVector<moe::CallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
+        const QMap<int,moe::CallDynamicAnalysis> &ecallDynamicAnalysisMap = db->getEcallDynamicAnalysis();
+        const QMap<int,moe::CallDynamicAnalysis> &ocallDynamicAnalysisMap = db->getOcallDynamicAnalysis();
 
         analysisDialig_ = new QDialog();
         analysisDialig_->setWindowTitle(tr("Call Static Analysis"));
@@ -1101,10 +1127,10 @@ void MainWindow::generateCallStaticAnalysis()
         oCallStaticAnalysisTable->setRowCount(ocallStaticAnalysisList.size());
         oCallStaticAnalysisTable->setColumnCount(2);
         oCallStaticAnalysisTable->setHorizontalHeaderLabels(QString("Call Name;Analysis").split(";"));
-        for (int i = 0; i < ocallStaticAnalysisList.size() ; ++i)
+        for (int j = 0; j < ocallStaticAnalysisList.size() ; ++j)
         {
-            oCallStaticAnalysisTable->setItem(i,0,new QTableWidgetItem(ocallStaticAnalysisList[i].callName_));
-            oCallStaticAnalysisTable->setItem(i,1,new QTableWidgetItem(ocallStaticAnalysisList[i].analysisText_));
+            oCallStaticAnalysisTable->setItem(j,0,new QTableWidgetItem(ocallStaticAnalysisList[j].callName_));
+            oCallStaticAnalysisTable->setItem(j,1,new QTableWidgetItem(ocallStaticAnalysisList[j].analysisText_));
         }
         oCallStaticAnalysisTable->resizeRowsToContents();
         oCallStaticAnalysisTable->resizeColumnsToContents();
@@ -1113,10 +1139,57 @@ void MainWindow::generateCallStaticAnalysis()
         oCallStaticAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
         oCallStaticAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
+        auto eCallDynamicAnalysisTable = new QTableWidget();
+        eCallDynamicAnalysisTable->setRowCount(ecallDynamicAnalysisMap.size());
+        eCallDynamicAnalysisTable->setColumnCount(3);
+        eCallDynamicAnalysisTable->setHorizontalHeaderLabels(QString("Id;Call Name;Analysis").split(";"));
+        QMap<int,moe::CallDynamicAnalysis>::const_iterator k;
+        int tblCntr = 0;
+        for (k = ecallDynamicAnalysisMap.begin();  k != ecallDynamicAnalysisMap.end() ; k++)
+        {
+            auto item = new QTableWidgetItem;
+            item->setData(Qt::EditRole,k.value().callId_);
+            eCallDynamicAnalysisTable->setItem(tblCntr, 0, item);
+            eCallDynamicAnalysisTable->setItem(tblCntr, 1, new QTableWidgetItem(k.value().callName_));
+            eCallDynamicAnalysisTable->setItem(tblCntr, 2, new QTableWidgetItem(k.value().analysisText_));
+            tblCntr++;
+        }
+        eCallDynamicAnalysisTable->resizeColumnsToContents();
+        eCallDynamicAnalysisTable->resizeRowsToContents();
+        eCallDynamicAnalysisTable->horizontalHeader()->setStretchLastSection(true);
+        eCallDynamicAnalysisTable->verticalHeader()->setStretchLastSection(true);
+        eCallDynamicAnalysisTable->verticalHeader()->hide();
+        eCallDynamicAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        eCallDynamicAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+        auto oCallDynamicAnalysisTable = new QTableWidget();
+        oCallDynamicAnalysisTable->setRowCount(ocallDynamicAnalysisMap.size());
+        oCallDynamicAnalysisTable->setColumnCount(3);
+        oCallDynamicAnalysisTable->setHorizontalHeaderLabels(QString("Id;Call Name;Analysis").split(";"));
+        tblCntr = 0;
+        for (k = ocallDynamicAnalysisMap.begin();  k != ocallDynamicAnalysisMap.end() ; k++)
+        {
+            auto item = new QTableWidgetItem;
+            item->setData(Qt::EditRole,k.value().callId_);
+            oCallDynamicAnalysisTable->setItem(tblCntr, 0, item);
+            oCallDynamicAnalysisTable->setItem(tblCntr, 1, new QTableWidgetItem(k.value().callName_));
+            oCallDynamicAnalysisTable->setItem(tblCntr, 2, new QTableWidgetItem(k.value().analysisText_));
+            tblCntr++;
+        }
+        oCallDynamicAnalysisTable->resizeColumnsToContents();
+        oCallDynamicAnalysisTable->resizeRowsToContents();
+        oCallDynamicAnalysisTable->horizontalHeader()->setStretchLastSection(true);
+        oCallDynamicAnalysisTable->verticalHeader()->setStretchLastSection(true);
+        oCallDynamicAnalysisTable->verticalHeader()->hide();
+        oCallDynamicAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        oCallDynamicAnalysisTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
         analysisDialogTab->addTab(staticAnalysisDialogTab,"Static");
         analysisDialogTab->addTab(dynamicAnalysisDialogTab,"Dynamic");
         staticAnalysisDialogTab->addTab(eCallStaticAnalysisTable,"ECall");
         staticAnalysisDialogTab->addTab(oCallStaticAnalysisTable,"OCall");
+        dynamicAnalysisDialogTab->addTab(eCallDynamicAnalysisTable, "ECall");
+        dynamicAnalysisDialogTab->addTab(oCallDynamicAnalysisTable, "OCall");
 
         dialogLayout->addWidget(analysisDialogTab);
         analysisDialig_->setLayout(dialogLayout);
@@ -1125,31 +1198,5 @@ void MainWindow::generateCallStaticAnalysis()
         //tab->addTab()
     } else {
         analysisDialig_->show();
-    }
-}
-
-void MainWindow::generateCallStatistics()
-{
-    if(!db->statsGenerated())
-    {
-        db->loadEcallsStats();
-        db->loadOcallsStats();
-        statisticsDialog_ = new QDialog();
-        statisticsDialog_->setWindowTitle(tr("E/OCall Statistics"));
-        auto statsDiagLayout = new QVBoxLayout();
-
-        auto statsDiagTab = new QTabWidget();
-
-        auto ecallStatsTable = loadECallStats();
-        auto ocallStatsTable = loadOCallStats();
-
-        statsDiagTab->addTab(ecallStatsTable, "ECall");
-        statsDiagTab->addTab(ocallStatsTable, "OCall");
-        statsDiagLayout->addWidget(statsDiagTab);
-        statisticsDialog_->setLayout(statsDiagLayout);
-        statisticsDialog_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
-        statisticsDialog_->show();
-    } else {
-        statisticsDialog_->show();
     }
 }

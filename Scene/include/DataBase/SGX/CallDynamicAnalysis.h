@@ -75,7 +75,6 @@ namespace moe {
                 //ToDo add here later a check for the percentage of how often this pattern appears according to the total calls counter
                 if (i.value() >= 2 && (patternPercentage(i.value()) > 50.0))
                 {
-                    std::cerr << " patternpercentage " << patternPercentage(i.value())  << " is it bigger than 50 ? " << (patternPercentage(i.value()) > 50) << std::endl;
                     //successorsIDs.append(QString::number(i.key()) + " ,");
                     successorsIDs.append(QString::number(i.key()) + " ) , the exact occurrence of this Pattern is ( " +  QString::number(patternPercentage(i.value())) + "% ) \n");
                 }

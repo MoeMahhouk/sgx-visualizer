@@ -55,7 +55,7 @@ void MainWindow::wheelEvent(QWheelEvent *event)
             qreal yOffsetTailDiff = ((this->height()*0.75) + ((yOffset_ * factor_)/yScale_)); // gives the tail of the objects in pixel coordination
             qreal oldYOffset = yOffset_;
             const qreal limit = (qreal)scaleLineStep/(qreal)(yScale_*yScaleFactor);
-            if(limit/pow(10,8) > 1 || limit < 300 || mouseScenePos.y()/yScale_ > yOffsetTailDiff){
+            if(limit/pow(10,9) > 1 || limit < 300 || mouseScenePos.y()/yScale_ > yOffsetTailDiff){
                 return;
             }
             verticalZoom(yScaleFactor);

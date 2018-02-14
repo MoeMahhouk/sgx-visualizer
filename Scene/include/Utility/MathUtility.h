@@ -95,7 +95,9 @@ namespace moe {
             return QString::number(0,'f',decimal);
         }
     }
-
+    /*
+     * ToDo this is for later implementation of sorting in statistics tables
+     */
     inline AbstractTimeUnit checkAbsTimeUnit(qreal time, int decimal = 2)
     {
         AbstractTimeUnit result;

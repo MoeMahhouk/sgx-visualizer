@@ -57,7 +57,7 @@ namespace moe {
                     {
                         subClusterList.back()->addBlock(eCallRenderable);
                     } else {
-                        subClusterList.push_back(new SeqDiagBlockCluster());
+                        subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta)));
                         subClusterList.back()->addBlock(eCallRenderable);
                     }
                 }

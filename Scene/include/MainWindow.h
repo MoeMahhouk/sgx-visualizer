@@ -43,8 +43,7 @@ private slots:
     void scrollLeftPressed();
     void scrollToNextEvent();
 
-    //void loadOCallStats();
-    //void loadECallStats();
+
     void generateCallStatistics();
     void generateCallStaticAnalysis();
 protected:
@@ -80,7 +79,6 @@ private:
     void resizeEvent(QResizeEvent *event);
 
     void clearSequenceListNode();
-    QListView *filterListView;
     moe::SgxDatabaseStructure* db = 0;
     // Ui::MainWindow *ui;
     qreal factor_ = 1;
@@ -95,15 +93,13 @@ private:
     QMenu *fileMenu_;
     QMenu *viewMenu_;
     QMenu *helpMenu_;
-    QMenuBar *menuBar_;
+    //QMenuBar *menuBar_;
     QToolBar *toolBar_;
-    QDialog *eCallStatsDialog_;
-    QDialog *oCallStatsDialog_;
     QDialog *analysisDialig_;
     QDialog *statisticsDialog_;
 
 
-    QStatusBar *statusBar_;
+    //QStatusBar *statusBar_;
     /*
      * test stuff
      */
@@ -113,7 +109,6 @@ private:
     QSet<int> chosenEnclaves;
     QPair<uint64_t ,uint64_t > chosenTimeFilter;
     moe::IFilter *filter;
-    QTabWidget* generateTabList();
     void generateEncalveList();
     void generateECallList();
     void generateOCallList();
@@ -126,12 +121,11 @@ private:
     bool updateTimeFilter();
     uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsOcallsEnclavesAndTimeline();
-    void clearQList();
+    //void clearQList();
     QTableWidget *loadOCallStats();
     QTableWidget *loadECallStats();
 
 
-    QTabWidget *tabwidget_;
     QLineEdit *startTimeFilter;
     QLineEdit *endTimeFilter;
     QListWidget *enclavesList_;

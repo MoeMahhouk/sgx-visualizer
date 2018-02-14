@@ -55,7 +55,7 @@ namespace moe {
             CallStaticAnalysis::generateAnalysisText();
             if(shouldBePrivate_) {
                 hint = true;
-                analysisText_.append("\n (Hint this ECall is only called inside OCalls, Why not make it private :) )");
+                analysisText_.append("\n (Hint: This ECall is only called inside OCalls, Why not make it private :) )");
             }
         }
     };

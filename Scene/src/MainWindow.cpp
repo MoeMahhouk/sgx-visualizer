@@ -168,7 +168,7 @@ void MainWindow::generateGraphicsView()
     view_ = new QGraphicsView(scene_,this);
     view_->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     //view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view_->setMouseTracking(true);
     view_->setInteractive(true);
    // view_->setGeometry(0, 0, this->rect().width()*0.7, this->rect().height()*0.8);

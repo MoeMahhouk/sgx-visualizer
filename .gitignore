@@ -1,1 +1,9 @@
 Scene/cmake-build-*
+BAThesis/*.log
+BAThesis/*.aux
+BAThesis/*.lof
+BAThesis/*.lot
+BAThesis/*.pdf
+BAThesis/*.toc
+BAThesis/chapters/*.log
+BAThesis/chapters/*.aux

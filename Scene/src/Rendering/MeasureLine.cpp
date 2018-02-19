@@ -63,17 +63,13 @@ void moe::MeasureLine::updateScales(qreal yScale, qreal yOffset)
 void moe::MeasureLine::onNotify(Event* event) {
     if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event))
     {
-            //generateScales(zoom->yScale_, -zoom->yOffset_);
         updateScales(zoom->yScale_, -zoom->yOffset_);
     } else if (ScrollEvent *scroll = dynamic_cast<ScrollEvent*>(event))
     {
-            //generateScales(scroll->yScale_, -scroll->yOffset_);
         updateScales(scroll->yScale_, -scroll->yOffset_);
     } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event))
     {
-        //resetScales();
         updateScales(1,0);
-
     }
 }
 

@@ -200,7 +200,7 @@ int moe::SgxDatabaseStructure::getEcallsNumberOfThreadAtIndex(int index) {
 void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery)
 {
     QMap<int, Call*> calls;
-    int id,call_id,call_event,isFail, involvedThreadId, eid;
+    int id,call_id,call_event,isFail, involvedThreadId, eid, aex;
     uint64_t start_time, relative_start_time, total_time, symbol_address;
     QString symbol_name;
     uint64_t programStratTime = getProgramStartTime();
@@ -224,7 +224,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     " e_.call_event, e.return_value, e_.involved_thread, e_.eid, e.aex_count "
                     "from events_children as e_ inner join events as e on e.call_event = e_.id "
             "where e.type IN (15, 17) ) "
-            "select distinct e.id, e.type, e.start_time, e.end_time, e.call_id, e.call_event, e.return_value, e.involved_thread, e.eid, e.aex_count, "
+            "select distinct e.id, e.type, e.start_time, e.end_time, e.call_id, e.call_event, e.return_value, e.involved_thread, e.eid, IFNULL (e.aex_count,-1), "
             "IFNULL(ec.symbol_name, oc.symbol_name) as symbol_name, IFNULL(ec.symbol_address, oc.symbol_address_normalized),"
             " oc.symbol_file_name as symbol_file_name "
                     "from filtered_events as e left join ecalls as ec on ec.id = e.call_id and e.type = 14 "
@@ -249,6 +249,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
         isFail = query.value(6).toInt();
         involvedThreadId = query.value(7).toInt();
         eid = query.value(8).toInt();
+        aex = query.value(9).toInt();
         symbol_name = query.value(10).toString();
         symbol_address = (uint64_t)query.value(11).toDouble(); //ToDo maybe should be fixed later because of Ocall normalized address
 
@@ -264,6 +265,7 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     callHoverInfoMap[id].callTotalTime += total_time;
                     callHoverInfoMap[id].callName += symbol_name;
                     callHoverInfoMap[id].enclaveId += eid;
+                    callHoverInfoMap[id].aex = aex;
                     callHoverInfoMap[id].enclaveBinaryName += enclavesList[eid];
                     callHoverInfoMap[id].status = isFail;
                     eCall->callInfo = callHoverInfoMap[id];
@@ -409,7 +411,6 @@ void moe::SgxDatabaseStructure::loadECallTypeList()
         ECallTypes eCalltypeMember = ECallTypes(id, eid, symbol_address, symbol_name, isprivate);
         eCallTypeList[id] = eCalltypeMember;
     }
-
 }
 
 void moe::SgxDatabaseStructure::loadOCallTypeList()
@@ -436,7 +437,6 @@ void moe::SgxDatabaseStructure::loadOCallTypeList()
         OCallTypes oCalltypeMember = OCallTypes(id, eid, symbol_address, symbol_name, symbol_address_normalized, symbol_file_name);
         oCallTypeList[id] = (oCalltypeMember);
     }
-
 }
 
 const QVector<moe::OCallTypes> &moe::SgxDatabaseStructure::getOCallTypeList() const {
@@ -773,7 +773,7 @@ void moe::SgxDatabaseStructure::loadECallDynamicAnalysis()
             int ecallId = threads_[i].threadEcalls_[j]->id_;
             if (!ecallDynamicAnalysis.count(ecallId))
             {
-                CallDynamicAnalysis ecall;
+                ECallDynamicAnalysis ecall;
                 ecall.callId_ = ecallId;
                 ecall.eid_ = threads_[i].threadEcalls_[j]->eid_;
                 ecall.callName_ = threads_[i].threadEcalls_[j]->symbol_name_;
@@ -793,19 +793,19 @@ void moe::SgxDatabaseStructure::loadECallDynamicAnalysis()
             }
         }
     }
-    QMap<int,CallDynamicAnalysis>::iterator k;
+    QMap<int,ECallDynamicAnalysis>::iterator k;
     for (k = ecallDynamicAnalysis.begin(); k != ecallDynamicAnalysis.end() ; ++k)
     {
         k.value().generateAnalysisText();
     }
 }
 
-const QMap<int, moe::CallDynamicAnalysis> &moe::SgxDatabaseStructure::getEcallDynamicAnalysis() const
+const QMap<int, moe::ECallDynamicAnalysis> &moe::SgxDatabaseStructure::getEcallDynamicAnalysis() const
 {
     return ecallDynamicAnalysis;
 }
 
-const QMap<int, moe::CallDynamicAnalysis> &moe::SgxDatabaseStructure::getOcallDynamicAnalysis() const
+const QMap<int, moe::OCallDynamicAnalysis> &moe::SgxDatabaseStructure::getOcallDynamicAnalysis() const
 {
     return ocallDynamicAnalysis;
 }
@@ -821,7 +821,7 @@ void moe::SgxDatabaseStructure::loadOCallDynamicAnalysis()
                 int ocallId = threads_[i].threadEcalls_[j]->children_[k]->id_;
                 if (!ocallDynamicAnalysis.count(ocallId))
                 {
-                    CallDynamicAnalysis ocall;
+                    OCallDynamicAnalysis ocall;
                     ocall.callId_ = ocallId;
                     ocall.eid_ = threads_[i].threadEcalls_[j]->children_[k]->eid_;
                     ocall.callName_ = threads_[i].threadEcalls_[j]->children_[k]->symbol_name_;
@@ -842,7 +842,7 @@ void moe::SgxDatabaseStructure::loadOCallDynamicAnalysis()
             }
         }
     }
-    QMap<int,CallDynamicAnalysis>::iterator l;
+    QMap<int,OCallDynamicAnalysis>::iterator l;
     for (l = ocallDynamicAnalysis.begin(); l != ocallDynamicAnalysis.end() ; ++l)
     {
         l.value().generateAnalysisText();

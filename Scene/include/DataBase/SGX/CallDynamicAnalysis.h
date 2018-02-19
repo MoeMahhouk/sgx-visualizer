@@ -16,7 +16,7 @@ namespace moe {
         QString callName_, analysisText_;
         QMap<int,int> sucessorId_Counter_Map_;
         QMap<int,int> predecessoreId_Counter_Map_; //ToDo remove this later if it appears to be useless
-
+        bool warning = false;
 
         void incrementSuccessorIdCounter(int id)
         {
@@ -38,29 +38,9 @@ namespace moe {
             }
         }
 
-        void generateAnalysisText()
-        {
-            QString tempAnlytxt = "";
-            QString successorPatternIds = checkForSuccessorPattern();
-            QString predecessorsPatternIds = checkForPredessorPattern();
-            if(!successorPatternIds.isEmpty())
-            {
-                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a predecessor with the call id ( ");
-                tempAnlytxt.append(successorPatternIds);
-            }
-            if(!predecessorsPatternIds.isEmpty())
-            {
-                tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a successor with the call id ( ");
-                tempAnlytxt.append(predecessorsPatternIds);
-            }
-            if(successorPatternIds.isEmpty() && predecessorsPatternIds.isEmpty()) {
-                analysisText_ = "No Suspicious Pattern was found for this Call";
-            } else {
-                analysisText_ = tempAnlytxt;
-            }
-        }
+        virtual void generateAnalysisText() = 0;
 
-    private:
+    protected:
 
         QString checkForSuccessorPattern()
         {
@@ -92,6 +72,60 @@ namespace moe {
         float patternPercentage(int neighbourCount)
         {
             return ((float)neighbourCount/(float)counter_) * 100;
+        }
+    };
+
+    struct ECallDynamicAnalysis : public CallDynamicAnalysis {
+
+        virtual void generateAnalysisText()
+        {
+            QString tempAnlytxt = "";
+            QString successorPatternIds = checkForSuccessorPattern();
+            QString predecessorsPatternIds = checkForPredessorPattern();
+            if(!successorPatternIds.isEmpty())
+            {
+                tempAnlytxt.append("It appears that this ecall builds up some kind of pattern as a predecessor with the call id ( ");
+                tempAnlytxt.append(successorPatternIds);
+                warning = true;
+            }
+            if(!predecessorsPatternIds.isEmpty())
+            {
+                tempAnlytxt.append("It appears that this ecall builds up some kind of pattern as a successor with the call id ( ");
+                tempAnlytxt.append(predecessorsPatternIds);
+                warning = true;
+            }
+            if(successorPatternIds.isEmpty() && predecessorsPatternIds.isEmpty()) {
+                analysisText_ = "No suspicious pattern was found for this ecall";
+            } else {
+                analysisText_ = tempAnlytxt;
+            }
+        }
+    };
+
+    struct OCallDynamicAnalysis : public CallDynamicAnalysis {
+
+        virtual void generateAnalysisText()
+        {
+            QString tempAnlytxt = "";
+            QString successorPatternIds = checkForSuccessorPattern();
+            QString predecessorsPatternIds = checkForPredessorPattern();
+            if(!successorPatternIds.isEmpty())
+            {
+                tempAnlytxt.append("It appears that this ocall builds up some kind of pattern as a predecessor with the call id ( ");
+                tempAnlytxt.append(successorPatternIds);
+                warning = true;
+            }
+            if(!predecessorsPatternIds.isEmpty())
+            {
+                tempAnlytxt.append("It appears that this ocall builds up some kind of pattern as a successor with the call id ( ");
+                tempAnlytxt.append(predecessorsPatternIds);
+                warning = true;
+            }
+            if(successorPatternIds.isEmpty() && predecessorsPatternIds.isEmpty()) {
+                analysisText_ = "No suspicious pattern was found for this ocall";
+            } else {
+                analysisText_ = tempAnlytxt;
+            }
         }
     };
 }

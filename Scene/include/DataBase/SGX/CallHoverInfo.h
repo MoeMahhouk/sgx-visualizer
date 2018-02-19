@@ -17,6 +17,7 @@ namespace moe {
         uint64_t callTotalTime = 0;
         int enclaveId = 0;
         int status = 0;
+        int aex = -1;
         QString enclaveBinaryName = "";
     };
 }

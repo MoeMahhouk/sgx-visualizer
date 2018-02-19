@@ -52,6 +52,7 @@ void moe::SeqDiagBlock::initializeStats(const CallHoverInfo &callsInfos)
     callsInfos_.enclaveId = callsInfos.enclaveId;
     callsInfos_.enclaveBinaryName = callsInfos.enclaveBinaryName;
     callsInfos_.status = callsInfos.status;
+    callsInfos_.aex = callsInfos.aex;
 }
 
 void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -78,10 +79,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
         enclaveInfo->setY(callName->boundingRect().bottomLeft().y());
         rowCount++;
         elementWidths.push_back(enclaveInfo->boundingRect().right());
-    } /*else {
-        enclaveInfo->setDefaultTextColor(Qt::black);
-        enclaveInfo->setHtml("EnclaveID/Name : <b> NaN / OCall </b>");
-    }*/
+    }
 
     auto status = new QGraphicsTextItem(mouseOver_);
     status->setDefaultTextColor(Qt::black);
@@ -118,6 +116,16 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
         yOffset = childrenTotalTime->boundingRect().bottomLeft().y();
         elementWidths.push_back(childrenTotalTime->boundingRect().right());
 
+    }
+
+    if(callsInfos_.aex >= 0)
+    {
+        auto asyncExit = new QGraphicsTextItem(mouseOver_);
+        asyncExit->setDefaultTextColor(Qt::black);
+        asyncExit->setHtml("AEX count : <b> " + QString::number(callsInfos_.aex,'f',0) + "</b>");
+        asyncExit->setY(yOffset + (15 * rowCount));
+        rowCount++;
+        yOffset = asyncExit->boundingRect().bottomLeft().y();
     }
 
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());

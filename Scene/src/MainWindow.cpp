@@ -1093,8 +1093,8 @@ void MainWindow::generateCallStaticAnalysis()
         db->loadOcallAnalysis();
         const QVector<moe::ECallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
         const QVector<moe::OCallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
-        const QMap<int,moe::CallDynamicAnalysis> &ecallDynamicAnalysisMap = db->getEcallDynamicAnalysis();
-        const QMap<int,moe::CallDynamicAnalysis> &ocallDynamicAnalysisMap = db->getOcallDynamicAnalysis();
+        const QMap<int,moe::ECallDynamicAnalysis> &ecallDynamicAnalysisMap = db->getEcallDynamicAnalysis();
+        const QMap<int,moe::OCallDynamicAnalysis> &ocallDynamicAnalysisMap = db->getOcallDynamicAnalysis();
 
         analysisDialig_ = new QDialog();
         analysisDialig_->setWindowTitle(tr("Call Static Analysis"));
@@ -1145,7 +1145,7 @@ void MainWindow::generateCallStaticAnalysis()
         eCallDynamicAnalysisTable->setRowCount(ecallDynamicAnalysisMap.size());
         eCallDynamicAnalysisTable->setColumnCount(3);
         eCallDynamicAnalysisTable->setHorizontalHeaderLabels(QString("Id;Call Name;Analysis").split(";"));
-        QMap<int,moe::CallDynamicAnalysis>::const_iterator k;
+        QMap<int,moe::ECallDynamicAnalysis>::const_iterator k;
         int tblCntr = 0;
         for (k = ecallDynamicAnalysisMap.begin();  k != ecallDynamicAnalysisMap.end() ; k++)
         {
@@ -1153,7 +1153,9 @@ void MainWindow::generateCallStaticAnalysis()
             item->setData(Qt::EditRole,k.value().callId_);
             eCallDynamicAnalysisTable->setItem(tblCntr, 0, item);
             eCallDynamicAnalysisTable->setItem(tblCntr, 1, new QTableWidgetItem(k.value().callName_));
-            eCallDynamicAnalysisTable->setItem(tblCntr, 2, new QTableWidgetItem(k.value().analysisText_));
+            auto textItem = new QTableWidgetItem(k.value().analysisText_);
+            !k.value().warning ? textItem->setBackground(QBrush(Qt::green)) : textItem->setForeground(QBrush(Qt::red));
+            eCallDynamicAnalysisTable->setItem(tblCntr, 2, textItem);
             tblCntr++;
         }
         eCallDynamicAnalysisTable->resizeColumnsToContents();
@@ -1169,13 +1171,16 @@ void MainWindow::generateCallStaticAnalysis()
         oCallDynamicAnalysisTable->setColumnCount(3);
         oCallDynamicAnalysisTable->setHorizontalHeaderLabels(QString("Id;Call Name;Analysis").split(";"));
         tblCntr = 0;
-        for (k = ocallDynamicAnalysisMap.begin();  k != ocallDynamicAnalysisMap.end() ; k++)
+        QMap<int,moe::OCallDynamicAnalysis>::const_iterator l;
+        for (l = ocallDynamicAnalysisMap.begin();  l != ocallDynamicAnalysisMap.end() ; l++)
         {
             auto item = new QTableWidgetItem;
-            item->setData(Qt::EditRole,k.value().callId_);
+            item->setData(Qt::EditRole,l.value().callId_);
             oCallDynamicAnalysisTable->setItem(tblCntr, 0, item);
-            oCallDynamicAnalysisTable->setItem(tblCntr, 1, new QTableWidgetItem(k.value().callName_));
-            oCallDynamicAnalysisTable->setItem(tblCntr, 2, new QTableWidgetItem(k.value().analysisText_));
+            oCallDynamicAnalysisTable->setItem(tblCntr, 1, new QTableWidgetItem(l.value().callName_));
+            auto textItem = new QTableWidgetItem(l.value().analysisText_);
+            !l.value().warning ? textItem->setBackground(QBrush(Qt::green)) : textItem->setForeground(QBrush(Qt::red));
+            oCallDynamicAnalysisTable->setItem(tblCntr, 2, textItem);
             tblCntr++;
         }
         oCallDynamicAnalysisTable->resizeColumnsToContents();
@@ -1197,7 +1202,6 @@ void MainWindow::generateCallStaticAnalysis()
         analysisDialig_->setLayout(dialogLayout);
         analysisDialig_->setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
         analysisDialig_->show();
-        //tab->addTab()
     } else {
         analysisDialig_->show();
     }

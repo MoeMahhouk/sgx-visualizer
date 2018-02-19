@@ -83,9 +83,9 @@ namespace moe {
 
         const QVector<OCallStaticAnalysis> &getOcallStaticAnalysis() const;
 
-        const QMap<int, CallDynamicAnalysis> &getEcallDynamicAnalysis() const;
+        const QMap<int, ECallDynamicAnalysis> &getEcallDynamicAnalysis() const;
 
-        const QMap<int, CallDynamicAnalysis> &getOcallDynamicAnalysis() const;
+        const QMap<int, OCallDynamicAnalysis> &getOcallDynamicAnalysis() const;
 
     private:
         int getNumberOfRows(const QString& tableName);
@@ -100,8 +100,8 @@ namespace moe {
         int searchThreadIndex(int threadId);
         QString getInvolvedThreads();
 
-        QMap<int, CallDynamicAnalysis> ocallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
-        QMap<int, CallDynamicAnalysis> ecallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
+        QMap<int, OCallDynamicAnalysis> ocallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
+        QMap<int, ECallDynamicAnalysis> ecallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid
         QMap<int, bool> directPublicEcalls;
         QVector<CallStatistics> ecallStatistics;
         QVector<CallStatistics> ocallStatistics;

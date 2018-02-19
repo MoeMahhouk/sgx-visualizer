@@ -165,7 +165,7 @@ void MainWindow::generateGraphicsView()
     viewToolbar_ = new QToolBar(viewArea_);
     addZoomAndScrollOptions(viewToolbar_);
     layout->addWidget(viewToolbar_);
-    scene_ = new QGraphicsScene();
+    scene_ = new QGraphicsScene(this);
     view_ = new QGraphicsView(scene_,this);
     view_->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -973,7 +973,6 @@ QTableWidget *MainWindow::loadOCallStats()
     table->setSortingEnabled(true);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
     return table;
 }
 

@@ -40,10 +40,12 @@ namespace moe {
 
 	private:
 		virtual void onNotify(Event* event) override;
+        //void paintGrid();
 		Line measureLine_;
 		int pixel_line_depth_ = 0;
 		uint64_t total_timeline_ = 0;
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
+        QVector<Line *> gridLines_;
     };
 
 }

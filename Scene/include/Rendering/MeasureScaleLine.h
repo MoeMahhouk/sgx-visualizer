@@ -22,17 +22,19 @@ namespace moe {
         }
 
         void setXTarget(qreal xTarget);
+
         void setText(const QString &title);
 
     protected:
+
         void draw(SceneData &sceneData, Transform2D &parentTransform) override;
 
-    private:
-        Line scaleLine_;
-    protected:
         void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
     private:
+
+        Line scaleLine_;
+
         TitleText scaleText_;
 
     };

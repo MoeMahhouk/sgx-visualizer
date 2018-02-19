@@ -15,6 +15,7 @@ namespace moe {
         virtual ~Line()
         {
             delete pen_;
+            //delete line_; //ToDo QGraphicsLineItem has no constructor
         }
 
 

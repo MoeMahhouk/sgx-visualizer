@@ -2,6 +2,7 @@
 // Created by moe on 19.11.17.
 //
 
+#include <Utility/MathUtility.h>
 #include "Rendering/TitleText.h"
 #include "Rendering/Line.h"
 #include "Rendering/MeasureLine.h"
@@ -42,7 +43,7 @@ void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset)
     {
         scaleLine->setTransform(Transform2D(1,0,0,1,0,i * ((qreal)pixel_line_depth_/total_timeline_)));
         scaleLine->setXTarget(2);
-        scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
+        scaleLine->setText(checkTimeUnit((yOffset/yScale) + (i/yScale)));
         i += step;
     }
 
@@ -55,12 +56,13 @@ void moe::MeasureLine::updateScales(qreal yScale, qreal yOffset)
     qreal step = total_timeline_ / (scaleLines-1);
     for (MeasureScaleLine *scaleLine : measureLines_)
     {
-        scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
+        scaleLine->setText(checkTimeUnit((yOffset/yScale) + (i/yScale)));
         i += step;
     }
 }
 
-void moe::MeasureLine::onNotify(Event* event) {
+void moe::MeasureLine::onNotify(Event* event)
+{
     if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event))
     {
         updateScales(zoom->yScale_, -zoom->yOffset_);
@@ -73,28 +75,6 @@ void moe::MeasureLine::onNotify(Event* event) {
     }
 }
 
-QString moe::MeasureLine::checkUnit(qreal scaleNumber) {
-    if (scaleNumber == 0) {
-        return QString::number(scaleNumber,'f',2);
-    }
-    if(scaleNumber >= pow(10,9)) {
-        return QString::number(scaleNumber / pow(10,9),'f',2) + "s";
-    } else if (scaleNumber >= pow(10,6)) {
-        return QString::number(scaleNumber / pow(10, 6), 'f', 2) + "ms";
-    } else if (scaleNumber >= pow(10,3)) {
-        return QString::number(scaleNumber / pow(10,3),'f',2) + "us";
-    } else if (scaleNumber >1) {
-        return QString::number(scaleNumber,'f',2) + "ns";
-    } else if (scaleNumber * pow(10,3) > 1) {
-        return QString::number(scaleNumber * pow(10,3),'f',2) + "ps";
-    } else if(scaleNumber * pow(10,6) > 1) {
-        return QString::number(scaleNumber * pow(10,6),'f',2) + "fs";
-    } else if(scaleNumber * pow(10,9) > 1) {
-        return QString::number(scaleNumber * pow(10,9),'f',2) + "as";
-    } else {
-        return QString::number(0,'f',2);
-    }
-}
 
 void moe::MeasureLine::setPixel_line_depth_(int pixel_line_depth_) {
     MeasureLine::pixel_line_depth_ = pixel_line_depth_;

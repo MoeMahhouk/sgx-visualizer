@@ -39,8 +39,6 @@ namespace moe {
 		void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) override;
 
 	private:
-
-		QString checkUnit(qreal scaleNumber);
 		virtual void onNotify(Event* event) override;
 		Line measureLine_;
 		int pixel_line_depth_ = 0;

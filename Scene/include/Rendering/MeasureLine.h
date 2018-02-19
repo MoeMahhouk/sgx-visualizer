@@ -26,6 +26,8 @@ namespace moe {
 
         void generateScales(qreal yScale, qreal yOffset);
 
+		void updateScales(qreal yScale, qreal yOffset);
+
 		void setPixel_line_depth_(int pixel_line_depth_);
 
 		const int getNumOfScaleLines()const;

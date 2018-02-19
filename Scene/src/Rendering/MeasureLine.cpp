@@ -33,11 +33,13 @@ moe::Line & moe::MeasureLine::getMeasureLine_() {
     return measureLine_;
 }
 
-void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset) {
+void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset)
+{
     int scaleLines = measureLines_.size();
     qreal i = 0;
     qreal step = total_timeline_ / (scaleLines-1);
-    for (MeasureScaleLine *scaleLine : measureLines_) {
+    for (MeasureScaleLine *scaleLine : measureLines_)
+    {
         scaleLine->setTransform(Transform2D(1,0,0,1,0,i * ((qreal)pixel_line_depth_/total_timeline_)));
         scaleLine->setXTarget(2);
         scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
@@ -46,14 +48,31 @@ void moe::MeasureLine::generateScales(qreal yScale, qreal yOffset) {
 
 }
 
+void moe::MeasureLine::updateScales(qreal yScale, qreal yOffset)
+{
+    int scaleLines = measureLines_.size();
+    qreal i = 0;
+    qreal step = total_timeline_ / (scaleLines-1);
+    for (MeasureScaleLine *scaleLine : measureLines_)
+    {
+        scaleLine->setText(checkUnit((yOffset/yScale) + (i/yScale)));
+        i += step;
+    }
+}
+
 void moe::MeasureLine::onNotify(Event* event) {
-    if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event)) {
-            generateScales(zoom->yScale_, -zoom->yOffset_);
-    } else if (ScrollEvent *scroll = dynamic_cast<ScrollEvent*>(event)) {
-            generateScales(scroll->yScale_, -scroll->yOffset_);
-    } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event)) {
+    if (ZoomEvent *zoom = dynamic_cast<ZoomEvent*>(event))
+    {
+            //generateScales(zoom->yScale_, -zoom->yOffset_);
+        updateScales(zoom->yScale_, -zoom->yOffset_);
+    } else if (ScrollEvent *scroll = dynamic_cast<ScrollEvent*>(event))
+    {
+            //generateScales(scroll->yScale_, -scroll->yOffset_);
+        updateScales(scroll->yScale_, -scroll->yOffset_);
+    } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event))
+    {
         //resetScales();
-        generateScales(1,0);
+        updateScales(1,0);
 
     }
 }

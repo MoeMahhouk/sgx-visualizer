@@ -1092,7 +1092,7 @@ void MainWindow::generateCallStaticAnalysis()
         db->loadEcallAnalysis();
         db->loadOcallAnalysis();
         const QVector<moe::ECallStaticAnalysis> &ecallStaticAnalysisList = db->getEcallStaticAnalysis();
-        const QVector<moe::CallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
+        const QVector<moe::OCallStaticAnalysis> &ocallStaticAnalysisList = db->getOcallStaticAnalysis();
         const QMap<int,moe::CallDynamicAnalysis> &ecallDynamicAnalysisMap = db->getEcallDynamicAnalysis();
         const QMap<int,moe::CallDynamicAnalysis> &ocallDynamicAnalysisMap = db->getOcallDynamicAnalysis();
 
@@ -1112,7 +1112,7 @@ void MainWindow::generateCallStaticAnalysis()
         {
             eCallStaticAnalysisTable->setItem(i,0,new QTableWidgetItem(ecallStaticAnalysisList[i].callName_));
             auto textItem = new QTableWidgetItem(ecallStaticAnalysisList[i].analysisText_);
-            ecallStaticAnalysisList[i].hint ? textItem->setForeground(QBrush(Qt::green)) : textItem->setForeground(textItem->foreground());
+            !ecallStaticAnalysisList[i].warning ? textItem->setBackground(QBrush(Qt::green)) : textItem->setForeground(QBrush(Qt::red));
             eCallStaticAnalysisTable->setItem(i,1,textItem);
         }
         eCallStaticAnalysisTable->resizeRowsToContents();
@@ -1130,7 +1130,9 @@ void MainWindow::generateCallStaticAnalysis()
         for (int j = 0; j < ocallStaticAnalysisList.size() ; ++j)
         {
             oCallStaticAnalysisTable->setItem(j,0,new QTableWidgetItem(ocallStaticAnalysisList[j].callName_));
-            oCallStaticAnalysisTable->setItem(j,1,new QTableWidgetItem(ocallStaticAnalysisList[j].analysisText_));
+            auto textItem = new QTableWidgetItem(ocallStaticAnalysisList[j].analysisText_);
+            !ocallStaticAnalysisList[j].warning ? textItem->setBackground(QBrush(Qt::green)) : textItem->setForeground(QBrush(Qt::red));
+            oCallStaticAnalysisTable->setItem(j,1,textItem);
         }
         oCallStaticAnalysisTable->resizeRowsToContents();
         oCallStaticAnalysisTable->resizeColumnsToContents();

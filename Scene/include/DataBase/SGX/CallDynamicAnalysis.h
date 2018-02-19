@@ -46,16 +46,12 @@ namespace moe {
             if(!successorPatternIds.isEmpty())
             {
                 tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a predecessor with the call id ( ");
-                //successorPatternIds.remove(successorPatternIds.size()-1,1);
                 tempAnlytxt.append(successorPatternIds);
-               // tempAnlytxt.append(" )\n");
             }
             if(!predecessorsPatternIds.isEmpty())
             {
                 tempAnlytxt.append("It appears that this Call builds up some kind of pattern as a successor with the call id ( ");
-                //predecessorsPatternIds.remove(predecessorsPatternIds.size()-1,1);
                 tempAnlytxt.append(predecessorsPatternIds);
-                //tempAnlytxt.append(" )\n");
             }
             if(successorPatternIds.isEmpty() && predecessorsPatternIds.isEmpty()) {
                 analysisText_ = "No Suspicious Pattern was found for this Call";
@@ -75,7 +71,6 @@ namespace moe {
                 //ToDo add here later a check for the percentage of how often this pattern appears according to the total calls counter
                 if (i.value() >= 2 && (patternPercentage(i.value()) > 50.0))
                 {
-                    //successorsIDs.append(QString::number(i.key()) + " ,");
                     successorsIDs.append(QString::number(i.key()) + " ) , the exact occurrence of this Pattern is ( " +  QString::number(patternPercentage(i.value())) + "% ) \n");
                 }
             }

@@ -719,7 +719,7 @@ void moe::SgxDatabaseStructure::loadOcallAnalysis() {
 
     while(loadOCallAnalysisQuery.next())
     {
-        CallStaticAnalysis oCallStaticAnalysis;
+        OCallStaticAnalysis oCallStaticAnalysis;
         oCallStaticAnalysis.callId_ = loadOCallAnalysisQuery.value(0).toInt();
         oCallStaticAnalysis.callName_ = loadOCallAnalysisQuery.value(1).toString();
         oCallStaticAnalysis.totalCount_ = loadOCallAnalysisQuery.value(2).toInt();
@@ -739,7 +739,7 @@ const QVector<moe::ECallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStat
     return ecallStaticAnalysis;
 }
 
-const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getOcallStaticAnalysis() const
+const QVector<moe::OCallStaticAnalysis> &moe::SgxDatabaseStructure::getOcallStaticAnalysis() const
 {
     return ocallStaticAnalysis;
 }

@@ -43,7 +43,7 @@ namespace moe {
                                                                  total_time_ * factor
             );
 
-            if (!threadEcalls_.isEmpty())
+            if (threadEcalls_.size() > 1)
             {
                 SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta));
                 threadSeqDiag->addBlock(clusterTest);
@@ -64,6 +64,12 @@ namespace moe {
                 for (SeqDiagBlockCluster *subCluster: subClusterList)
                 {
                     clusterTest->addBlock(subCluster);
+                }
+            } else {
+                for (ECall *eCall : threadEcalls_)
+                {
+                    SeqDiagBlock *eCallRenderable = eCall->toRenderable(factor);
+                    threadSeqDiag->addBlock(eCallRenderable);
                 }
             }
             return threadSeqDiag;

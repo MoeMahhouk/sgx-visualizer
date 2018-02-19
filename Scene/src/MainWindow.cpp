@@ -2,6 +2,7 @@
 
 
 #include <DataBase/SGX/SGXErrorCodes.h>
+#include <Utility/TimeStamp.h>
 #include "MainWindow.h"
 #include "Utility/MathUtility.h"
 
@@ -164,15 +165,13 @@ void MainWindow::generateGraphicsView()
     viewToolbar_ = new QToolBar(viewArea_);
     addZoomAndScrollOptions(viewToolbar_);
     layout->addWidget(viewToolbar_);
-    scene_ = new QGraphicsScene(this);
+    scene_ = new QGraphicsScene();
     view_ = new QGraphicsView(scene_,this);
     view_->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    //view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view_->setMouseTracking(true);
     view_->setInteractive(true);
-   // view_->setGeometry(0, 0, this->rect().width()*0.7, this->rect().height()*0.8);
-   // view_->setFrameStyle(0);
+    view_->setFrameStyle(0);
     scene_->setSceneRect(view_->rect());
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
@@ -666,7 +665,7 @@ void MainWindow::createFilterDocks()
 {
     timeDock_ = new QDockWidget(tr("Time Filter"),this);
     auto *timeDockWidget = new QWidget();
-    timeDock_->setMinimumWidth(380);
+    timeDock_->setMinimumWidth(395);
     timeDock_->setMaximumHeight(100);
     timeDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     auto timeFilterLayout = new QHBoxLayout();
@@ -931,7 +930,7 @@ void MainWindow::updateTraces() {
 QTableWidget *MainWindow::loadOCallStats()
 {
     const QVector<moe::CallStatistics> &oCallStatsList = db->getOcallStatistics();
-    QTableWidget *table = new QTableWidget();
+    auto table = new QTableWidget();
     table->setRowCount(oCallStatsList.size());
     table->setColumnCount(9);
 
@@ -939,12 +938,17 @@ QTableWidget *MainWindow::loadOCallStats()
     table->setHorizontalHeaderLabels(QString("ID;Call Name;Count;Average;Median;Standard Deviation;99th Percentile;95th Percentile;90th Percentile").split(";"));
     for (int i = 0; i < table->rowCount(); ++i)
     {
-        QTableWidgetItem *item = new QTableWidgetItem;
+        auto item = new QTableWidgetItem;
         item->setData(Qt::EditRole,oCallStatsList[i].callId_);
         table->setItem(i,0, item);
         //table->setItem(i,0, new QTableWidgetItem(QString::number(oCallStatsList[i].callId_)));
         table->setItem(i,1, new QTableWidgetItem(oCallStatsList[i].callSymbolName_));
         table->setItem(i,2, new QTableWidgetItem(QString::number(oCallStatsList[i].count_,'f',0)));
+
+        /*auto testItem = new QTableWidgetItem;
+        moe::TimeStamp test = moe::TimeStamp(QString::number(oCallStatsList[i].callAvg_,'f',0));
+        testItem->setData(Qt::EditRole,test);
+        table->setItem(i,3,testItem);*/
         table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].callAvg_,0) + " (" + QString::number(oCallStatsList[i].callAvg_,'f',0) + " ns)"));
         table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].median_,0) + " (" + QString::number(oCallStatsList[i].median_,'f',0) + " ns)"));
         table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].standardDeviation_,0) + " (" + QString::number(oCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));

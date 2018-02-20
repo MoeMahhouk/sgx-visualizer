@@ -200,10 +200,13 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     toolbar->addWidget(scrollLabel);
 
 
-    auto* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
+    auto* scrollLeft = new QPushButton(toolbar);
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
     scrollLeft->setShortcut(QKeySequence::MoveToPreviousChar);
+    //scrollLeft->setIcon(QIcon("/Resources/famfamIcon/action_back.gif"));
+    //scrollLeft->setIconSize(QSize(65,65));
     toolbar->addWidget(scrollLeft);
+
 
     auto* scrollRight = new QPushButton(tr("Scroll Right ->"), toolbar);
     scrollRight->connect(scrollRight,SIGNAL(clicked()), this, SLOT(scrollRightPressed()));

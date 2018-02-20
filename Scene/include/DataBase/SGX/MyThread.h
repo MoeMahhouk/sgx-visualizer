@@ -45,10 +45,10 @@ namespace moe {
 
             if (threadEcalls_.size() > 1)
             {
-                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern));
+                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern));
                 threadSeqDiag->addBlock(clusterTest);
                 QVector<SeqDiagBlockCluster *> subClusterList;
-                subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern)));
+                subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern)));
                 for (ECall *eCall : threadEcalls_)
                 {
 
@@ -57,7 +57,7 @@ namespace moe {
                     {
                         subClusterList.back()->addBlock(eCallRenderable);
                     } else {
-                        subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern)));
+                        subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkMagenta, Qt::Dense3Pattern)));
                         subClusterList.back()->addBlock(eCallRenderable);
                     }
                 }

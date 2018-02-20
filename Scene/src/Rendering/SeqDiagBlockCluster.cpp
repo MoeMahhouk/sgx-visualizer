@@ -172,7 +172,7 @@ void moe::SeqDiagBlockCluster::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 }
 
 
-const int moe::SeqDiagBlockCluster::size() const
+int moe::SeqDiagBlockCluster::size() const
 {
     return lineOffset_->children_.size();
 }

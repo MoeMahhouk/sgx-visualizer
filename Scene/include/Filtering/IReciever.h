@@ -12,7 +12,7 @@ namespace TYPES
         THREADFILTER,
         ECALLOCALLFILTER,
     };
-};
+}
 
 namespace moe {
 

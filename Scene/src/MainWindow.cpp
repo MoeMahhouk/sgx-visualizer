@@ -944,17 +944,19 @@ QTableWidget *MainWindow::loadOCallStats()
         //table->setItem(i,0, new QTableWidgetItem(QString::number(oCallStatsList[i].callId_)));
         table->setItem(i,1, new QTableWidgetItem(oCallStatsList[i].callSymbolName_));
         table->setItem(i,2, new QTableWidgetItem(QString::number(oCallStatsList[i].count_,'f',0)));
-
-        /*auto testItem = new QTableWidgetItem;
-        moe::TimeStamp test = moe::TimeStamp(QString::number(oCallStatsList[i].callAvg_,'f',0));
-        testItem->setData(Qt::EditRole,test);
-        table->setItem(i,3,testItem);*/
-        table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].callAvg_,0) + " (" + QString::number(oCallStatsList[i].callAvg_,'f',0) + " ns)"));
-        table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].median_,0) + " (" + QString::number(oCallStatsList[i].median_,'f',0) + " ns)"));
-        table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].standardDeviation_,0) + " (" + QString::number(oCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
-        table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
-        table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
-        table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
+        if(oCallStatsList[i].count_ != 0)
+        {
+            /*auto testItem = new QTableWidgetItem;
+            moe::TimeStamp test = moe::TimeStamp(QString::number(oCallStatsList[i].callAvg_,'f',0));
+            testItem->setData(Qt::EditRole,test);
+            table->setItem(i,3,testItem);*/
+            table->setItem(i,3, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].callAvg_,0) + " (" + QString::number(oCallStatsList[i].callAvg_,'f',0) + " ns)"));
+            table->setItem(i,4, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].median_,0) + " (" + QString::number(oCallStatsList[i].median_,'f',0) + " ns)"));
+            table->setItem(i,5, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i].standardDeviation_,0) + " (" + QString::number(oCallStatsList[i].standardDeviation_,'f',0)+ " ns)"));
+            table->setItem(i,6, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._99thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._99thPercentile_,'f',0)+ " ns)"));
+            table->setItem(i,7, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._95thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._95thPercentile_,'f',0)+ " ns)"));
+            table->setItem(i,8, new QTableWidgetItem(moe::checkTimeUnit(oCallStatsList[i]._90thPercentile_,0) + " (" + QString::number(oCallStatsList[i]._90thPercentile_,'f',0)+ " ns)"));
+        }
     }
     table->resizeColumnsToContents();
     table->resizeRowsToContents();

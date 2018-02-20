@@ -144,6 +144,7 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
             " FROM threads AS t JOIN events AS e1  ON t.id = e1.involved_thread "
             "WHERE e1.type = 3";
 
+    std::cerr<< queryString.toStdString() << std::endl;
     if (!conditionQuery.isEmpty())
     {
         queryString.append(conditionQuery);
@@ -231,9 +232,6 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     "left join ocalls as oc on oc.id = e.call_id and e.type = 16 "
                     "order by start_time ASC");
 
-    //ToDo aex_count should be IFNULL(aex_count , 0) ?? and what should be done with it exactly ? (still open  :| )
-    //ToDo what about isPrivate from ecalls and symbol Address from Ocalls (still open :| )
-    std::cerr << newQueryString.toStdString() << std::endl;
     query.prepare(newQueryString);
 
     if(!execAndCheckQuery(query))
@@ -283,10 +281,6 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     //here i calculate the relative start time of the child according to his parent start time
                     eCall->relative_start_time_ -= calls[call_event]->start_time_;
                     calls[call_event]->children_.push_back(eCall);
-                    /*
-                     * ToDo add these for the statistic implementation later
-                     * ToDo ask nico, after filtering those infos will be deleted and zeros will be
-                     */
                     //because we only need to gather these information at the initilizing the database phase and then they should stay untouched
                     if (conditionQuery.isEmpty())
                     {
@@ -329,9 +323,6 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     //here i calculate the relative start time of the child according to his parent start time
                     oCall->relative_start_time_ -= calls[call_event]->start_time_;
                     calls[call_event]->children_.push_back(oCall);
-                    /*
-                     * ToDo add these for the statistic implementation later
-                     */
                     if (conditionQuery.isEmpty())
                     {
                         calls[call_event]->callInfo.childrenCounter += 1;
@@ -433,7 +424,6 @@ void moe::SgxDatabaseStructure::loadOCallTypeList()
         symbol_name = query.value(3).toString();
         symbol_address_normalized = (uint64_t) query.value(4).toDouble();
         symbol_file_name = query.value(5).toString();
-       // std::cerr << id << "   "  << symbol_name.toStdString() << std::endl;
         OCallTypes oCalltypeMember = OCallTypes(id, eid, symbol_address, symbol_name, symbol_address_normalized, symbol_file_name);
         oCallTypeList[id] = (oCalltypeMember);
     }
@@ -488,7 +478,6 @@ QString moe::SgxDatabaseStructure::getInvolvedThreads()
         }
         availableThreads.remove(availableThreads.length()-1,1);
         availableThreads.append(")");
-       // std::cerr << " involved Threads are " << availableThreads.toStdString() << std::endl;
         return availableThreads;
     } else {
         availableThreads.append(")");
@@ -595,15 +584,37 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
     if(!execAndCheckQuery(query))
         return;
 
+    int cntrCheck = 0;
     while(query.next())
     {
         CallStatistics ocallStats;
         ocallStats.callId_ = query.value(0).toInt();
-        ocallStats.callSymbolName_ = query.value(1).toString();
-        ocallStats.callAvg_ = query.value(2).toReal();
-        ocallStats.count_ = query.value(3).toReal();
+        if(ocallStats.callId_ != cntrCheck)
+        {
+            ocallStats.callSymbolName_ = oCallTypeList[cntrCheck].symbol_name_;
+            ocallStats.count_ = 0;
+        } else {
+            ocallStats.callSymbolName_ = query.value(1).toString();
+            ocallStats.callAvg_ = query.value(2).toReal();
+            ocallStats.count_ = query.value(3).toReal();
+        }
+        cntrCheck += 1;
         ocallStatistics.push_back(ocallStats);
     }
+
+    /*
+     * this is in case that the last ocalls were not listed and were not found in the query above
+     */
+    while(oCallTypeList.size() > cntrCheck)
+    {
+        CallStatistics ocallStats;
+        ocallStats.callId_ = cntrCheck;
+        ocallStats.callSymbolName_ = oCallTypeList[cntrCheck].symbol_name_;
+        ocallStats.count_ = 0;
+        ocallStatistics.push_back(ocallStats);
+        cntrCheck += 1;
+    }
+
 
 
     QMap<int, QVector<uint64_t >> medianTotalTimeListMap;
@@ -614,6 +625,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
                                 "FROM events AS e1 JOIN events as e2 ON e1.id = e2.call_event "
                                 "WHERE e1.type = 16 AND e2.type = 17 "
                                 "order BY call_id, total_time ");
+
     if(!execAndCheckQuery(medianQuery))
         return;
 
@@ -626,20 +638,27 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
 
     for (CallStatistics ocallStats : ocallStatistics)
     {
-        ocallStatistics[ocallStats.callId_].median_ = median(medianTotalTimeListMap[ocallStats.callId_]);
-        ocallStatistics[ocallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ocallStats.callId_],ocallStats.callAvg_);
-        ocallStatistics[ocallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.99);
-        ocallStatistics[ocallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.95);
-        ocallStatistics[ocallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.90);
+        if(ocallStats.count_ != 0)
+        {
+            ocallStatistics[ocallStats.callId_].median_ = median(medianTotalTimeListMap[ocallStats.callId_]);
+            ocallStatistics[ocallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ocallStats.callId_],ocallStats.callAvg_);
+            ocallStatistics[ocallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.99);
+            ocallStatistics[ocallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.95);
+            ocallStatistics[ocallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.90);
+        }
     }
+
+
 
 }
 
-const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getOcallStatistics() const {
+const QVector<moe::CallStatistics> &moe::SgxDatabaseStructure::getOcallStatistics() const
+{
     return ocallStatistics;
 }
 
-void moe::SgxDatabaseStructure::loadEcallAnalysis() {
+void moe::SgxDatabaseStructure::loadEcallAnalysis()
+{
     if(!m_db.tables(QSql::Views).contains("ECallAnalysisView",Qt::CaseInsensitive))
     {
         QSqlQuery createViewQuery;
@@ -685,7 +704,8 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis() {
     }
 }
 
-void moe::SgxDatabaseStructure::loadOcallAnalysis() {
+void moe::SgxDatabaseStructure::loadOcallAnalysis()
+{
 
     if(!m_db.tables(QSql::Views).contains("OCallAnalysisView",Qt::CaseInsensitive))
     {

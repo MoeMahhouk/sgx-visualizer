@@ -584,36 +584,31 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
     if(!execAndCheckQuery(query))
         return;
 
-    int cntrCheck = 0;
     while(query.next())
     {
         CallStatistics ocallStats;
         ocallStats.callId_ = query.value(0).toInt();
-        if(ocallStats.callId_ != cntrCheck)
-        {
-            ocallStats.callSymbolName_ = oCallTypeList[cntrCheck].symbol_name_;
-            ocallStats.count_ = 0;
-        } else {
-            ocallStats.callSymbolName_ = query.value(1).toString();
-            ocallStats.callAvg_ = query.value(2).toReal();
-            ocallStats.count_ = query.value(3).toReal();
-        }
-        cntrCheck += 1;
+        ocallStats.callSymbolName_ = query.value(1).toString();
+        ocallStats.callAvg_ = query.value(2).toReal();
+        ocallStats.count_ = query.value(3).toReal();
         ocallStatistics.push_back(ocallStats);
     }
 
     /*
-     * this is in case that the last ocalls were not listed and were not found in the query above
+     * this step is to fill the ocalls that does not appear in the data bank event table
      */
-    while(oCallTypeList.size() > cntrCheck)
+    for (int i = 0; i < oCallTypeList.size() ; ++i)
     {
-        CallStatistics ocallStats;
-        ocallStats.callId_ = cntrCheck;
-        ocallStats.callSymbolName_ = oCallTypeList[cntrCheck].symbol_name_;
-        ocallStats.count_ = 0;
-        ocallStatistics.push_back(ocallStats);
-        cntrCheck += 1;
+        if(!isInOCallList(i))
+        {
+            CallStatistics ocallStats;
+            ocallStats.callId_ = i;
+            ocallStats.callSymbolName_ = oCallTypeList[i].symbol_name_;
+            ocallStats.count_ = 0;
+            ocallStatistics.insert(i,ocallStats);
+        }
     }
+
 
 
 
@@ -636,7 +631,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
         medianTotalTimeListMap[id].push_back(totalTime);
     }
 
-    for (CallStatistics ocallStats : ocallStatistics)
+    /*for (CallStatistics ocallStats : ocallStatistics)
     {
         if(ocallStats.count_ != 0)
         {
@@ -645,6 +640,18 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
             ocallStatistics[ocallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.99);
             ocallStatistics[ocallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.95);
             ocallStatistics[ocallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.90);
+        }
+    }*/
+    for (int i = 0; i < ocallStatistics.size() ; ++i)
+    {
+        if (ocallStatistics[i].count_ != 0)
+        {
+            int id = ocallStatistics[i].callId_;
+            ocallStatistics[i].median_ = median(medianTotalTimeListMap[id]);
+            ocallStatistics[i].standardDeviation_ = standardDeviation(medianTotalTimeListMap[id],ocallStatistics[i].callAvg_);
+            ocallStatistics[i]._99thPercentile_ = percentile(medianTotalTimeListMap[id],0.99);
+            ocallStatistics[i]._95thPercentile_ = percentile(medianTotalTimeListMap[id],0.95);
+            ocallStatistics[i]._90thPercentile_ = percentile(medianTotalTimeListMap[id],0.90);
         }
     }
 
@@ -867,4 +874,13 @@ void moe::SgxDatabaseStructure::loadOCallDynamicAnalysis()
     {
         l.value().generateAnalysisText();
     }
+}
+
+bool moe::SgxDatabaseStructure::isInOCallList(int id) {
+    for(CallStatistics ocallStats : ocallStatistics)
+    {
+        if(ocallStats.callId_ == id)
+            return true;
+    }
+    return false;
 }

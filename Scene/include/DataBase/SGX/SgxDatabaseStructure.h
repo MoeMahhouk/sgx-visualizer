@@ -98,6 +98,7 @@ namespace moe {
         void loadOCallTypeList();
         void loadExistingEnclaves();
         int searchThreadIndex(int threadId);
+        bool isInOCallList(int id);
         QString getInvolvedThreads();
 
         QMap<int, OCallDynamicAnalysis> ocallDynamicAnalysis; //ToDo rewrite this later to take tupels as key for id and eid

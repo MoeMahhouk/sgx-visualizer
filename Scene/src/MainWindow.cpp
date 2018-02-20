@@ -199,6 +199,7 @@ void MainWindow::addZoomAndScrollOptions(QToolBar *toolbar)
     auto scrollLabel = new QLabel("Scroll Options: ");
     toolbar->addWidget(scrollLabel);
 
+
     auto* scrollLeft = new QPushButton(tr("Scroll Left <-"), toolbar);
     scrollLeft->connect(scrollLeft,SIGNAL(clicked()), this, SLOT(scrollLeftPressed()));
     scrollLeft->setShortcut(QKeySequence::MoveToPreviousChar);

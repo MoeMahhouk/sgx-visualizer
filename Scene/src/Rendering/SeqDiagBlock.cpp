@@ -64,7 +64,7 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     topLevelItem()->setZValue(10.0);
     setZValue(11);
     mouseOver_->setBrush(Qt::lightGray);
-    mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
+    mouseOver_->setPos(this->boundingRect().right(), event->pos().y());
 
     auto callName = new QGraphicsTextItem(mouseOver_);
     callName->setDefaultTextColor(Qt::black);
@@ -129,12 +129,16 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     }
 
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());
-    mouseOver_->setRect(-5,-5, maxWidth + 15, yOffset + (15 * ++rowCount));
-    //scene()->update();
-    /*std::cerr << "we are here boooooooooyz mouse Pos : " << event->pos().y() << " mouse Over coordination is y : " << mouseOver_->pos().y() << "  x:" << mouseOver_->pos().x()<< std::endl;
+    mouseOver_->setRect(0,0, maxWidth + 15, yOffset + (15 * ++rowCount));
 
-    std::cerr << "this object coordinations x" << this->boundingRect().x() << std::endl;
-    std::cerr << "this object coordinations y" << this->boundingRect().y() << std::endl;*/
+    //std::cerr << "mouseover top right x is "<< mouseOver_->rect().right() << std::endl;
+    //std::cerr << "this top right x is "<< this->boundingRect().right() << std::endl;
+    //std::cerr << "scene width is "<< scene()->sceneRect().topRight().x() << std::endl;
+
+    if(this->boundingRect().right() + mouseOver_->rect().topRight().x() > scene()->sceneRect().width())
+    {
+        mouseOver_->setPos(this->boundingRect().left()-maxWidth - 15,event->pos().y());
+    }
 }
 
 void moe::SeqDiagBlock::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
@@ -142,7 +146,12 @@ void moe::SeqDiagBlock::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     if (mouseOver_ == nullptr)
         return;
 
-    mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
+    if(this->boundingRect().right() + mouseOver_->rect().topRight().x() > scene()->sceneRect().width())
+    {
+        mouseOver_->setPos(this->boundingRect().left()- mouseOver_->rect().width(),event->pos().y());
+    } else {
+        mouseOver_->setPos(this->boundingRect().right(), event->pos().y());
+    }
 }
 
 void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)

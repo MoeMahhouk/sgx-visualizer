@@ -105,7 +105,7 @@ void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) 
     topLevelItem()->setZValue(10.0);
     setZValue(11);
     mouseOver_->setBrush(Qt::lightGray);
-    mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
+    mouseOver_->setPos(this->boundingRect().right(), event->pos().y());
 
     auto callName = new QGraphicsTextItem(mouseOver_);
     callName->setDefaultTextColor(Qt::black);
@@ -120,10 +120,7 @@ void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) 
         enclaveInfo->setY(callName->boundingRect().bottomLeft().y());
         rowCount++;
         elementWidths.push_back(enclaveInfo->boundingRect().right());
-    } /*else {
-        enclaveInfo->setDefaultTextColor(Qt::black);
-        enclaveInfo->setHtml("EnclaveID/Name : <b> NaN / OCall Cluster </b>");
-    }*/
+    }
 
     auto clusterTotalTime = new QGraphicsTextItem(mouseOver_);
     clusterTotalTime->setDefaultTextColor(Qt::black);
@@ -161,7 +158,7 @@ void moe::SeqDiagBlockCluster::hoverEnterEvent(QGraphicsSceneHoverEvent *event) 
     }
 
     qreal maxWidth = *std::max_element(elementWidths.begin(),elementWidths.end());
-    mouseOver_->setRect(-5,-5, maxWidth + 15, yOffset + (15 * ++rowCount));
+    mouseOver_->setRect(0,0, maxWidth + 15, yOffset + (15 * ++rowCount));
     //return;
 }
 

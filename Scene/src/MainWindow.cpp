@@ -169,7 +169,7 @@ void MainWindow::generateGraphicsView()
     scene_ = new QGraphicsScene(this);
     view_ = new QGraphicsView(scene_,this);
     view_->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    //view_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view_->setMouseTracking(true);
     view_->setInteractive(true);
     view_->setFrameStyle(0);

@@ -47,7 +47,7 @@ add_compile_options(
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} src/Utility/TimeStamp.cpp include/Utility/TimeStamp.h src/Rendering/GridLine.cpp include/Rendering/GridLine.h)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} src/Utility/TimeStamp.cpp include/Utility/TimeStamp.h src/Rendering/GridLine.cpp include/Rendering/GridLine.h src/Utility/TimeTableWidgetItem.cpp include/Utility/TimeTableWidgetItem.h)
 
 #use the widgets/Sql module from Qt 5
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql Qt5::PrintSupport)

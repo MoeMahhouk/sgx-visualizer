@@ -43,6 +43,7 @@ void MainWindow::open()
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
 
+    statusBar()->showMessage("Scale : "  + QString::number(yScale_,'f', 2));
     const qreal MEASURELINE_OFFSET = 50;
     QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;
 
@@ -278,7 +279,16 @@ void MainWindow::resizeEvent(QResizeEvent* event)
         qreal oldYscale = yScale_;
         qreal oldXoffset = sequenceListNode_->getTransform().getX();
         resetPressed();
-        measureLine_->setPixel_line_depth_(this->height()*0.75);
+        if(measureLine_)
+        {
+            sceneRootNode_->children_.removeAll(measureLine_);
+            unRegisterObersver(measureLine_);
+            delete measureLine_;
+        }
+        measureLine_ = new moe::MeasureLine(moe::Transform2D(1,0,0,1,scene_->sceneRect().x()+5,50),db->getProgramTotalTime(),this->height() * 0.75, 40);
+        registerObserver(measureLine_);
+        sceneRootNode_->children_.push_back(measureLine_);
+        //measureLine_->setPixel_line_depth_(this->height()*0.75);
         factor_ = (this->height()*0.75)/db->getProgramTotalTime();
         clearSequenceListNode();
         scene_->clear();
@@ -307,6 +317,7 @@ void MainWindow::loadFile(const QString& fileName)
         //std::thread t1(&MainWindow::updateTraces,this);
         //t1.join();
         updateTraces();
+        setWindowTitle(fileName);
     }
 }
 

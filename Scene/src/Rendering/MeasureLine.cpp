@@ -111,16 +111,4 @@ int moe::MeasureLine::getNumOfScaleLines() const {
     return measureLines_.size();
 }
 
-/*void moe::MeasureLine::paintGrid()
-{
-    QPainter painter;
-    QPen pen;
-    pen.setColor(Qt::black);
-    pen.setStyle(Qt::DotLine);
-    painter.setPen(pen);
-    for (int i = 0; i < std::ceil(getNumOfScaleLines()/5.0) ; ++i)
-    {
 
-    }
-}
-*/

@@ -25,7 +25,7 @@ namespace moe  {
         {
 
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
-                                                        , 50, total_time_*factor, new QPen(Qt::blue),
+                                                        , 50, total_time_*factor, isFail_ ? new QPen(Qt::red) : new QPen(Qt::blue),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_  << std::endl;

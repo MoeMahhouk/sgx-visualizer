@@ -20,7 +20,7 @@ namespace moe {
 
         void addBlock(SeqDiagBlock *innerBlock);
 
-        const int size() const;
+        int size() const;
 
         bool checkClusterCriteria(Renderable *innerBlock);
 

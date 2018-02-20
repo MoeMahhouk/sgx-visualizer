@@ -137,6 +137,14 @@ void moe::SeqDiagBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     std::cerr << "this object coordinations y" << this->boundingRect().y() << std::endl;*/
 }
 
+void moe::SeqDiagBlock::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    if (mouseOver_ == nullptr)
+        return;
+
+    mouseOver_->setPos(this->boundingRect().right() + 5, event->pos().y());
+}
+
 void moe::SeqDiagBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
    // if(!rect->isVisible()) {
@@ -175,8 +183,9 @@ void moe::SeqDiagBlock::removeFromScene(SceneData& sceneData)
     if (mouseOver_)
     {
         mouseOver_->hide();
-        delete mouseOver_;
+        auto temp = mouseOver_;
         mouseOver_ = nullptr;
+        delete temp;
     }
     if(isInScene)
     {
@@ -209,8 +218,9 @@ void moe::SeqDiagBlock::addToScene(SceneData& sceneData)
     {
         std::cerr << "we are here now and mouseover should be hidden "<< std::endl;
         mouseOver_->hide();
-        delete mouseOver_;
+        auto temp = mouseOver_;
         mouseOver_ = nullptr;
+        delete temp;
     }
     if(!isInScene)
     {
@@ -236,7 +246,8 @@ void moe::SeqDiagBlock::hideMouseOverAfterRenderUpdate() {
     if(mouseOver_){
         mouseOver_->hide();
         scene()->removeItem(mouseOver_);
-        delete mouseOver_;
+        auto temp = mouseOver_;
         mouseOver_ = nullptr;
+        delete temp;
     }
 }

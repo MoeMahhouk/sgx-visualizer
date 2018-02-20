@@ -26,7 +26,7 @@ namespace moe {
         virtual SeqDiagBlock* toRenderable(qreal factor) const override //ToDo added factor for test purposes
         {
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
-                                                        , 50, total_time_*factor, new QPen(Qt::gray),
+                                                        , 50, total_time_*factor, isFail_? new QPen(Qt::red) : new QPen(Qt::yellow),
                                                        isFail_? new QBrush(Qt::red) : new QBrush(Qt::yellow));
             //std::cerr << "OCALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
             callBlock->initializeStats(callInfo);

@@ -83,8 +83,15 @@ namespace moe {
             drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
-        virtual void removeFromScene(SceneData &sceneData) {}
-        virtual void addToScene(SceneData &sceneData) {}
+        virtual void removeFromScene(SceneData &sceneData)
+        {
+	        (void)sceneData;
+        }
+
+        virtual void addToScene(SceneData &sceneData)
+        {
+	        (void)sceneData;
+        }
 
     protected:
 
@@ -107,9 +114,17 @@ namespace moe {
 
     protected:
 
-        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform) {}
+        virtual void initializeRenderable(SceneData &sceneData, Transform2D &parentTransform)
+        {
+            (void)sceneData;
+            (void)parentTransform;
+        }
 
-        virtual void draw(SceneData &sceneData, Transform2D &parentTransform) {}
+        virtual void draw(SceneData &sceneData, Transform2D &parentTransform)
+        {
+            (void)sceneData;
+            (void)parentTransform;
+        }
 
     public:
 

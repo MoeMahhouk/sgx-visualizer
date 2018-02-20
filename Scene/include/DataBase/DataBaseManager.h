@@ -15,7 +15,10 @@ namespace moe {
 
     public:
 
-        DataBaseManager(const QString& path = "newDataBaseCreated"){}
+        DataBaseManager(const QString& path = "newDataBaseCreated")
+        {
+            (void)path;
+        }
 
         virtual ~DataBaseManager() = default;
 

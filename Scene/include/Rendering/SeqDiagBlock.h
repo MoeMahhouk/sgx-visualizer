@@ -43,6 +43,8 @@ namespace moe {
 
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
+        void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+
         virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 
         void hideMouseOverAfterRenderUpdate();

@@ -30,7 +30,7 @@ namespace moe {
 
 		void setPixel_line_depth_(int pixel_line_depth_);
 
-		const int getNumOfScaleLines()const;
+		int getNumOfScaleLines()const;
 
 	protected:
 
@@ -41,9 +41,9 @@ namespace moe {
 	private:
 		virtual void onNotify(Event* event) override;
         //void paintGrid();
-		Line measureLine_;
 		int pixel_line_depth_ = 0;
 		uint64_t total_timeline_ = 0;
+	    Line measureLine_;
         QVector<MeasureScaleLine*> measureLines_ = QVector<MeasureScaleLine*>(0);
         QVector<Line *> gridLines_;
     };

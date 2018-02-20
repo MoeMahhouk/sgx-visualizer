@@ -80,6 +80,7 @@ void moe::MeasureLine::onNotify(Event* event)
         updateScales(scroll->yScale_, -scroll->yOffset_);
     } else if (ResetEvent *reset = dynamic_cast<ResetEvent*>(event))
     {
+        (void)reset;
         updateScales(1,0);
     }
 }
@@ -106,7 +107,7 @@ void moe::MeasureLine::initializeRenderable(moe::SceneData &sceneData, moe::Tran
     return;
 }
 
-const int moe::MeasureLine::getNumOfScaleLines() const {
+int moe::MeasureLine::getNumOfScaleLines() const {
     return measureLines_.size();
 }
 

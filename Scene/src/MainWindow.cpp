@@ -412,6 +412,7 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
  */
 void MainWindow::verticalZoom(qreal yScale, qreal factor)
 {
+	(void)factor;
     //qreal oldYOffset = yOffset_;
     for (moe::Renderable* r: sequenceListNode_->children_)
     {

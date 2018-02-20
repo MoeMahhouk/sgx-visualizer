@@ -25,7 +25,7 @@ namespace moe  {
         {
 
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
-                                                        , 50, total_time_*factor, new QPen(Qt::green),
+                                                        , 50, total_time_*factor, isFail_ ? new QPen(Qt::red) : new QPen(Qt::blue),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
             //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_  << std::endl;
@@ -33,12 +33,13 @@ namespace moe  {
             //std::cerr << " ECALL totaltime mulitplicated with factor (height) : " << (total_time_ * factor)  << std::endl;
             //SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow));
             callBlock->initializeStats(callInfo);
+
             if (children_.size() > 1)
             {
-                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow));
+                SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow, Qt::Dense3Pattern));
                 callBlock->addBlock(clusterTest);
                 QVector<SeqDiagBlockCluster *> subClusterList;
-                subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow)));
+                subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow, Qt::Dense3Pattern)));
 
                 for (Call *call : children_)
                 {
@@ -48,7 +49,7 @@ namespace moe  {
                     {
                         subClusterList.back()->addBlock(childRenderable);
                     } else {
-                        subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow)));
+                        subClusterList.push_back(new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::gray), new QBrush(Qt::darkYellow, Qt::Dense3Pattern)));
                         subClusterList.back()->addBlock(childRenderable);
                     }
                 }

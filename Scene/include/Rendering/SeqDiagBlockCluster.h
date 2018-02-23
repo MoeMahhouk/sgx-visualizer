@@ -22,6 +22,21 @@ namespace moe {
 
         int size() const;
 
+        qreal smallestChildHeight()
+        {
+            qreal min = INT_MAX;
+            std::for_each(lineOffset_->children_.begin(), lineOffset_->children_.end(), [&min](Renderable *r)
+            {
+                auto s = dynamic_cast<Rect *>(r);
+                if (s == nullptr)
+                    return;
+                auto c = s->boundingRect().height();
+                if (c < min)
+                    min = c;
+            });
+            return min;
+        }
+
         bool checkClusterCriteria(Renderable *innerBlock);
 
 

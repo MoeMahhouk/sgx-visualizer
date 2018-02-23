@@ -55,7 +55,9 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
     hideMouseOverAfterRenderUpdate();
     updateRectTranform();
     if ((rect->rect().height() / (this->size()+1)) < 15.0)
+    //if (smallestChildHeight() < 15)
     {
+        // wir zeigen den cluster an
         if(!isClustered)
         {
 
@@ -72,7 +74,7 @@ void moe::SeqDiagBlockCluster::draw(moe::SceneData &data, moe::Transform2D &pare
         }
         checkInSceneBorders(data);
     } else {
-
+        // wir zeigen die kinder an
         if(isInScene)
         {
             hideInScene(data);
@@ -173,5 +175,6 @@ int moe::SeqDiagBlockCluster::size() const
 {
     return lineOffset_->children_.size();
 }
+
 
 

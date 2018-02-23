@@ -126,7 +126,7 @@ uint64_t moe::SgxDatabaseStructure::getThreadStartTime(int index) {
 void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
     uint64_t pthread_id,start_address, start_address_normalized, start_symbol, start_time, total_time;
 
-    std::string name, start_symbol_file_name; // ToDo add start symbol name and start address normalized and start symbol
+    QString name = "", start_symbol_file_name; // ToDo add start symbol name and start address normalized and start symbol
     int id;
     //int ecallNumbers = getEcallsNumberOfThreadAtIndex(index); //ToDo causes problems when added (should be fixed later)
 
@@ -162,9 +162,9 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
         id = query.value(0).toInt();
         pthread_id = (uint64_t) query.value(1).toDouble();
         start_address = (uint64_t) query.value(2).toDouble();
-        name = query.value(3).toString().toStdString();
+        name += query.value(3).toString();
         start_symbol = (uint64_t) query.value(4).toDouble();
-        start_symbol_file_name = query.value(5).toString().toStdString();
+        start_symbol_file_name = query.value(5).toString();
         start_address_normalized = (uint64_t) query.value(6).toDouble();
         threads_.push_back(MyThread(id, pthread_id, start_address, start_address_normalized, start_symbol,
                                     start_time, total_time, name, start_symbol_file_name));

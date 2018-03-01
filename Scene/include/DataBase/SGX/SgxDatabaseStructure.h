@@ -98,6 +98,7 @@ namespace moe {
         void loadOCallTypeList();
         void loadExistingEnclaves();
         int searchThreadIndex(int threadId);
+        void loadAexTimes(int ecallId, uint64_t ecallStartTime);
         bool isInOCallList(int id);
         QString getInvolvedThreads();
 

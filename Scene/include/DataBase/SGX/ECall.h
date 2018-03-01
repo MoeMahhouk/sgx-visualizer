@@ -26,14 +26,11 @@ namespace moe  {
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)
                                                         , 50, total_time_*factor, isFail_ ? new QPen(Qt::red) : new QPen(Qt::blue),
                                                        isFail_ ? new QBrush(Qt::red) : new QBrush(Qt::blue));
-            if(callInfo.aex > 0) {
-                callBlock->addBlock(new Line(Transform2D(1,0,0,1,-5,0),60,0,3,new QPen(QColor( 0xFF, 0xA0, 0x00 ))));
+            for (int i = 0; i < callInfo.aexTimes.size(); ++i)
+            {
+                qreal aexYOffset = callInfo.aexTimes[i];
+                callBlock->addBlock(new Line(Transform2D(1,0,0,1,-5,aexYOffset * factor),60,0,3,new QPen(QColor( 0xFF, 0xA0, 0x00 ))));
             }
-            //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_ * factor << std::endl;
-            //std::cerr << " ECALL position mulitplicated with factor : " << relative_start_time_  << std::endl;
-            //std::cerr << " ECALL position mulitplicated with factor : " << (relative_start_time_ + total_time_)  << std::endl;
-            //std::cerr << " ECALL totaltime mulitplicated with factor (height) : " << (total_time_ * factor)  << std::endl;
-            //SeqDiagBlockCluster *clusterTest = new SeqDiagBlockCluster(Transform2D(),0,0,new QPen(Qt::green), new QBrush(Qt::yellow));
             callBlock->initializeStats(callInfo);
 
             if (children_.size() > 1)

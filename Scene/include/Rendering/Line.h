@@ -18,6 +18,10 @@ namespace moe {
             //delete line_; //ToDo QGraphicsLineItem has no constructor
         }
 
+        void removeFromScene(SceneData &sceneData) override;
+
+        void addToScene(SceneData &sceneData) override;
+
 
         qreal yTarget() const;
         void setYTarget(const qreal &lineDepth);

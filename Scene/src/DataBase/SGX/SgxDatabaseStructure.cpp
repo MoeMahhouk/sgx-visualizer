@@ -144,7 +144,7 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
             " FROM threads AS t JOIN events AS e1  ON t.id = e1.involved_thread "
             "WHERE e1.type = 3";
 
-    std::cerr<< queryString.toStdString() << std::endl;
+    //std::cerr<< queryString.toStdString() << std::endl;
     if (!conditionQuery.isEmpty())
     {
         queryString.append(conditionQuery);
@@ -264,7 +264,8 @@ void moe::SgxDatabaseStructure::initializeECallsAndOCalls(QString conditionQuery
                     callHoverInfoMap[id].callName += symbol_name;
                     callHoverInfoMap[id].enclaveId += eid;
                     callHoverInfoMap[id].aex = aex;
-                    callHoverInfoMap[id].enclaveBinaryName += enclavesList[eid];
+                    aex > 0 ? loadAexTimes(id, start_time) : void();
+                    callHoverInfoMap[id].enclaveBinaryName = enclavesList[eid];
                     callHoverInfoMap[id].status = isFail;
                     eCall->callInfo = callHoverInfoMap[id];
 
@@ -876,11 +877,30 @@ void moe::SgxDatabaseStructure::loadOCallDynamicAnalysis()
     }
 }
 
-bool moe::SgxDatabaseStructure::isInOCallList(int id) {
+bool moe::SgxDatabaseStructure::isInOCallList(int id)
+{
     for(CallStatistics ocallStats : ocallStatistics)
     {
         if(ocallStats.callId_ == id)
             return true;
     }
     return false;
+}
+
+void moe::SgxDatabaseStructure::loadAexTimes(int ecallId, uint64_t ecallStartTime)
+{
+    uint64_t progStartTime = getProgramStartTime();
+    QSqlQuery query;
+    QString queryString = "SELECT time from events where type = 18 and call_event = ";
+    queryString.append( QString::number(ecallId));
+    //query.prepare("SELECT time from events where type = 18 and call_event = (:call_event)");
+    //query.bindValue("call_event", QString::number(ecallId));
+    query.prepare(queryString);
+    if (!execAndCheckQuery(query))
+        return;
+    while (query.next())
+    {
+        uint64_t relativeAexStartTime = (uint64_t) query.value(0).toDouble() - (progStartTime + ecallStartTime);
+        callHoverInfoMap[ecallId].aexTimes.push_back(relativeAexStartTime);
+    }
 }

@@ -138,7 +138,7 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
      */
     total_time = getProgramTotalTime(); // ToDo another query according the thread destruction event
     QSqlQuery query;
-    QString queryString = "SELECT t.id, t.pthread_id, t.start_address, t.name, IFNULL(t.start_symbol,0),"
+    QString queryString = "SELECT t.id, t.pthread_id, t.start_address, IFNULL(t.name,\"\"), IFNULL(t.start_symbol,0),"
             " IFNULL(t.start_symbol_file_name, \"\"),"
             " IFNULL(t.start_address_normalized,0), e1.time AS start_time"
             " FROM threads AS t JOIN events AS e1  ON t.id = e1.involved_thread "
@@ -162,7 +162,7 @@ void moe::SgxDatabaseStructure::initializeThreads(QString conditionQuery) {
         id = query.value(0).toInt();
         pthread_id = (uint64_t) query.value(1).toDouble();
         start_address = (uint64_t) query.value(2).toDouble();
-        name += query.value(3).toString();
+        name = query.value(3).toString();
         start_symbol = (uint64_t) query.value(4).toDouble();
         start_symbol_file_name = query.value(5).toString();
         start_address_normalized = (uint64_t) query.value(6).toDouble();

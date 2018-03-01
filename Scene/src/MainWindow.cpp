@@ -180,7 +180,7 @@ void MainWindow::generateGraphicsView()
     sceneRootNode_ = new moe::EmptyRenderable();
     sequenceListNode_ = new moe::EmptyRenderable();
     std::cout << "MainWindow 1" << std::endl;
-    sceneRootNode_->children_.push_back(sequenceListNode_);
+   // sceneRootNode_->children_.push_back(sequenceListNode_);
     layout->addWidget(view_);
     viewArea_->setLayout(layout);
     viewArea_->show();
@@ -923,6 +923,7 @@ void MainWindow::updateTraces() {
     if(measureLine_)
     {
         sceneRootNode_->children_.removeAll(measureLine_);
+        sceneRootNode_->children_.removeAll(sequenceListNode_);
         unRegisterObersver(measureLine_);
         delete measureLine_;
     }
@@ -934,6 +935,7 @@ void MainWindow::updateTraces() {
     scaleLineStep = db->getProgramTotalTime()/measureLine_->getNumOfScaleLines();
     registerObserver(measureLine_);
     sceneRootNode_->children_.push_back(measureLine_);
+    sceneRootNode_->children_.push_back(sequenceListNode_);
     generateThreadList();
     generateECallList();
     generateOCallList();

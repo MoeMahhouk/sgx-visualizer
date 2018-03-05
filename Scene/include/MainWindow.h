@@ -57,6 +57,7 @@ private:
     moe::MeasureLine *measureLine_ = 0;
 
     moe::Transform2D sceneTransformation = moe::Transform2D(1,0,0,1,0,0);
+    bool checkEmptyThreads();
     void visualizeThreads(const QVector<moe::MyThread> threads, qreal factor = 1);
     void createMenus();
     void createStatusBar();

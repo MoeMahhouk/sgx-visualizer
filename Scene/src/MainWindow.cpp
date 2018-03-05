@@ -75,6 +75,8 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 
 void MainWindow::resetPressed()
 {
+    if(sequenceListNode_->children_.isEmpty())
+        return;
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
@@ -337,7 +339,7 @@ void MainWindow::loadFile(const QString& fileName)
 void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor)
 {
     //ToDo ask nico if the other threads should still out of the list or not
-    int counter = 0;
+    /*int counter = 0;
     for (int i = 0; i < threads.length() ; ++i)
     {
         if(!threads[i].threadEcalls_.isEmpty()) {
@@ -346,6 +348,13 @@ void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal fa
             sequenceListNode_->children_.push_back(thread);
             counter++;
         }
+    }*/
+
+    for (int i = 0; i < threads.length() ; ++i)
+    {
+        moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
+        thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (135 * (i + 1)), 30));
+        sequenceListNode_->children_.push_back(thread);
     }
 }
 
@@ -360,7 +369,6 @@ void MainWindow::scrollToNextEvent(const QVector<moe::MyThread> threads, qreal f
         return;
 
     qreal currentTime = (yOffset_ * moe::signum(yOffset_)) / yScale_/1000;
-    //uint64_t currentTime =(uint64_t) ((yOffset_ * moe::signum(yOffset_)) / yScale_);
     qreal new_yOffset = 0;
     QVector<uint64_t> nextEventStartTime;
 
@@ -431,7 +439,6 @@ void MainWindow::verticalScroll(qreal yOffset, qreal factor)
 void MainWindow::verticalZoom(qreal yScale, qreal factor)
 {
 	(void)factor;
-    //qreal oldYOffset = yOffset_;
     for (moe::Renderable* r: sequenceListNode_->children_)
     {
         moe::SequenceDiagram *s = static_cast<moe::SequenceDiagram*>(r);
@@ -440,8 +447,7 @@ void MainWindow::verticalZoom(qreal yScale, qreal factor)
     yScale_ *= yScale;
     moe::ZoomEvent e = {yScale_, yOffset_};
     notify(&e);
-    //scrollTo(oldYOffset * yScale, factor_);
-    //render();
+
 }
 
 void MainWindow::scrollTo(qreal yOffset, qreal factor)
@@ -451,7 +457,6 @@ void MainWindow::scrollTo(qreal yOffset, qreal factor)
     yOffset_ = yOffset;     // so that, it jumps to the target location and doesnt added the targets location to the current offset
     moe::ScrollEvent e = {yScale_, yOffset_};
     notify(&e);
-    //render();
 }
 
 /**
@@ -462,14 +467,15 @@ void MainWindow::zoomAndScrollTofirstEvent()
 {
     if(db && !db->getThreads_().isEmpty())
     {
+        const QVector<moe::MyThread> &threadList = db->getThreads_();
         bool threadsChildrenEmpty = true;
         qreal yScaleNew;
         qreal startTimeOfFirstEvent;
-        for (int j = 0; j < db->getThreads_().size(); ++j)
+        for (int j = 0; j < threadList.size(); ++j)
         {
-            if (!db->getThreads_()[j].threadEcalls_.isEmpty())
+            if (!threadList[j].threadEcalls_.isEmpty())
             {
-                startTimeOfFirstEvent = db->getThreads_()[j].threadEcalls_[0]->start_time_;
+                startTimeOfFirstEvent = threadList[j].threadEcalls_[0]->start_time_;
                 threadsChildrenEmpty = false;
                 break;
             }
@@ -483,14 +489,14 @@ void MainWindow::zoomAndScrollTofirstEvent()
         qreal startTimeOfLastEvent;
         qreal endTimeOfLastEvent;
         qreal endTimeOfLongestEcall = 0;
-        for (int i = 0; i < db->getThreads_().size(); ++i)
+        for (int i = 0; i < threadList.size(); ++i)
         {
-            if (!db->getThreads_()[i].threadEcalls_.isEmpty())
+            if (!threadList[i].threadEcalls_.isEmpty())
             {
-                lastEcallIndex = db->getThreads_()[i].threadEcalls_.length() - 1;
+                lastEcallIndex = threadList[i].threadEcalls_.length() - 1;
                 lastEcallIndex = lastEcallIndex < 0 ? 0 : lastEcallIndex;
-                startTimeOfLastEvent = db->getThreads_()[i].threadEcalls_[lastEcallIndex]->start_time_;
-                endTimeOfLastEvent = startTimeOfLastEvent + db->getThreads_()[i].threadEcalls_[lastEcallIndex]->total_time_;
+                startTimeOfLastEvent = threadList[i].threadEcalls_[lastEcallIndex]->start_time_;
+                endTimeOfLastEvent = startTimeOfLastEvent + threadList[i].threadEcalls_[lastEcallIndex]->total_time_;
                 if (endTimeOfLongestEcall < endTimeOfLastEvent)
                 {
                     endTimeOfLongestEcall = endTimeOfLastEvent;
@@ -577,10 +583,11 @@ void MainWindow::generateThreadList()
     threadList_->clear();
     if(db)
     {
-        for (int i = 0; i <db->getThreads_().size() ; ++i)
+        const QVector<moe::MyThread> &threadList = db->getThreads_();
+        for (int i = 0; i < threadList.size() ; ++i)
         {
-            QString threadItemName = "Thread ";
-            threadItemName.append(QString::number(i));
+            QString threadItemName = "";
+            threadList[i].name_.isEmpty() ? threadItemName.append("Thread " + QString::number(i)) : threadItemName.append(threadList[i].name_);
             auto *threadItem = new QListWidgetItem(threadItemName, threadList_);
             threadItem->setFlags(threadItem->flags() | Qt::ItemIsUserCheckable);
             threadItem->setCheckState(db->getThreads_()[i].threadEcalls_.isEmpty() ? Qt::Unchecked :Qt::Checked); //ToDo here we checked out the empty threads
@@ -940,11 +947,17 @@ void MainWindow::updateTraces() {
     generateECallList();
     generateOCallList();
     generateEncalveList();
-    visualizeThreads(db->getThreads_(), factor_);
-    moe::SceneData data{scene_};
-    sceneRootNode_->initialize(data, sceneTransformation);
-    zoomAndScrollTofirstEvent();
-    render();
+    if(checkEmptyThreads())
+    {
+        applyFilter();
+    } else {
+        visualizeThreads(db->getThreads_(), factor_);
+        moe::SceneData data{scene_};
+        sceneRootNode_->initialize(data, sceneTransformation);
+        zoomAndScrollTofirstEvent();
+        render();
+    }
+
 
 }
 
@@ -1211,4 +1224,18 @@ void MainWindow::generateCallStaticAnalysis()
     } else {
         analysisDialig_->show();
     }
+}
+
+bool MainWindow::checkEmptyThreads()
+{
+    if(db)
+    {
+        const QVector<moe::MyThread> & threadList = db->getThreads_();
+        for (int i = 0; i < threadList.size() ; ++i)
+        {
+            if(threadList[i].threadEcalls_.isEmpty())
+                return true;
+        }
+    }
+    return false;
 }

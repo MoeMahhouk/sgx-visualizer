@@ -319,7 +319,10 @@ void MainWindow::loadFile(const QString& fileName)
         if (db) {
             delete db;
         }
+
+        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         db = new moe::SgxDatabaseStructure(fileName);
+
         loadCallStatistics->setEnabled(true);
         loadCallStaticAnalysis_->setEnabled(true);
         //QThread thread1(this) ;
@@ -328,6 +331,11 @@ void MainWindow::loadFile(const QString& fileName)
         //t1.join();
         updateTraces();
         setWindowTitle(fileName);
+        std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count();
+
+        std::cerr << duration << std::endl;
     }
 }
 

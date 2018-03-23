@@ -9,6 +9,9 @@
 
 namespace moe {
 
+    /**
+     * Clusters block class for the sequence diagram blocks
+     */
     class SeqDiagBlockCluster : public SeqDiagBlock{
 
     public:

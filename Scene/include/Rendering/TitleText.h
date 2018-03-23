@@ -9,6 +9,10 @@
 #include "Renderable.h"
 
 namespace moe {
+
+    /**
+     * Title text class adds visual text into the scene
+     */
     class TitleText : public Renderable {
 
     public:

@@ -12,6 +12,9 @@
 #include "ECall.h"
 
 namespace moe {
+    /**
+     * data structure for the threads
+     */
     struct MyThread {
         int id_;
         uint64_t pthread_id_, start_address_, start_address_normalized_, start_symbol_, start_time_, total_time_;
@@ -35,6 +38,12 @@ namespace moe {
             this->threadEcalls_.clear();
         }
 
+        /**
+         * translates the thread object into a rendered object in an iterative process through all its children ecall/ocall events
+         * and initialises potential clusters
+         * @param factor
+         * @return
+         */
         SequenceDiagram *toRenderable(qreal factor) const
         {
             QString threadName = "";

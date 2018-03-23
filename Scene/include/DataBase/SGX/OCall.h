@@ -10,6 +10,9 @@
 
 namespace moe {
 
+    /**
+     * data structure for ocall events
+     */
     struct OCall : public Call{
 
         uint64_t symbol_address_normalized_;
@@ -23,6 +26,11 @@ namespace moe {
         {
         }
 
+        /**
+         * translates ocall objects into a rendered object in an iterative process through all its children ecall events
+         * @param factor
+         * @return
+         */
         virtual SeqDiagBlock* toRenderable(qreal factor) const override //ToDo added factor for test purposes
         {
             SeqDiagBlock *callBlock = new SeqDiagBlock(Transform2D(1, 0, 0, 1, 0, relative_start_time_*factor)

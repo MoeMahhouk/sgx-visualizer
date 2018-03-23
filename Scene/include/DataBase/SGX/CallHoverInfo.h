@@ -9,7 +9,9 @@
 #include <QtCore/QString>
 
 namespace moe {
-
+    /**
+     * data structure for the hover information of ecalls and ocalls
+     */
     struct CallHoverInfo {
         int childrenCounter = 0;
         uint64_t childrenTotalRuntime = 0;

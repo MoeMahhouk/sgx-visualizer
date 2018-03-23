@@ -10,7 +10,9 @@
 #include "IReciever.h"
 
 namespace moe {
-
+    /**
+     * abstract filter class for the command pattern
+     */
     class IFilter {
 
     public:
@@ -22,8 +24,15 @@ namespace moe {
             // delete dReciever_;//ToDO this is causing problems because it deletes the db and produce free error (ask nico for help politly :) )
         };
 
+        /**
+         * translates the executed filter command into a string for the sql query
+         * @return
+         */
         virtual QString toSQLStatement() = 0;
 
+        /**
+         * executes the generated sql statement
+         */
         virtual void execute() = 0;
 
     protected:

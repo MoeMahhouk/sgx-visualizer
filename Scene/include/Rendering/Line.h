@@ -5,7 +5,9 @@
 #include <QGraphicsLineItem>
 
 namespace moe {
-
+    /**
+     * Line class that draws lines into the scene
+     */
     class Line : public Renderable {
 
     public :

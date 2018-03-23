@@ -10,7 +10,9 @@
 
 
 namespace moe {
-
+    /**
+     * abstract class for other databases than sgx
+     */
     class DataBaseManager {
 
     public:

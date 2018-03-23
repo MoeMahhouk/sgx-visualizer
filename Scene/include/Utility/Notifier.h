@@ -11,14 +11,25 @@
 
 namespace moe
 {
+    /**
+     * Notifier class for the observer pattern
+     */
     class Notifier
     {
     public:
+        /**
+         * adds the observer object to the observers list
+         * @param observer
+         */
         virtual void registerObserver(Observer* observer)
         {
             observers_.insert(observer);
         }
 
+        /**
+         * deletes observer from the list of observers
+         * @param observer
+         */
         virtual void unRegisterObersver(Observer* observer)
         {
             QSet<Observer*>::iterator iter = observers_.find(observer);
@@ -31,6 +42,10 @@ namespace moe
         }
 
     protected:
+        /**
+         * notifies all observers from the list to execute the proper actions
+         * @param event
+         */
         virtual void notify(Event* event)
         {
             std::for_each(observers_.begin(),observers_.end(), [&](Observer* observer) {observer->onNotify(event);});

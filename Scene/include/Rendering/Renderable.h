@@ -8,6 +8,9 @@
 #include "Transform2D.h"
 
 namespace moe {
+    /**
+     * data structure contains the graphics view framwork scenes information
+     */
     struct SceneData {
         QGraphicsScene* scene;
         std::string indent = "";
@@ -15,6 +18,9 @@ namespace moe {
         SceneData(QGraphicsScene* scene) : scene(scene) {}
     };
 
+    /**
+     * abstract class that represents the scene graph used for the rendering process
+     */
     class Renderable {
 
     public:
@@ -56,6 +62,12 @@ namespace moe {
             relativeTransform_ = transform;
         }
 
+        /**
+         * initialises the rendered object and adds them into the scene
+         * it iterates through all children and intitialises them recursively too
+         * @param sceneData
+         * @param parentTransform
+         */
         void initialize(SceneData& sceneData, Transform2D &parentTransform)
         {
             absoluteTransform_ =  relativeTransform_ * parentTransform;
@@ -74,6 +86,11 @@ namespace moe {
             //sceneData.indent = myIndent;
         }
 
+        /**
+         * updates the transformation matrix of each rendered object relatively to its parent and renders it on the scene
+         * @param sceneData
+         * @param parentTransform
+         */
         void render(SceneData& sceneData, Transform2D &parentTransform)
         {
             absoluteTransform_ =  relativeTransform_ * parentTransform;
@@ -83,21 +100,44 @@ namespace moe {
             drawChildren(sceneData);
             //std::cout << myIndent << "done" << std::endl;
         }
+
+        /**
+         * remove the rendered object from the scene without deleting its pointer
+         * @param sceneData
+         */
         virtual void removeFromScene(SceneData &sceneData)
         {
 	        (void)sceneData;
         }
 
+        /**
+         * adds a removed rendering object into the scene again
+         * @param sceneData
+         */
         virtual void addToScene(SceneData &sceneData)
         {
 	        (void)sceneData;
         }
 
     protected:
-
+        /**
+         * Initialises the renderable relatively to its parent transformation matrix
+         * @param sceneData
+         * @param parentTransform
+         */
         virtual void initializeRenderable(SceneData& sceneData, Transform2D &parentTransform) = 0;
 
+        /**
+         * updates and draws the renderables relatively to their parents transformation matrix
+         * @param sceneData
+         * @param parentTransform
+         */
         virtual void draw(SceneData &sceneData, Transform2D &parentTransform) = 0;
+
+        /**
+         * iterates through the children of the renderable and applies the render method on them
+         * @param sceneData
+         */
         virtual void drawChildren(SceneData& sceneData) {
             for(Renderable* child: children_) {
                 // std::cout << myIndent << "child: " << child->name << " " << child << std::endl;
@@ -109,7 +149,9 @@ namespace moe {
         Transform2D absoluteTransform_;
 
     };
-
+    /**
+     * generates empty without shape rendering object that work as place holders
+     */
     class EmptyRenderable : public Renderable {
 
     protected:

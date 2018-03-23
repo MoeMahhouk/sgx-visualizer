@@ -9,7 +9,9 @@
 #include <QtCore/QVector>
 
 namespace moe {
-
+    /**
+     *  abstract data structure for ecalls and ocalls
+     */
     struct Call {
 
         int id_, eid_;
@@ -37,8 +39,12 @@ namespace moe {
             }
             this->children_.clear();
         }
-
-        virtual SeqDiagBlock* toRenderable(qreal factor) const = 0; //ToDo added factor for test purposes
+        /**
+         * transfers the Call object to a rendering object including its hover stats infos
+         * @param factor
+         * @return
+         */
+        virtual SeqDiagBlock* toRenderable(qreal factor) const = 0;
     };
 
     /*struct CallCluster : public Call {

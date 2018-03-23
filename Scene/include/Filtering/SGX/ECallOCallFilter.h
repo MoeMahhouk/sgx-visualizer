@@ -9,7 +9,9 @@
 #include <Filtering/IFilter.h>
 
 namespace moe {
-
+    /**
+     * Ecall ocall filter class
+     */
     class ECallOCallFilter : public IFilter {
 
     public:

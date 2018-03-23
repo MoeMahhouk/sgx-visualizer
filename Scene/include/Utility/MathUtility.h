@@ -10,6 +10,9 @@
 #include <QString>
 #include <QVector>
 
+/**
+ * this is a gathering of global math functions
+ */
 namespace moe {
 
 
@@ -19,6 +22,13 @@ namespace moe {
         QString timeWithUnit_ = "";
     };
 
+    /**
+     * returns the signum of the given number
+     * @tparam T
+     * @param x
+     * @param is_signed
+     * @return
+     */
     template <typename T> inline constexpr
     int signum(T x, std::false_type is_signed)
     {
@@ -37,18 +47,35 @@ namespace moe {
         return signum(x, std::is_signed<T>());
     }
 
+    /**
+     * checks if the given number is int or not
+     * @tparam T
+     * @param x
+     * @return
+     */
     template <typename T> inline constexpr
     bool isInteger(T x)
     {
         return floorf(x) == x;
     }
 
+    /**
+     * computes the median of the sorted list
+     * @param sortedTotalTimeList
+     * @return
+     */
     inline double median(QVector<uint64_t > sortedTotalTimeList)
     {
         int listSize = sortedTotalTimeList.size();
         return listSize % 2 == 0 ? (sortedTotalTimeList[(listSize / 2) - 1] + sortedTotalTimeList[listSize/2]) / 2.0 : sortedTotalTimeList[(listSize-1) / 2];
     }
 
+    /**
+     * calculates the variant of the given list and average
+     * @param sortedTotaltimeList
+     * @param average
+     * @return
+     */
     inline double varianz(QVector<uint64_t> sortedTotaltimeList, qreal average)
     {
         int listSize = sortedTotaltimeList.length();
@@ -60,11 +87,23 @@ namespace moe {
         return (varianz / (double)listSize);
     }
 
+    /**
+     * calculates the standard deviation of the given list using the given average
+     * @param sortedTotaltimeList
+     * @param average
+     * @return
+     */
     inline double standardDeviation(QVector<uint64_t> sortedTotaltimeList, qreal average)
     {
         return sqrt(varianz(sortedTotaltimeList,average));
     }
 
+    /**
+     * computes the desired percentile of the given list
+     * @param sortedTotaltimeList
+     * @param percent
+     * @return
+     */
     inline double percentile(QVector<uint64_t> sortedTotaltimeList, qreal percent)
     {
         int listSize = sortedTotaltimeList.size();
@@ -72,6 +111,12 @@ namespace moe {
         return isInteger(result) ? (sortedTotaltimeList[result - 1] + sortedTotaltimeList[result]) / 2 : sortedTotaltimeList[ceilf(result) - 1];
     }
 
+    /**
+     * convert the time from ns into the nearest time unit
+     * @param time
+     * @param decimal
+     * @return
+     */
     inline QString checkTimeUnit(qreal time,int decimal = 2)
     {
         if (time == 0) {

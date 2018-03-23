@@ -57,7 +57,7 @@ namespace moe {
         {
             varianz += pow(totalTimeElement - average, 2);
         }
-        return varianz / listSize;
+        return (varianz / (double)listSize);
     }
 
     inline double standardDeviation(QVector<uint64_t> sortedTotaltimeList, qreal average)

@@ -152,7 +152,6 @@ private:
      * end of test
      */
     QAction *openAction_;
-
 };
 
 #endif // MainWindow_H

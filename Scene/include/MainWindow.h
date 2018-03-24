@@ -293,9 +293,6 @@ private:
     QWidget *filterControls_;
     QAction *openAction_;
 
-    qreal totalDura = 0;
-    QVector<uint64_t> timeList;
-    qreal cntr = 0;
 };
 
 #endif // MainWindow_H

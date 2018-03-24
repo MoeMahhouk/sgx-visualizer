@@ -9,16 +9,23 @@
 #include <QtCore/QString>
 
 namespace moe {
-
+    /**
+     * abstract class for the static analysis of ecalls and ocalls
+     */
     struct CallStaticAnalysis {
         int callId_, eid_ , totalCount_, totalOfLowerThanMicroSeconds_, totalOflowerThan10MicroSeconds_;
         QString callName_;
         QString analysisText_;
         bool warning = false;
-
+        /**
+         * generates the static analysis text based on the analysed data
+         */
         virtual void generateAnalysisText() = 0;
     };
 
+    /**
+     * static analysis class for ecalls
+     */
     struct ECallStaticAnalysis : public CallStaticAnalysis {
         bool shouldBePrivate_;
 
@@ -60,8 +67,10 @@ namespace moe {
         }
     };
 
-    //ToDo later for warning massages in red (but first we should change the CallStaticAnalysis to abstract class and reimplement the generate method)
     //ToDo ask nico if ecalls needs to be tested for under 1µs and10 µs
+    /**
+     * static analysis class for ocalls
+     */
     struct OCallStaticAnalysis : public CallStaticAnalysis {
 
         virtual void generateAnalysisText()
@@ -77,7 +86,7 @@ namespace moe {
                 //ToDo ask nico what are the proper percent to show a warning
                 underOneMicroPercent > 15 ? text.append(" ( Warning ) \n")  : text.append("\n");
                 underOneMicroPercent > 15 ? warning = true : warning = false;
-                //ToDo ad here later a check for the synchro ocalls to add a proper warning to change them to spin locks for later :)
+                //ToDo add here a check for the synchro ocalls to add a proper warning to change them to spin locks for later :)
             }
             if(totalOflowerThan10MicroSeconds_ > totalOfLowerThanMicroSeconds_)
             {

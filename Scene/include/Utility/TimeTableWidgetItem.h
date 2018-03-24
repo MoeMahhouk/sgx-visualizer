@@ -8,6 +8,9 @@
 #include <QtWidgets/QTableWidgetItem>
 #include "Utility/MathUtility.h"
 namespace moe {
+    /**
+     * extended QTableWidgetItem in order to sort the time entries in the tables not as strings but as real time integers
+     */
     class TimeTableWidgetItem : public QTableWidgetItem {
 
     public:

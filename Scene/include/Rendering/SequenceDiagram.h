@@ -11,7 +11,9 @@
 #include "LabeledBlock.h"
 
 namespace moe{
-
+    /**
+     * Sequence diagram class that initialises a sequence diagram with a line into the scene
+     */
     class SequenceDiagram : public Renderable {
     public:
 

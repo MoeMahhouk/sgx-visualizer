@@ -10,7 +10,10 @@
 #include "Utility/Observer.h"
 
 namespace moe {
-
+	/**
+	 * Measure Line class generates the measure line at the left of the scene and is part of the observer pattern
+	 * such that each navigation operationg is executed, it get notified
+	 */
     class MeasureLine : public Renderable, public Observer {
 
     public:

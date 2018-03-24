@@ -8,7 +8,9 @@
 #include <QtCore/QString>
 
 namespace moe {
-    //ToDo is not currently used because these are in hexadecimal and the ones in the data bank are already converted to decimal numbers
+    /**
+     * original mapping of all sgx error events
+     */
     enum SGXErrorCodes {
         SGX_SUCCESS                                              = 0,
         SGX_ERROR_UNEXPECTED                                     = 1,

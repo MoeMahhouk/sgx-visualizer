@@ -10,9 +10,12 @@
 #include <QtCore/QMap>
 
 namespace moe {
+    /**
+     * abstract class for the dynamic analysis of ecalls and ocalls
+     */
     struct CallDynamicAnalysis {
         //ToDo refine this with the eid for later traces
-        int callId_,eid_,counter_ = 0; //ToDo added the counter to check later the successorsId counter percent from this calls total count and evently give better analysis
+        int callId_,eid_,counter_ = 0;
         QString callName_, analysisText_;
         QMap<int,int> sucessorId_Counter_Map_;
         QMap<int,int> predecessoreId_Counter_Map_; //ToDo remove this later if it appears to be useless
@@ -38,10 +41,16 @@ namespace moe {
             }
         }
 
+        /**
+         * generates the analysis text based on the analysed data
+         */
         virtual void generateAnalysisText() = 0;
 
     protected:
-
+        /**
+         * checks if there is some kind of pattern as a predecessor
+         * @return string containing the found pattern or empty in case no pattern was found
+         */
         QString checkForSuccessorPattern()
         {
             QString successorsIDs = "";
@@ -57,6 +66,10 @@ namespace moe {
             return successorsIDs;
         }
 
+        /**
+        * checks if there is some kind of pattern as a successor
+        * @return string containing the found pattern or empty in case no pattern was found
+        */
         QString checkForPredessorPattern()
         {
             QString predecessorsIDs = "";
@@ -69,12 +82,20 @@ namespace moe {
             return predecessorsIDs;
         }
 
+        /**
+         * calculates the pattern's occurrence percentage
+         * @param neighbourCount
+         * @return
+         */
         float patternPercentage(int neighbourCount)
         {
             return ((float)neighbourCount/(float)counter_) * 100;
         }
     };
 
+    /**
+     * Dynamic analysis class for ecalls
+     */
     struct ECallDynamicAnalysis : public CallDynamicAnalysis {
 
         virtual void generateAnalysisText()
@@ -102,6 +123,9 @@ namespace moe {
         }
     };
 
+    /**
+     * Dynamic analysis class for ocalls
+     */
     struct OCallDynamicAnalysis : public CallDynamicAnalysis {
 
         virtual void generateAnalysisText()

@@ -10,7 +10,9 @@
 #include "TitleText.h"
 
 namespace moe {
-
+    /**
+     * Measure Scale Line class generates the mini scale lines placed on the main measure line on the scene
+     */
     class MeasureScaleLine : public Renderable {
     public:
         MeasureScaleLine(Transform2D transform = Transform2D(), qreal yPos = 0, qreal xTarget = 0, const QString &title_ = "");

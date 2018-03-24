@@ -9,7 +9,9 @@
 #include <Filtering/IFilter.h>
 
 namespace moe {
-
+    /**
+     * thread filter class
+     */
     class ThreadFilter : public IFilter {
 
     public:

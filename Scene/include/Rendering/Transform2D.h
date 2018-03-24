@@ -6,6 +6,10 @@
 
 
 namespace moe {
+
+    /**
+     * The transformation matrix class that is responsible for translating, scaling, rotation and shear operations
+     */
     class Transform2D : public QTransform {
         //static const Transform2D NORM_TRANSFORM = Transform2D(0, 0, 1, 1);
     public:

@@ -9,6 +9,9 @@
 #include <QtCore/QString>
 
 namespace moe {
+    /**
+     * data structure for the distince ecall/ocall types
+     */
     struct CallTypes {
         int id_, eid_;
         uint64_t symbol_address_;

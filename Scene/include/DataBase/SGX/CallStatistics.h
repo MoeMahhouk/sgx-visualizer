@@ -9,7 +9,9 @@
 #include <QtCore/QString>
 
 namespace moe {
-
+    /**
+     * data structure for the ecall/ocall statistics
+     */
     struct CallStatistics {
         QString callSymbolName_;
         int callId_;

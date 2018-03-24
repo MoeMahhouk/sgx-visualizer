@@ -8,6 +8,9 @@
 #include <cstdint>
 
 namespace moe{
+    /**
+     * event map of the SGX trace
+     */
     enum class EventMap : std::int8_t {
         Event = 0,
         SignalEvent,

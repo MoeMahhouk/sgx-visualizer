@@ -9,7 +9,9 @@
 #include "Call.h"
 
 namespace moe  {
-
+    /**
+     * ecall event class
+     */
     struct ECall : public Call {
 
         bool is_private_;
@@ -20,6 +22,12 @@ namespace moe  {
         {
         }
 
+        /**
+         * translates the ecall event into a rendered object in an iterative process through its all children ocall events
+         * and initialises potential clusters
+         * @param factor
+         * @return
+         */
         virtual SeqDiagBlock* toRenderable(qreal factor) const override //ToDo added factor for test purposes
         {
 

@@ -14,7 +14,9 @@
 
 namespace moe {
 
-
+    /**
+     * extends the rectangle class and adds sequence diagram blocks into the scene
+     */
     class SeqDiagBlock : public Rect {
 
     public:
@@ -24,8 +26,16 @@ namespace moe {
 
         virtual ~SeqDiagBlock();
 
+        /**
+         * adds renderable object to the renderable children
+         * @param innerBlock
+         */
         void addBlock(Renderable *innerBlock);
 
+        /**
+         * stores the hover information in case of hovering events
+         * @param callsInfos
+         */
         virtual void initializeStats(const CallHoverInfo &callsInfos);
 
         virtual QRectF boundingRect() const override;
@@ -38,15 +48,29 @@ namespace moe {
         const CallHoverInfo &getCallsInfos_() const;
 
     protected:
-
+        /**
+         * is triggered when hovering over the hitbox sequence diagram block
+         * @param event
+         */
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
 
+        /**
+         * is triggered when leaving the hitbox sequence diagram block
+         * @param event
+         */
         virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
+        /**
+          * is triggered when moving on the hitbox sequence diagram block
+          * @param event
+          */
         void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
         virtual void draw(SceneData &data, Transform2D &parentTransform) override;
 
+        /**
+         * removes the hover block info artifacts from the scene
+         */
         void hideMouseOverAfterRenderUpdate();
 
         CallHoverInfo callsInfos_;

@@ -1144,7 +1144,7 @@ void MainWindow::generateCallStaticAnalysis()
             eCallStaticAnalysisTable->setItem(i,1,textItem);
         }
         eCallStaticAnalysisTable->resizeRowsToContents();
-        eCallStaticAnalysisTable->resizeColumnsToContents();
+        //eCallStaticAnalysisTable->resizeColumnsToContents();
         eCallStaticAnalysisTable->horizontalHeader()->setStretchLastSection(true);
         eCallStaticAnalysisTable->verticalHeader()->setStretchLastSection(true);
         eCallStaticAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -1163,7 +1163,7 @@ void MainWindow::generateCallStaticAnalysis()
             oCallStaticAnalysisTable->setItem(j,1,textItem);
         }
         oCallStaticAnalysisTable->resizeRowsToContents();
-        oCallStaticAnalysisTable->resizeColumnsToContents();
+        //oCallStaticAnalysisTable->resizeColumnsToContents();
         oCallStaticAnalysisTable->horizontalHeader()->setStretchLastSection(true);
         oCallStaticAnalysisTable->verticalHeader()->setStretchLastSection(true);
         oCallStaticAnalysisTable->setEditTriggers(QAbstractItemView::NoEditTriggers);

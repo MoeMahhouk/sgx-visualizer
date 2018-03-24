@@ -8,7 +8,9 @@
 #include "SeqDiagBlock.h"
 
 namespace moe {
-
+    /**
+     * class for sequence diagram block with titles
+     */
     class LabeledBlock : public SeqDiagBlock {
     public:
         LabeledBlock(Transform2D transform = Transform2D(), qreal width=0, qreal height=0, QString title = "",

@@ -320,22 +320,12 @@ void MainWindow::loadFile(const QString& fileName)
             delete db;
         }
 
-        std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
         db = new moe::SgxDatabaseStructure(fileName);
 
         loadCallStatistics->setEnabled(true);
         loadCallStaticAnalysis_->setEnabled(true);
-        //QThread thread1(this) ;
-        //thread1.
-        //std::thread t1(&MainWindow::updateTraces,this);
-        //t1.join();
         updateTraces();
         setWindowTitle(fileName);
-        std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count();
-
-        std::cerr << duration << std::endl;
     }
 }
 
@@ -347,18 +337,6 @@ void MainWindow::loadFile(const QString& fileName)
  */
 void MainWindow::visualizeThreads(const QVector<moe::MyThread> threads, qreal factor)
 {
-    //ToDo ask nico if the other threads should still out of the list or not
-    /*int counter = 0;
-    for (int i = 0; i < threads.length() ; ++i)
-    {
-        if(!threads[i].threadEcalls_.isEmpty()) {
-            moe::SequenceDiagram* thread = threads[i].toRenderable(factor);
-            thread->setTransform(moe::Transform2D(1,0,0,1, scene_->sceneRect().x() + (135 * (counter + 1)), 30));
-            sequenceListNode_->children_.push_back(thread);
-            counter++;
-        }
-    }*/
-
     for (int i = 0; i < threads.length() ; ++i)
     {
         moe::SequenceDiagram* thread = threads[i].toRenderable(factor);

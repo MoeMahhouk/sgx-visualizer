@@ -246,16 +246,10 @@ private:
     QMenu *fileMenu_;
     QMenu *viewMenu_;
     QMenu *helpMenu_;
-    //QMenuBar *menuBar_;
     QToolBar *toolBar_;
     QDialog *analysisDialig_;
     QDialog *statisticsDialog_;
 
-
-    //QStatusBar *statusBar_;
-    /*
-     * test stuff
-     */
     QSet<int> chosenThreads;
     QSet<int> chosenEcalls;
     QSet<int> chosenOcalls;
@@ -274,10 +268,8 @@ private:
     bool updateTimeFilter();
     uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsOcallsEnclavesAndTimeline();
-    //void clearQList();
     QTableWidget *loadOCallStats();
     QTableWidget *loadECallStats();
-
 
     QLineEdit *startTimeFilter;
     QLineEdit *endTimeFilter;
@@ -299,11 +291,11 @@ private:
     QAction *timeFilterAction_;
     QAction *applyDockAction_;
     QWidget *filterControls_;
-
-    /*
-     * end of test
-     */
     QAction *openAction_;
+
+    qreal totalDura = 0;
+    QVector<uint64_t> timeList;
+    qreal cntr = 0;
 };
 
 #endif // MainWindow_H

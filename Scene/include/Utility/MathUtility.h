@@ -82,7 +82,7 @@ namespace moe {
         double varianz = 0;
         for (uint64_t totalTimeElement : sortedTotaltimeList)
         {
-            varianz += pow(totalTimeElement - average, 2);
+            varianz += pow((double)totalTimeElement - average, 2);
         }
         return (varianz / (double)listSize);
     }

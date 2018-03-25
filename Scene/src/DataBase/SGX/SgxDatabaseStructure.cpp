@@ -22,7 +22,7 @@ moe::SgxDatabaseStructure::SgxDatabaseStructure(const QString &path, const QStri
     initializeThreads();
     initializeECallsAndOCalls();
     loadECallDynamicAnalysis();
-    loadOCallDynamicAnalysis(); //TODO its only a test
+    loadOCallDynamicAnalysis();
 
 }
 

@@ -292,7 +292,6 @@ private:
     QAction *applyDockAction_;
     QWidget *filterControls_;
     QAction *openAction_;
-
 };
 
 #endif // MainWindow_H

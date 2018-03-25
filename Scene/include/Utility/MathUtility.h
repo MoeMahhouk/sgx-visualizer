@@ -76,7 +76,7 @@ namespace moe {
      * @param average
      * @return
      */
-    inline double varianz(QVector<uint64_t> sortedTotaltimeList, qreal average)
+    template <typename T> inline double varianz(QVector<T> sortedTotaltimeList, qreal average)
     {
         int listSize = sortedTotaltimeList.length();
         double varianz = 0;
@@ -93,7 +93,7 @@ namespace moe {
      * @param average
      * @return
      */
-    inline double standardDeviation(QVector<uint64_t> sortedTotaltimeList, qreal average)
+    template <typename T> inline double standardDeviation(QVector<T> sortedTotaltimeList, qreal average)
     {
         return sqrt(varianz(sortedTotaltimeList,average));
     }

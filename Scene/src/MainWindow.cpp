@@ -44,7 +44,6 @@ void MainWindow::open()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
-
     statusBar()->showMessage("Scale : "  + QString::number(yScale_,'f', 2));
     const qreal MEASURELINE_OFFSET = 50;
     QPointF mouseScenePos = view_->mapToScene(event->pos()) - (view_->mapFromScene(QPointF(0,MEASURELINE_OFFSET))*0.8) ;
@@ -68,7 +67,7 @@ void MainWindow::wheelEvent(QWheelEvent *event)
         } else if(event->modifiers() & Qt::AltModifier) {
             moe::signum(event->delta()) > 0 ? scrollRightPressed() : scrollLeftPressed();
         } else {
-            verticalScroll(moe::signum(event->delta())*40,factor_);
+            verticalScroll(moe::signum(event->delta())*30,factor_);
         }
     }
 }
@@ -321,7 +320,6 @@ void MainWindow::loadFile(const QString& fileName)
         }
 
         db = new moe::SgxDatabaseStructure(fileName);
-
         loadCallStatistics->setEnabled(true);
         loadCallStaticAnalysis_->setEnabled(true);
         updateTraces();
@@ -1211,6 +1209,7 @@ void MainWindow::generateCallStaticAnalysis()
     } else {
         analysisDialig_->show();
     }
+
 }
 
 bool MainWindow::checkEmptyThreads()

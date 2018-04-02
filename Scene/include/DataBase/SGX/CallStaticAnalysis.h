@@ -20,7 +20,7 @@ namespace moe {
         /**
          * generates the static analysis text based on the analysed data
          */
-        virtual void generateAnalysisText() = 0;
+        virtual void generateAnalysisText() {};
     };
 
     /**

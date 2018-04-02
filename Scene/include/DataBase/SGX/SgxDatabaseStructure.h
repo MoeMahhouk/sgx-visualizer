@@ -113,9 +113,9 @@ namespace moe {
 
         const QVector<CallStatistics> &getOcallStatistics() const;
 
-        const QVector<ECallStaticAnalysis> &getEcallStaticAnalysis() const;
+        const QVector<CallStaticAnalysis> &getEcallStaticAnalysis() const;
 
-        const QVector<OCallStaticAnalysis> &getOcallStaticAnalysis() const;
+        const QVector<CallStaticAnalysis> &getOcallStaticAnalysis() const;
 
         const QMap<int, ECallDynamicAnalysis> &getEcallDynamicAnalysis() const;
 
@@ -192,8 +192,8 @@ namespace moe {
         QMap<int, bool> directPublicEcalls;
         QVector<CallStatistics> ecallStatistics;
         QVector<CallStatistics> ocallStatistics;
-        QVector<ECallStaticAnalysis> ecallStaticAnalysis;
-        QVector<OCallStaticAnalysis> ocallStaticAnalysis;
+        QVector<CallStaticAnalysis> ecallStaticAnalysis;
+        QVector<CallStaticAnalysis> ocallStaticAnalysis;
         QSet<int> availableEcalls;
         QSet<int> availableOcalls;
         QMap<int, QString> enclavesList; //stores the pair eid and enclave name

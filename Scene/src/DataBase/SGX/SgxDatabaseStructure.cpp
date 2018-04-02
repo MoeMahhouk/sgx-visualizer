@@ -697,19 +697,21 @@ void moe::SgxDatabaseStructure::loadEcallAnalysis()
 
     while(loadECallAnalysisQuery.next())
     {
-        ECallStaticAnalysis eCallStaticAnalysis;
-        eCallStaticAnalysis.callId_ = loadECallAnalysisQuery.value(0).toInt();
-        eCallStaticAnalysis.callName_ = loadECallAnalysisQuery.value(1).toString();
-        eCallStaticAnalysis.totalCount_ = loadECallAnalysisQuery.value(2).toInt();
-        eCallStaticAnalysis.totalOfLowerThanMicroSeconds_ = loadECallAnalysisQuery.value(3).toInt();
-        eCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadECallAnalysisQuery.value(4).toInt();
-        ecallStaticAnalysis.push_back(eCallStaticAnalysis);
+        ECallStaticAnalysis eCallStaticAnalysisItem;
+        eCallStaticAnalysisItem.callId_ = loadECallAnalysisQuery.value(0).toInt();
+        eCallStaticAnalysisItem.callName_ = loadECallAnalysisQuery.value(1).toString();
+        eCallStaticAnalysisItem.totalCount_ = loadECallAnalysisQuery.value(2).toInt();
+        eCallStaticAnalysisItem.totalOfLowerThanMicroSeconds_ = loadECallAnalysisQuery.value(3).toInt();
+        eCallStaticAnalysisItem.totalOflowerThan10MicroSeconds_ = loadECallAnalysisQuery.value(4).toInt();
+        eCallStaticAnalysisItem.shouldBePrivate_ = !directPublicEcalls[loadECallAnalysisQuery.value(0).toInt()];
+        eCallStaticAnalysisItem.generateAnalysisText();
+        ecallStaticAnalysis.push_back(eCallStaticAnalysisItem);
     }
-    for (int i = 0; i < ecallStaticAnalysis.size() ; ++i)
+    /*for (int i = 0; i < ecallStaticAnalysis.size() ; ++i)
     {
         ecallStaticAnalysis[i].shouldBePrivate_ = !directPublicEcalls[ecallStaticAnalysis[i].callId_];
         ecallStaticAnalysis[i].generateAnalysisText();
-    }
+    }*/
 }
 
 void moe::SgxDatabaseStructure::loadOcallAnalysis()
@@ -753,21 +755,22 @@ void moe::SgxDatabaseStructure::loadOcallAnalysis()
         oCallStaticAnalysis.totalCount_ = loadOCallAnalysisQuery.value(2).toInt();
         oCallStaticAnalysis.totalOfLowerThanMicroSeconds_ = loadOCallAnalysisQuery.value(3).toInt();
         oCallStaticAnalysis.totalOflowerThan10MicroSeconds_ = loadOCallAnalysisQuery.value(4).toInt();
+        oCallStaticAnalysis.generateAnalysisText();
         ocallStaticAnalysis.push_back(oCallStaticAnalysis);
     }
 
-    for (int i = 0; i < ocallStaticAnalysis.size() ; ++i)
+    /*for (int i = 0; i < ocallStaticAnalysis.size() ; ++i)
     {
         ocallStaticAnalysis[i].generateAnalysisText();
-    }
+    }*/
 }
 
-const QVector<moe::ECallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStaticAnalysis() const
+const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getEcallStaticAnalysis() const
 {
     return ecallStaticAnalysis;
 }
 
-const QVector<moe::OCallStaticAnalysis> &moe::SgxDatabaseStructure::getOcallStaticAnalysis() const
+const QVector<moe::CallStaticAnalysis> &moe::SgxDatabaseStructure::getOcallStaticAnalysis() const
 {
     return ocallStaticAnalysis;
 }

@@ -22,10 +22,10 @@ find_package(Qt5 REQUIRED COMPONENTS
         )
 
 #take all .c files from src folder and add them to the SOURCE_FILE variable
-file(GLOB SOURCE_FILES src/*.cpp src/DataBase/*.cpp src/DataBase/SGX/*.cpp src/Rendering/*.cpp src/Filtering/SGX/*.cpp src/lib/*.cpp src/Utility/*.cpp)
+file(GLOB SOURCE_FILES src/*.cpp src/DataBase/SGX/*.cpp src/Rendering/*.cpp src/Filtering/SGX/*.cpp src/lib/*.cpp src/Utility/*.cpp src/CustomWidgets/SGX/*.cpp src/DataBase/*.cpp src/DataBase/SGX/*.cpp)
 
 #take all .h files from include folder and add them to the HEADER_FILES variable
-file(GLOB HEADER_FILES include/*.h include/DataBase/*.h include/DataBase/SGX/*.h include/Rendering/*.h include/Utility/*.h include/Filtering/*.h include/Filtering/SGX/*.h include/lib/*.h)
+file(GLOB HEADER_FILES include/*.h include/DataBase/*.h include/DataBase/SGX/*.h include/Rendering/*.h include/Utility/*.h include/Filtering/*.h include/Filtering/SGX/*.h include/lib/*.h include/CustomWidgets/IDialogWidget/*.h include/CustomWidgets/SGX/*.h)
 
 #set(LIB_DIR_LOCATION /usr/local/lib)
 #find_library(SQLite3 REQUIRED NAMES sqlite3 PATHS ${LIB_DIR_LOCATION})
@@ -47,7 +47,7 @@ add_compile_options(
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES} src/Utility/TimeStamp.cpp include/Utility/TimeStamp.h src/Rendering/GridLine.cpp include/Rendering/GridLine.h src/Utility/TimeTableWidgetItem.cpp include/Utility/TimeTableWidgetItem.h)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
 
 #use the widgets/Sql module from Qt 5
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Sql Qt5::PrintSupport)

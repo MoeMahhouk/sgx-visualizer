@@ -21,7 +21,7 @@ namespace moe {
 
         virtual ~IFilter()
         {
-            // delete dReciever_;//ToDO this is causing problems because it deletes the db and produce free error (ask nico for help politly :) )
+            // delete dReciever_;//ToDO this is causing problems because it deletes the db_ and produce free error (ask nico for help politly :) )
         };
 
         /**

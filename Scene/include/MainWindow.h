@@ -247,8 +247,8 @@ private:
     QMenu *viewMenu_;
     QMenu *helpMenu_;
     QToolBar *toolBar_;
-    QDialog *analysisDialig_;
-    QDialog *statisticsDialog_;
+    QDialog *analysisDialig_ = 0;
+    QDialog *statisticsDialog_ = 0;
 
     QSet<int> chosenThreads;
     QSet<int> chosenEcalls;
@@ -268,8 +268,6 @@ private:
     bool updateTimeFilter();
     uint64_t getTime(const QLineEdit &inputTime) const;
     void resetThreadsEcallsOcallsEnclavesAndTimeline();
-    QTableWidget *loadOCallStats();
-    QTableWidget *loadECallStats();
 
     QLineEdit *startTimeFilter;
     QLineEdit *endTimeFilter;

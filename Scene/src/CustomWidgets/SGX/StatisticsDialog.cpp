@@ -98,12 +98,15 @@ QTableWidget *moe::StatisticsDialog::loadECallStats()
         auto countItem = new QTableWidgetItem;
         countItem->setData(Qt::EditRole,eCallStatsList[i].count_);
         table->setItem(i,2, countItem);
-        table->setItem(i,3, new moe::TimeTableWidgetItem(eCallStatsList[i].callAvg_));
-        table->setItem(i,4, new moe::TimeTableWidgetItem(eCallStatsList[i].median_));
-        table->setItem(i,5, new moe::TimeTableWidgetItem(eCallStatsList[i].standardDeviation_));
-        table->setItem(i,6, new moe::TimeTableWidgetItem(eCallStatsList[i]._99thPercentile_));
-        table->setItem(i,7, new moe::TimeTableWidgetItem(eCallStatsList[i]._95thPercentile_));
-        table->setItem(i,8, new moe::TimeTableWidgetItem(eCallStatsList[i]._90thPercentile_));
+        if(eCallStatsList[i].count_ != 0)
+        {
+            table->setItem(i,3, new moe::TimeTableWidgetItem(eCallStatsList[i].callAvg_));
+            table->setItem(i,4, new moe::TimeTableWidgetItem(eCallStatsList[i].median_));
+            table->setItem(i,5, new moe::TimeTableWidgetItem(eCallStatsList[i].standardDeviation_));
+            table->setItem(i,6, new moe::TimeTableWidgetItem(eCallStatsList[i]._99thPercentile_));
+            table->setItem(i,7, new moe::TimeTableWidgetItem(eCallStatsList[i]._95thPercentile_));
+            table->setItem(i,8, new moe::TimeTableWidgetItem(eCallStatsList[i]._90thPercentile_));
+        }
     }
 
     table->resizeColumnsToContents();

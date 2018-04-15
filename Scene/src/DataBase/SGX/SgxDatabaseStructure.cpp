@@ -540,6 +540,22 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
         ecallStatistics.push_back(ecallStats);
     }
 
+    /*
+     * this step is to fill the ocalls that does not appear in the data bank event table
+     */
+    for (int i = 0; i < eCallTypeList.size() ; ++i)
+    {
+        if(!isInECallList(i))
+        {
+            CallStatistics ecallStats;
+            ecallStats.callId_ = i;
+            ecallStats.callSymbolName_ = eCallTypeList[i].symbol_name_;
+            ecallStats.count_ = 0;
+            ecallStatistics.insert(i,ecallStats);
+        }
+    }
+
+
     QMap<int, QVector<uint64_t >> medianTotalTimeListMap;
     int id;
     uint64_t totalTime;
@@ -561,11 +577,14 @@ void moe::SgxDatabaseStructure::loadEcallsStats()
 
     for (CallStatistics ecallStats : ecallStatistics)
     {
-        ecallStatistics[ecallStats.callId_].median_ = median(medianTotalTimeListMap[ecallStats.callId_]);
-        ecallStatistics[ecallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ecallStats.callId_],ecallStats.callAvg_);
-        ecallStatistics[ecallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.99);
-        ecallStatistics[ecallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.95);
-        ecallStatistics[ecallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.90);
+        if(ecallStats.count_ != 0)
+        {
+            ecallStatistics[ecallStats.callId_].median_ = median(medianTotalTimeListMap[ecallStats.callId_]);
+            ecallStatistics[ecallStats.callId_].standardDeviation_ = standardDeviation(medianTotalTimeListMap[ecallStats.callId_],ecallStats.callAvg_);
+            ecallStatistics[ecallStats.callId_]._99thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.99);
+            ecallStatistics[ecallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.95);
+            ecallStatistics[ecallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ecallStats.callId_],0.90);
+        }
     }
 
 }
@@ -632,7 +651,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
         medianTotalTimeListMap[id].push_back(totalTime);
     }
 
-    /*for (CallStatistics ocallStats : ocallStatistics)
+    for (CallStatistics ocallStats : ocallStatistics)
     {
         if(ocallStats.count_ != 0)
         {
@@ -642,8 +661,8 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
             ocallStatistics[ocallStats.callId_]._95thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.95);
             ocallStatistics[ocallStats.callId_]._90thPercentile_ = percentile(medianTotalTimeListMap[ocallStats.callId_],0.90);
         }
-    }*/
-    for (int i = 0; i < ocallStatistics.size() ; ++i)
+    }
+    /*for (int i = 0; i < ocallStatistics.size() ; ++i)
     {
         if (ocallStatistics[i].count_ != 0)
         {
@@ -654,7 +673,7 @@ void moe::SgxDatabaseStructure::loadOcallsStats()
             ocallStatistics[i]._95thPercentile_ = percentile(medianTotalTimeListMap[id],0.95);
             ocallStatistics[i]._90thPercentile_ = percentile(medianTotalTimeListMap[id],0.90);
         }
-    }
+    }*/
 
 
 
@@ -885,6 +904,15 @@ bool moe::SgxDatabaseStructure::isInOCallList(int id)
     for(CallStatistics ocallStats : ocallStatistics)
     {
         if(ocallStats.callId_ == id)
+            return true;
+    }
+    return false;
+}
+
+bool moe::SgxDatabaseStructure::isInECallList(int id) {
+    for(CallStatistics ecallStats : ecallStatistics)
+    {
+        if(ecallStats.callId_ == id)
             return true;
     }
     return false;

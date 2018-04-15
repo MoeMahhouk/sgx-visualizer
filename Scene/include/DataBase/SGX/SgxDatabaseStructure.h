@@ -182,6 +182,13 @@ namespace moe {
         bool isInOCallList(int id);
 
         /**
+         * checks if a specific ecall event already stored inside the ecall statistic list or not
+         * @param id
+         * @return
+         */
+        bool isInECallList(int id);
+
+        /**
          * iterates through all loaded threads
          * @return a string with the threads id in a query form
          */

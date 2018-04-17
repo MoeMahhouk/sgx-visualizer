@@ -36,7 +36,7 @@ namespace moe {
             QString text = "";
             if(totalOfLowerThanMicroSeconds_ > 0)
             {
-                underOneMicroPercent = ((qreal)totalOfLowerThanMicroSeconds_/(qreal)totalCount_) * 100;
+                underOneMicroPercent = ((qreal)totalOfLowerThanMicroSeconds_/(qreal)totalCount_) * 100.0;
                 text.append(QString::number(totalOfLowerThanMicroSeconds_) + " ( " + QString::number(underOneMicroPercent)
                             + " %) of this ecall's Total count ( " + QString::number(totalCount_) + " ) are under 1µs (micro second).");
                 //ToDo ask nico what are the proper percent to show a warning
@@ -46,7 +46,7 @@ namespace moe {
             }
             if(totalOflowerThan10MicroSeconds_ > totalOfLowerThanMicroSeconds_)
             {
-                underTenMicroPercent = ((qreal)totalOflowerThan10MicroSeconds_/(qreal)totalCount_) * 100;
+                underTenMicroPercent = ((qreal)totalOflowerThan10MicroSeconds_/(qreal)totalCount_) * 100.0;
                 text.append(QString::number(totalOflowerThan10MicroSeconds_) + " ( " + QString::number(underTenMicroPercent)
                             + " %) of this ecall's Total count ( " + QString::number(totalCount_) + " ) are under 10µs (micro seconds).");
                 underTenMicroPercent > 35 ? text.append(" ( Warning ) \n") : text.append("\n");

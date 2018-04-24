@@ -51,6 +51,11 @@ private slots:
     void open();
 
     /**
+     * triggered by pressing the open without visuals button to load the trace without visualising it (only for analysis purposes)
+     */
+    void openWithoutVisuals();
+
+    /**
      * executes the chosen filters by clicking the apply filter button
      */
     void applyFilter();
@@ -290,6 +295,7 @@ private:
     QAction *applyDockAction_;
     QWidget *filterControls_;
     QAction *openAction_;
+    QAction *openWithOutVisualisationAction_;
 };
 
 #endif // MainWindow_H

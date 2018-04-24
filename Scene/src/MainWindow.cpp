@@ -44,6 +44,27 @@ void MainWindow::open()
 }
 
 
+void MainWindow::openWithoutVisuals()
+{
+    QString fileName = QFileDialog::getOpenFileName(this);
+    if (!fileName.isEmpty() && fileName.contains(".db"))
+    {
+        if (db)
+        {
+            delete db;
+            delete analysisDialig_;
+            analysisDialig_ = 0;
+            delete statisticsDialog_;
+            statisticsDialog_ = 0;
+        }
+        db = new moe::SgxDatabaseStructure(fileName);
+        loadCallStatistics->setEnabled(true);
+        loadCallStaticAnalysis_->setEnabled(true);
+        setWindowTitle(fileName);
+
+    }
+}
+
 void MainWindow::wheelEvent(QWheelEvent *event)
 {//ToDo still buggy, does not recognize the real 0,0 coordination of the scene :/
     statusBar()->showMessage("Scale : "  + QString::number(yScale_,'f', 2));
@@ -117,6 +138,7 @@ void MainWindow::createMenus()
 {
     fileMenu_ = menuBar()->addMenu(tr("File"));
     fileMenu_->addAction(openAction_);
+    fileMenu_->addAction(openWithOutVisualisationAction_);
     auto load = new QMenu("Load",fileMenu_);
     fileMenu_->addMenu(load);
 
@@ -148,6 +170,11 @@ void MainWindow::createActions()
     openAction_->setShortcuts(QKeySequence::Open);
     openAction_->setStatusTip(tr("Open an existing executable"));
     connect(openAction_,SIGNAL(triggered()), this, SLOT(open()));
+
+    openWithOutVisualisationAction_ = new QAction(tr("Open w/o Visuals"), this);
+    openWithOutVisualisationAction_->setShortcut(tr("Ctrl+Shift+O"));
+    openWithOutVisualisationAction_->setStatusTip(tr("Open trace without visualistation (only for analysis purposes)"));
+    connect(openWithOutVisualisationAction_, SIGNAL(triggered()), this, SLOT(openWithoutVisuals()));
 
     loadCallStatistics = new QAction(tr("Statistics"),this);
     loadCallStatistics->setStatusTip(tr("Generate E/OCalls Statistics for the loaded trace"));
@@ -982,3 +1009,4 @@ bool MainWindow::checkEmptyThreads()
     }
     return false;
 }
+
